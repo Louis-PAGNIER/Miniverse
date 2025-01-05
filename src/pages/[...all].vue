@@ -10,7 +10,7 @@ import Player from "@/components/Player.vue";
     <TresPerspectiveCamera :position="[0, 8, 12]" :look-at="[0, 0, 0]"/>
 
     <Suspense>
-      <Player></Player>
+      <Player skin="/src/assets/louisleroisoleil.png"></Player>
     </Suspense>
 
     <TresAmbientLight :intensity="0.5"></TresAmbientLight>

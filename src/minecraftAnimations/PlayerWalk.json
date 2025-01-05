@@ -1,0 +1,21 @@
+{
+  "duration": 2,
+  "keyframes": {
+    "left-arm": [
+      { "time": 0, "rotation": [-0.5, 0, 0], "interpolation": "ease-in-out" },
+      { "time": 0.5, "rotation": [0.5, 0, 0], "interpolation": "ease-in-out" }
+    ],
+    "right-arm": [
+      { "time": 0, "rotation": [0.5, 0, 0], "interpolation": "ease-in-out" },
+      { "time": 0.5, "rotation": [-0.5, 0, 0], "interpolation": "ease-in-out" }
+    ],
+    "left-leg": [
+      { "time": 0, "rotation": [0.5, 0, 0], "interpolation": "ease-in-out" },
+      { "time": 0.5, "rotation": [-0.5, 0, 0], "interpolation": "ease-in-out" }
+    ],
+    "right-leg": [
+      { "time": 0, "rotation": [-0.5, 0, 0], "interpolation": "ease-in-out" },
+      { "time": 0.5, "rotation": [0.5, 0, 0], "interpolation": "ease-in-out" }
+    ]
+  }
+}

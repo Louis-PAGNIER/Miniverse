@@ -8,6 +8,11 @@ const props = defineProps({
   entityTexture: String,
   imageWidth: { type: Number, default: 64 },
   imageHeight: { type: Number, default: 32 },
+  position: { type: Array, default: () => [0, 0, 0]},
+  animation: {
+    type: Object,
+    required: false,
+  }
 });
 
 let materials = {};
@@ -67,7 +72,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TresGroup v-if="texturesLoaded">
-    <EntityPart :template="entityTemplate" :materials="materials" />
+  <TresGroup :position="position" v-if="texturesLoaded">
+    <EntityPart :template="entityTemplate" :materials="materials" :animation="animation"/>
   </TresGroup>
 </template>
