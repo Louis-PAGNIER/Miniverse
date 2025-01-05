@@ -1,0 +1,33 @@
+{
+  "duration": 10,
+  "offset": [0, -2.25, 0],
+  "keyframes": {
+    "body": [
+      { "time": 0, "rotation": [1.6, 0, 0], "interpolation": "ease-in-out" },
+      { "time": 0.33, "rotation": [1.5, 0, 0], "interpolation": "ease-in-out" },
+      { "time": 0.66, "rotation": [1.8, 0, 0], "interpolation": "ease-in-out" }
+    ],
+    "left-arm": [
+      { "time": 0, "rotation": [0.3, 0, 1.75], "interpolation": "ease-in-out" },
+      { "time": 0.5, "rotation": [-0.2, 0, 0.7], "interpolation": "ease-in-out" }
+    ],
+    "right-arm": [
+      { "time": 0, "rotation": [0, 0, -1.04], "interpolation": "linear" },
+      { "time": 0.3, "rotation": [0.3, 0, -1.8], "interpolation": "ease-in-out" },
+      { "time": 0.7, "rotation": [-0.2, 0, -0.8], "interpolation": "ease-in" }
+    ],
+    "left-leg": [
+      { "time": 0, "rotation": [0.1, 0, 1], "interpolation": "linear" },
+      { "time": 0.4, "rotation": [-0.1, 0, 0.2], "interpolation": "ease-in-out" },
+      { "time": 0.8, "rotation": [0.1, 0, 0.4], "interpolation": "ease-in-out" }
+    ],
+    "right-leg": [
+      { "time": 0, "rotation": [0.35, 0, -0.9], "interpolation": "ease-in-out" },
+      { "time": 0.6, "rotation": [0.45, 0, -0.1], "interpolation": "ease-in-out" }
+    ],
+    "head": [
+      { "time": 0, "rotation": [-0.7, -0.2, 0], "interpolation": "ease-in-out" },
+      { "time": 0.6, "rotation": [-0.6, 0.2, 0], "interpolation": "ease-in-out" }
+    ]
+  }
+}

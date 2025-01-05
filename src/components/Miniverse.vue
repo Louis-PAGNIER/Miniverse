@@ -1,21 +1,23 @@
 <script setup>
 import {TresCanvas, useRenderLoop} from "@tresjs/core";
-import { OrbitControls, Stars, MeshGlassMaterial, MeshWobbleMaterial, Sphere } from '@tresjs/cientos'
+import {OrbitControls, Stars} from '@tresjs/cientos'
 import {ref, shallowRef} from 'vue'
 import {MeshPhysicalMaterial, Vector2} from "three";
-import { extend } from '@tresjs/core'
+import {extend} from '@tresjs/core'
+import Player from "@/components/Player.vue";
+import floatAnimation from "@/assets/minecraftAnimations/PlayerFloat.json";
 
-extend({ MeshPhysicalMaterial })
+extend({MeshPhysicalMaterial})
 
-const blobRef = shallowRef(null)
-const isHovered = ref(false)
+const blobRef = shallowRef()
+const playerRef = shallowRef(null)
 const currentScale = ref(1)
 const targetScale = ref(1)
 
 const uniforms = {
-  uTime: { value: 0 },
-  uAmplitude: { value: new Vector2(0, 0.05) },
-  uFrequency: { value: new Vector2(20, 5) },
+  uTime: {value: 0},
+  uAmplitude: {value: new Vector2(0, 0.12)},
+  uFrequency: {value: new Vector2(10, 50)},
 }
 
 const vertexShader = `
@@ -41,38 +43,44 @@ precision mediump float;
 varying vec2 vUv;
 
 void main() {
-    gl_FragColor = vec4(0.5, vUv.y, 0.5, 0.5);
+    gl_FragColor = vec4(0.5, vUv.y, 0.5, 0.3);
 }
 `
 
-const { onLoop } = useRenderLoop()
+const {onLoop} = useRenderLoop()
 
-onLoop(({ delta, elapsed }) => {
+onLoop(({_, elapsed}) => {
   if (blobRef.value) {
     blobRef.value.material.uniforms.uTime.value = elapsed
 
-    currentScale.value += (targetScale.value - currentScale.value) * 0.1  // Adjust the speed here
+    currentScale.value += (targetScale.value - currentScale.value) * 0.1
     blobRef.value.scale.set(currentScale.value, currentScale.value, currentScale.value)
+  }
+
+  if (playerRef.value) {
+    playerRef.value.rotation.x = elapsed * 0.1
+    playerRef.value.rotation.y = elapsed * 0.05
+    playerRef.value.rotation.z = elapsed * 0.02
   }
 })
 
 const handleMouseEnter = () => {
-  targetScale.value = 1.2  // Target scale when hovered
+  targetScale.value = 1.2
   document.body.style.cursor = 'pointer'
 }
 
 const handleMouseLeave = () => {
-  targetScale.value = 1  // Target scale when not hovered
+  targetScale.value = 1
   document.body.style.cursor = 'default'
 }
 </script>
 
 <template>
   <TresCanvas window-size clear-color="black">
-    <Stars :size="0.4" />
+    <Stars :size="0.4"/>
 
     <TresPerspectiveCamera
-      :position="[3, 3, 3]" :look-at="[0, 0, 0]"
+        :position="[0, 0, 20]" :look-at="[0, 0, 0]"
     />
 
     <TresMesh
@@ -82,15 +90,20 @@ const handleMouseLeave = () => {
         @pointer-enter="handleMouseEnter"
         @pointer-leave="handleMouseLeave"
     >
-      <TresSphereGeometry :args="[1, 24, 24]" />
-      <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent depthWrite="false"/>
+      <TresSphereGeometry :args="[4, 24, 24]"/>
+      <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent
+                          depthWrite="false"/>
+
+      <TresGroup ref="playerRef">
+        <Player skin="/src/assets/louisleroisoleil.png" :animation="floatAnimation"></Player>
+      </TresGroup>
     </TresMesh>
 
-    <TresAmbientLight :intensity="0.1" />
+    <TresAmbientLight :intensity="0.5"/>
 
     <TresPointLight
         :position="[5, 5, 0]"
-        :intensity="10"
+        :intensity="50"
     />
 
     <OrbitControls/>

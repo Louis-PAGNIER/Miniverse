@@ -1,13 +1,19 @@
 <script setup>
-import { NearestFilter, TextureLoader } from "three";
-import { onMounted, ref } from "vue";
+import {NearestFilter, TextureLoader} from "three";
+import {onMounted, ref} from "vue";
 import EntityPart from "@/components/EntityPart.vue";
+import {addArray} from "@/math.js";
 
 const props = defineProps({
   entityTemplate: Object,
   entityTexture: String,
-  imageWidth: { type: Number, default: 64 },
-  imageHeight: { type: Number, default: 32 },
+  imageWidth: {type: Number, default: 64},
+  imageHeight: {type: Number, default: 32},
+  position: {type: Array, default: () => [0, 0, 0]},
+  animation: {
+    type: Object,
+    required: false,
+  }
 });
 
 let materials = {};
@@ -67,7 +73,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TresGroup v-if="texturesLoaded">
-    <EntityPart :template="entityTemplate" :materials="materials" />
+  <TresGroup :position="addArray(position, animation.offset ?? [0, 0, 0])" v-if="texturesLoaded">
+    <EntityPart :template="entityTemplate" :materials="materials" :animation="animation"/>
   </TresGroup>
 </template>
