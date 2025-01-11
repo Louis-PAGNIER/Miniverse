@@ -1,0 +1,109 @@
+<script setup>
+import {Vector2} from "three";
+import {shallowRef} from "vue";
+import {useRenderLoop} from "@tresjs/core";
+
+const {onLoop} = useRenderLoop()
+
+const uniforms = {
+  uTime: {value: 0},
+  uAmplitude: {value: new Vector2(0.14, 0.14)},
+  uFrequency: {value: new Vector2(7, 7)},
+}
+
+const currentScale = shallowRef(1)
+const targetScale = shallowRef(1)
+const blobRef = shallowRef()
+
+const vertexShader = `
+uniform vec2 uAmplitude;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vPosition;
+
+void main() {
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+    modelPosition.y += sin(modelPosition.x * uFrequency.x - uTime) * uAmplitude.x;
+    modelPosition.x += cos(modelPosition.y * uFrequency.y - uTime) * uAmplitude.y;
+
+    vec4 viewPosition = viewMatrix * modelPosition;
+    gl_Position = projectionMatrix * viewPosition;
+
+    vUv = uv;
+    vNormal = normalMatrix * normal; // Transform local normals to world space
+    vPosition = modelPosition.xyz;
+}
+`
+
+const fragmentShader = `
+precision mediump float;
+
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vPosition;
+
+void main() {
+    vec3 normal = normalize(vNormal);
+    vec3 viewDir = normalize(cameraPosition - vPosition);
+
+    vec3 lightDir = normalize(vec3(7.0, 3.0, 4.0)) * 5.0;
+    float diff = max(dot(normal, lightDir), 0.1); // Minimum d'éclairage pour éviter les zones trop sombres
+
+    float fresnel = pow(1.0 - abs(dot(viewDir, normal)), 2.0);
+
+    float gradient = smoothstep(0.25, 0.75, vUv.y);
+
+    vec3 color1 = vec3(0.5, 0.2, 0.8);
+    vec3 color2 = vec3(0.2, 0.8, 0.5);
+    vec3 baseColor = mix(color1, color2, gradient);
+
+    vec3 finalColor = baseColor * (0.5 + diff * 0.5) + vec3(fresnel * 0.2);
+
+    gl_FragColor = vec4(finalColor, 0.35);
+}
+`
+
+onLoop(({_, elapsed}) => {
+  if (blobRef.value) {
+    blobRef.value.material.uniforms.uTime.value = elapsed
+
+    currentScale.value += (targetScale.value - currentScale.value) * 0.1
+    blobRef.value.scale.set(currentScale.value, currentScale.value, currentScale.value)
+  }
+})
+
+const handleMouseEnter = () => {
+  targetScale.value = 1.2
+  document.body.style.cursor = 'pointer'
+}
+
+const handleMouseLeave = () => {
+  targetScale.value = 1
+  document.body.style.cursor = 'default'
+}
+
+</script>
+
+<template>
+  <TresMesh
+      :position="[0, 0, 0]"
+      :renderOrder="1"
+      ref="blobRef"
+      @pointer-enter="handleMouseEnter"
+      @pointer-leave="handleMouseLeave"
+  >
+
+    <TresSphereGeometry :args="[4, 12, 12]"/>
+    <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent/>
+
+    <slot></slot>
+
+  </TresMesh>
+</template>
+
+<style scoped>
+
+</style>
