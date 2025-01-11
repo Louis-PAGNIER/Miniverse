@@ -7,7 +7,7 @@ const {onLoop} = useRenderLoop()
 
 const uniforms = {
   uTime: {value: 0},
-  uAmplitude: {value: new Vector2(0.14, 0.14)},
+  uAmplitude: {value: new Vector2(0, 0.14)},
   uFrequency: {value: new Vector2(7, 7)},
 }
 
@@ -49,20 +49,23 @@ void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(cameraPosition - vPosition);
 
-    vec3 lightDir = normalize(vec3(7.0, 3.0, 4.0)) * 5.0;
-    float diff = max(dot(normal, lightDir), 0.1); // Minimum d'éclairage pour éviter les zones trop sombres
+    vec3 lightDir = normalize(vec3(5.0, 5.0, 0.0));
+    float diff = max(dot(normal, lightDir), 0.2); // Minimum pour éviter les ombres trop sombres
 
-    float fresnel = pow(1.0 - abs(dot(viewDir, normal)), 2.0);
+    float fresnel = pow(1.0 - dot(viewDir, normal), 2.5);
 
-    float gradient = smoothstep(0.25, 0.75, vUv.y);
+    float gradient = smoothstep(0.0, 1.0, vUv.y + fresnel * 0.4);
 
-    vec3 color1 = vec3(0.5, 0.2, 0.8);
-    vec3 color2 = vec3(0.2, 0.8, 0.5);
+    // Couleurs vibrantes ajustées (violet et vert)
+    vec3 color1 = vec3(0.6, 0.2, 1.0); // Violet avec une touche de douceur
+    vec3 color2 = vec3(0.2, 1.0, 0.6); // Vert légèrement atténué
     vec3 baseColor = mix(color1, color2, gradient);
 
-    vec3 finalColor = baseColor * (0.5 + diff * 0.5) + vec3(fresnel * 0.2);
+    // Combinaison des effets d'éclairage, Fresnel et couleur de base
+    vec3 lighting = baseColor * (0.4 + diff * 0.2) + vec3(fresnel * 1.1);
 
-    gl_FragColor = vec4(finalColor, 0.35);
+    // Transparence légèrement augmentée
+    gl_FragColor = vec4(lighting, 0.5);
 }
 `
 
@@ -96,7 +99,7 @@ const handleMouseLeave = () => {
       @pointer-leave="handleMouseLeave"
   >
 
-    <TresSphereGeometry :args="[4, 12, 12]"/>
+    <TresSphereGeometry :args="[4, 16, 16]"/>
     <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent/>
 
     <slot></slot>
