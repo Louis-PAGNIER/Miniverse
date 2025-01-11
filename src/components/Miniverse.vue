@@ -16,8 +16,8 @@ const targetScale = ref(1)
 
 const uniforms = {
   uTime: {value: 0},
-  uAmplitude: {value: new Vector2(0, 0.12)},
-  uFrequency: {value: new Vector2(10, 50)},
+  uAmplitude: {value: new Vector2(0.14, 0.14)},
+  uFrequency: {value: new Vector2(5, 5)},
 }
 
 const vertexShader = `
@@ -26,6 +26,8 @@ uniform vec2 uFrequency;
 uniform float uTime;
 
 varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vPosition;
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -34,16 +36,38 @@ void main() {
 
     vec4 viewPosition = viewMatrix * modelPosition;
     gl_Position = projectionMatrix * viewPosition;
+
     vUv = uv;
+    vNormal = normalMatrix * normal; // Transform local normals to world space
+    vPosition = modelPosition.xyz;
 }
 `
 
 const fragmentShader = `
 precision mediump float;
+
 varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vPosition;
 
 void main() {
-    gl_FragColor = vec4(0.5, vUv.y, 0.5, 0.3);
+    vec3 normal = normalize(vNormal);
+    vec3 viewDir = normalize(cameraPosition - vPosition);
+
+    vec3 lightDir = normalize(vec3(7.0, 3.0, 4.0)) * 5.0;
+    float diff = max(dot(normal, lightDir), 0.1); // Minimum d'éclairage pour éviter les zones trop sombres
+
+    float fresnel = pow(1.0 - abs(dot(viewDir, normal)), 2.0);
+
+    float gradient = smoothstep(0.25, 0.75, vUv.y);
+
+    vec3 color1 = vec3(0.5, 0.2, 0.8);
+    vec3 color2 = vec3(0.2, 0.8, 0.5);
+    vec3 baseColor = mix(color1, color2, gradient);
+
+    vec3 finalColor = baseColor * (0.5 + diff * 0.5) + vec3(fresnel * 0.2);
+
+    gl_FragColor = vec4(finalColor, 0.35);
 }
 `
 
@@ -90,7 +114,7 @@ const handleMouseLeave = () => {
         @pointer-enter="handleMouseEnter"
         @pointer-leave="handleMouseLeave"
     >
-      <TresSphereGeometry :args="[4, 24, 24]"/>
+      <TresSphereGeometry :args="[4, 12, 12]"/>
       <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent
                           depthWrite="false"/>
 
@@ -102,8 +126,8 @@ const handleMouseLeave = () => {
     <TresAmbientLight :intensity="0.5"/>
 
     <TresPointLight
-        :position="[5, 5, 0]"
-        :intensity="50"
+        :position="[5, 5, 2]"
+        :intensity="75"
     />
 
     <OrbitControls/>
