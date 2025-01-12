@@ -3,7 +3,7 @@ import Miniverse from "@/components/Miniverse.vue";
 </script>
 
 <template>
-  <Miniverse></Miniverse>
+  <Miniverse :usernames="['louisleroisoleil', 'Malix08', 'HelmDeepYT', 'Notch']"></Miniverse>
 </template>
 
 <style scoped>

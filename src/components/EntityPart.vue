@@ -22,7 +22,8 @@ const {onBeforeRender} = useLoop();
 
 onBeforeRender(({_, elapsed}) => {
   if (props.animation?.keyframes[props.template.id]) {
-    const time = (elapsed % props.animation.duration) / props.animation.duration;
+    const duration = props.animation.duration
+    const time = ((elapsed + props.animation.start * duration) % duration) / duration;
     const rot = interpolateRotation(time, props.animation.keyframes[props.template.id], animationIndex);
     Object.assign(partRef.value.rotation, {x: rot[0], y: rot[1], z: rot[2]});
   }

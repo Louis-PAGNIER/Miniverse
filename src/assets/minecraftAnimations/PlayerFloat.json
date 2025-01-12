@@ -1,6 +1,7 @@
 {
   "duration": 10,
   "offset": [0, -2.25, 0],
+  "start": 0,
   "keyframes": {
     "body": [
       { "time": 0, "rotation": [1.6, 0, 0], "interpolation": "ease-in-out" },
