@@ -1,48 +1,27 @@
 <script setup>
-import {TresCanvas, useRenderLoop} from "@tresjs/core";
-import {OrbitControls, Stars} from '@tresjs/cientos';
-import {onBeforeUpdate, ref, watch} from 'vue';
+import {useRenderLoop} from "@tresjs/core";
+import {onBeforeUpdate, ref, shallowRef, watch} from 'vue';
 import Player from "@/components/Player.vue";
 import floatAnimationTemplate from "@/assets/minecraftAnimations/PlayerFloat.json";
 import Blob from "@/components/Blob.vue";
+import {generateFibonacciSphere} from "@/math.js";
 
 const props = defineProps({
   usernames: {type: Array, required: true},
+  position: { type: Array, default: () => [0, 0, 0] }
 });
 
 const players = ref([]);
 const playerRefs = ref([]);
+const currentScale = shallowRef(1)
+const targetScale = shallowRef(1)
+const miniverseRef = shallowRef()
 
 onBeforeUpdate(() => {
   playerRefs.value = []
 })
 
-const setPlayersRef = (el, index) => {
-  playerRefs.value[index] = el
-}
-
-const generateFibonacciSphere = (numPoints, radius) => {
-  if (numPoints === 1) return [{x: 0, y: 0, z: 0}];
-  const positions = [];
-  const offset = 2 / numPoints;
-  const increment = Math.PI * (3 - Math.sqrt(5));
-
-  for (let i = 0; i < numPoints; i++) {
-    const y = i * offset - 1 + offset / 2;
-    const r = Math.sqrt(1 - y * y);
-    const phi = i * increment;
-
-    const x = Math.cos(phi) * r * radius;
-    const z = Math.sin(phi) * r * radius;
-
-    positions.push({x, y: y * radius, z});
-  }
-
-  return positions;
-};
-
-// Distribution des joueurs
-const distributePlayers = (usernames) => {
+function distributePlayers(usernames) {
   const radius = 2.3;
   const fibonacciPositions = generateFibonacciSphere(usernames.length, radius);
   const scaleFactor = usernames.length > 1 ? 1 / Math.pow(usernames.length, 0.35) : 1;
@@ -54,7 +33,7 @@ const distributePlayers = (usernames) => {
     scale: scaleFactor,
     frequency: 0.2 + Math.random() * 0.3,
     positionPhase: Math.random() * Math.PI * 2,
-    animationStart: Math.random() * Math.PI,
+    animationStart: Math.random(),
     rotationSpeed: {x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() * 2 - 1},
   }));
 };
@@ -84,14 +63,31 @@ onLoop(({_, elapsed}) => {
     groupRef.rotation.y = elapsed * 0.05 * rotationSpeed.y;
     groupRef.rotation.z = elapsed * 0.05 * rotationSpeed.z;
   });
+
+  if (miniverseRef.value) {
+    currentScale.value += (targetScale.value - currentScale.value) * 0.1
+    miniverseRef.value.scale.set(currentScale.value, currentScale.value, currentScale.value)
+  }
 });
+
+function setPlayersRef(el, index) {
+  playerRefs.value[index] = el
+}
+
+function handleMouseEnter() {
+  targetScale.value = 1.2
+  document.body.style.cursor = 'pointer'
+}
+
+function handleMouseLeave() {
+  targetScale.value = 1
+  document.body.style.cursor = 'default'
+}
+
 </script>
 
 <template>
-  <TresCanvas window-size clear-color="black" :antialias="false">
-    <Stars :size="0.4"/>
-    <TresPerspectiveCamera :position="[0, 0, 20]" :look-at="[0, 0, 0]"/>
-
+  <TresGroup ref="miniverseRef" @pointer-enter="handleMouseEnter" @pointer-leave="handleMouseLeave">
     <Blob>
       <template v-for="(player, index) in players" :key="player.username">
         <TresGroup :ref="el => setPlayersRef(el, index)" :scale="player.scale">
@@ -100,9 +96,5 @@ onLoop(({_, elapsed}) => {
         </TresGroup>
       </template>
     </Blob>
-
-    <TresAmbientLight :intensity="0.5"/>
-    <TresPointLight :position="[5, 5, 2]" :intensity="75"/>
-    <OrbitControls/>
-  </TresCanvas>
+  </TresGroup>
 </template>

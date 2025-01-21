@@ -1,9 +1,11 @@
 <script setup>
-import Miniverse from "@/components/Miniverse.vue";
+import {Stars, Box, OrbitControls, ScrollControls} from "@tresjs/cientos";
+import {TresCanvas} from "@tresjs/core";
+import System from "@/components/System.vue";
 </script>
 
 <template>
-  <Miniverse :usernames="['louisleroisoleil', 'Malix08', 'HelmDeepYT', 'Notch']"></Miniverse>
+  <System></System>
 </template>
 
 <style scoped>

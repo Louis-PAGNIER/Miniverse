@@ -3,11 +3,21 @@
 </script>
 
 <template>
-  <main>
-    <router-view></router-view>
-  </main>
+  <router-view></router-view>
 </template>
 
-<style scoped>
-
+<style>
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+#app {
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  position: static !important;
+}
 </style>

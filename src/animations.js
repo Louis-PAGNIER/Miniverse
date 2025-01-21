@@ -2,8 +2,19 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const easeIn = (t) => t * t;
 const easeOut = (t) => t * (2 - t);
 const easeInOut = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+const cubicBezier = (t, p0, p1, p2, p3) => {
+  const u = 1 - t;
+  const tt = t * t;
+  const uu = u * u;
+  const ttt = tt * t;
+  const uuu = uu * u;
 
-const interpolate = (a, b, t, type = 'linear') => {
+  // Calcul du point sur la courbe
+  return uuu * p0 + 3 * uu * t * p1 + 3 * u * tt * p2 + ttt * p3;
+};
+
+
+export const interpolate = (a, b, t, type = 'linear') => {
   switch (type) {
     case 'ease-in':
       t = easeIn(t);
@@ -13,6 +24,9 @@ const interpolate = (a, b, t, type = 'linear') => {
       break;
     case 'ease-in-out':
       t = easeInOut(t);
+      break;
+    case 'spring':
+      t = cubicBezier(t, 0.27, 0.01, 0.73, 1.39)
       break;
     default:
       break;

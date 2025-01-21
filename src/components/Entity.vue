@@ -1,6 +1,6 @@
 <script setup>
 import {NearestFilter, TextureLoader} from "three";
-import {onMounted, ref, watch, computed} from "vue";
+import {onMounted, ref, shallowRef, watch} from "vue";
 import EntityPart from "@/components/EntityPart.vue";
 import {addArray} from "@/math.js";
 
@@ -14,8 +14,8 @@ const props = defineProps({
   }
 });
 
-const positionRef = ref([...props.position]);
 let materials = {};
+const groupRef = shallowRef();
 const texturesLoaded = ref(false);
 
 const textureLoader = new TextureLoader();
@@ -72,28 +72,23 @@ const recalculateTextures = async () => {
   texturesLoaded.value = true;
 };
 
+const recalculatePosition = (position) => {
+  const pos = addArray(position, props.animation?.offset ?? [0, 0, 0])
+  groupRef.value.position.set(pos[0], pos[1], pos[2]);
+}
+
 onMounted(() => {
   recalculateTextures();
+  recalculatePosition(props.position);
 });
 
-watch([() => props.entityTemplate, () => props.entityTexture], () => {
-  recalculateTextures();
-});
+watch([() => props.entityTemplate, () => props.entityTexture], () => { recalculateTextures() });
+watch(() => props.position, (newPosition) => { recalculatePosition(newPosition) });
 
-watch(
-    () => props.position,
-    (newPosition) => {
-      positionRef.value = [...newPosition];
-    }
-);
-
-const groupPosition = computed(() =>
-    addArray(positionRef.value, props.animation?.offset ?? [0, 0, 0])
-);
 </script>
 
 <template>
-  <TresGroup :position="groupPosition" v-if="texturesLoaded">
-    <EntityPart :template="entityTemplate" :materials="materials" :animation="animation"/>
+  <TresGroup ref="groupRef">
+    <EntityPart v-if="texturesLoaded" :template="entityTemplate" :materials="materials" :animation="animation"/>
   </TresGroup>
 </template>

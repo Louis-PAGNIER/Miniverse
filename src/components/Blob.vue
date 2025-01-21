@@ -11,8 +11,6 @@ const uniforms = {
   uFrequency: {value: new Vector2(35, 35)},
 }
 
-const currentScale = shallowRef(1)
-const targetScale = shallowRef(1)
 const blobRef = shallowRef()
 
 const vertexShader = `
@@ -69,38 +67,18 @@ void main() {
 onLoop(({_, elapsed}) => {
   if (blobRef.value) {
     blobRef.value.material.uniforms.uTime.value = elapsed
-
-    currentScale.value += (targetScale.value - currentScale.value) * 0.1
-    blobRef.value.scale.set(currentScale.value, currentScale.value, currentScale.value)
   }
 })
-
-const handleMouseEnter = () => {
-  targetScale.value = 1.2
-  document.body.style.cursor = 'pointer'
-}
-
-const handleMouseLeave = () => {
-  targetScale.value = 1
-  document.body.style.cursor = 'default'
-}
 
 </script>
 
 <template>
-  <TresMesh
-      :position="[0, 0, 0]"
-      :renderOrder="1"
-      ref="blobRef"
-      @pointer-enter="handleMouseEnter"
-      @pointer-leave="handleMouseLeave"
-  >
+  <TresMesh :position="[0, 0, 0]" :renderOrder="1" ref="blobRef">
 
     <TresSphereGeometry :args="[4, 28, 28]"/>
     <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent/>
 
     <slot></slot>
-
   </TresMesh>
 </template>
 
