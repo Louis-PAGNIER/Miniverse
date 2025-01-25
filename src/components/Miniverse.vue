@@ -36,7 +36,7 @@ function distributePlayers(usernames) {
     animationStart: Math.random(),
     rotationSpeed: {x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() * 2 - 1},
   }));
-};
+}
 
 watch(
     () => props.usernames,

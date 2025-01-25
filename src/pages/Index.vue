@@ -1,11 +1,9 @@
 <script setup>
-import {Stars, Box, OrbitControls, ScrollControls} from "@tresjs/cientos";
-import {TresCanvas} from "@tresjs/core";
-import System from "@/components/System.vue";
+import Canvas from "@/components/Canvas.vue";
 </script>
 
 <template>
-  <System></System>
+  <Canvas></Canvas>
 </template>
 
 <style scoped>

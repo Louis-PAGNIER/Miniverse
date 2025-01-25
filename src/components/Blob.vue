@@ -23,15 +23,16 @@ varying vec3 vNormal;
 varying vec3 vPosition;
 
 void main() {
-    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-    modelPosition.y += sin(modelPosition.x * uFrequency.x - uTime) * uAmplitude.x;
-    modelPosition.x += cos(modelPosition.y * uFrequency.y - uTime) * uAmplitude.y;
+    vec3 localPosition = position;
+    localPosition.y += sin(localPosition.x * uFrequency.x - uTime) * uAmplitude.x;
+    localPosition.x += cos(localPosition.y * uFrequency.y - uTime) * uAmplitude.y;
 
+    vec4 modelPosition = modelMatrix * vec4(localPosition, 1.0);
     vec4 viewPosition = viewMatrix * modelPosition;
     gl_Position = projectionMatrix * viewPosition;
 
     vUv = uv;
-    vNormal = normalMatrix * normal; // Transform local normals to world space
+    vNormal = normalMatrix * normal; // Transformer les normales locales en coordonnées du monde
     vPosition = modelPosition.xyz;
 }
 `
@@ -64,9 +65,9 @@ void main() {
 }
 `
 
-onLoop(({_, elapsed}) => {
+onLoop(({delta, _}) => {
   if (blobRef.value) {
-    blobRef.value.material.uniforms.uTime.value = elapsed
+    blobRef.value.material.uniforms.uTime.value += delta
   }
 })
 
