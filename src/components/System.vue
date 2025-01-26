@@ -1,6 +1,6 @@
 <script setup>
 import Miniverse from "@/components/Miniverse.vue";
-import { Stars } from "@tresjs/cientos";
+import { Stars, Html } from "@tresjs/cientos";
 import { useLoop } from "@tresjs/core";
 import { onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
 import { PositionAnimator } from "@/scripts/animations.js";
@@ -8,21 +8,22 @@ import { calculateGridDistribution } from "@/scripts/placement.js";
 
 /* -------------------- Constants -------------------- */
 const DEFAULT_CAMERA_POSITION = [0, 0, 40];
-const FOCUS_CAMERA_POSITION = [0, 20, 120];
-const FOCUS_MINIVERSE_POSITION = [0, 25, 80];
+const FOCUS_CAMERA_POSITION = [0, 20, 100];
+const FOCUS_MINIVERSE_POSITION = [0, 25, 60];
 const CAMERA_FOV = 30;
 const GRID_WIDTH_FACTOR_DEFAULT = 22;
-const GRID_WIDTH_FACTOR_FOCUS = 60;
-const GRID_SPACING = 10.4;
+const GRID_WIDTH_FACTOR_FOCUS = 50;
+const GRID_HORIZONTAL_SPACING = 10;
+const GRID_VERTICAL_SPACING = 13;
 
 /* -------------------- State -------------------- */
 const miniverses = [
-  { id: 1, name: "Miniverse 1", players: ['louisleroisoleil'], position: new PositionAnimator() },
-  { id: 2, name: "Miniverse 2", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator() },
-  { id: 3, name: "Miniverse 3", players: ['Notch'], position: new PositionAnimator() },
-  { id: 4, name: "Miniverse 4", players: ['louisleroisoleil'], position: new PositionAnimator() },
-  { id: 5, name: "Miniverse 5", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator() },
-  { id: 6, name: "Miniverse 6", players: ['Notch'], position: new PositionAnimator() },
+  { id: 1, name: "Miniverse 1", players: ['louisleroisoleil'], position: new PositionAnimator(), scale: 1 },
+  { id: 2, name: "Miniverse 2", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator(), scale: 1 },
+  { id: 3, name: "Miniverse 3", players: ['Notch'], position: new PositionAnimator(), scale: 1 },
+  { id: 4, name: "Miniverse 4", players: ['louisleroisoleil'], position: new PositionAnimator(), scale: 1 },
+  { id: 5, name: "Miniverse 5", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator(), scale: 1 },
+  { id: 6, name: "Miniverse 6", players: ['Notch'], position: new PositionAnimator(), scale: 1 },
 ];
 
 const cameraRef = ref();
@@ -43,7 +44,7 @@ const distributeMiniverses = (animated = true) => {
       ? miniverses.filter((miniverse) => miniverse.id !== skipId)
       : miniverses;
 
-  const [positions, rows] = calculateGridDistribution(filteredMiniverses, gridWidthFactor, GRID_SPACING);
+  const [positions, rows] = calculateGridDistribution(filteredMiniverses, gridWidthFactor, GRID_HORIZONTAL_SPACING, GRID_VERTICAL_SPACING);
   gridRows.value = rows;
 
   filteredMiniverses.forEach((miniverse, i) => {
@@ -58,8 +59,7 @@ const checkCameraBounds = () => {
   if (!focusedMiniverse.value) {
     const cameraY = cameraPos.endY;
     const rows = gridRows.value;
-    const rowHeight = 1.3 * 8;
-    const minCameraY = -rowHeight * (rows - 1);
+    const minCameraY = -GRID_VERTICAL_SPACING * (rows - 1);
     const maxCameraY = 0;
 
     if (cameraY > maxCameraY) {
@@ -76,8 +76,13 @@ const focusMiniverse = (miniverse) => {
 };
 
 const setFocusPositions = () => {
-  focusedMiniverse.value.position.setGoalPosition(...FOCUS_MINIVERSE_POSITION, 1000, 'ease-out');
-  cameraPos.setGoalPosition(...FOCUS_CAMERA_POSITION, 1000, 'ease-out');
+  if (!focusedMiniverse.value) {
+    cameraPos.setGoalPosition(...DEFAULT_CAMERA_POSITION, 1000, 'ease-out');
+  } else {
+    cameraPos.setGoalPosition(...FOCUS_CAMERA_POSITION, 1000, 'ease-out');
+    focusedMiniverse.value.position.setGoalPosition(...FOCUS_MINIVERSE_POSITION, 1000, 'ease-out');
+  }
+
   distributeMiniverses();
 };
 
@@ -89,6 +94,16 @@ const handleScroll = (event) => {
     checkCameraBounds();
   }
 };
+
+const handleMouseEnter = (miniverse) => {
+  miniverse.scale = 1.2;
+  document.body.style.cursor = "pointer";
+}
+
+const handleMouseLeave = (miniverse) => {
+  miniverse.scale = 1;
+  document.body.style.cursor = "default";
+}
 
 const handleMiniverseClick = (miniverse) => focusMiniverse(miniverse);
 
@@ -112,12 +127,27 @@ const { onBeforeRender } = useLoop();
 onBeforeRender(({ delta }) => {
   miniverses.forEach((miniverse, i) => {
     miniverse.position.updatePosition(delta);
-    miniversesRefs.value[i]?.position.set(...miniverse.position.value);
+    const miniverseRef = miniversesRefs.value[i];
+
+    if (miniverseRef) {
+      const currentScale = miniverseRef.scale.x;
+      const newScale = currentScale + (miniverse.scale - currentScale) * 0.1;
+      miniverseRef.position.set(...miniverse.position.value);
+      miniverseRef.scale.set(newScale, newScale, newScale);
+    }
   });
 
   cameraPos.updatePosition(delta);
   cameraRef.value.position.set(...cameraPos.value);
 });
+
+/* -------------------- Exposes -------------------- */
+
+defineExpose({
+  focusedMiniverse,
+  focusMiniverse
+})
+
 </script>
 
 <template>
@@ -126,10 +156,34 @@ onBeforeRender(({ delta }) => {
 
   <template v-for="(miniverse, index) in miniverses" :key="miniverse.id">
     <TresGroup :ref="el => setMiniversesRef(el, index)">
-      <Miniverse @click="handleMiniverseClick(miniverse)" :usernames="miniverse.players" />
+      <Miniverse @click="handleMiniverseClick(miniverse)"
+                 @pointer-enter="handleMouseEnter(miniverse)"
+                 @pointer-leave="handleMouseLeave(miniverse)"
+                 :usernames="miniverse.players" />
+      <Html v-if="!focusedMiniverse"
+            transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
+        <div class="miniverse-name-wrapper">
+          <h1 class="miniverse-name">
+            {{ miniverse.name }}
+          </h1>
+        </div>
+      </Html>
     </TresGroup>
   </template>
 
   <TresAmbientLight :intensity="0.7" />
   <TresPointLight :position="[5, 5, 2]" :intensity="75" />
 </template>
+
+<style scoped>
+.miniverse-name {
+  cursor: text;
+  color: white;
+}
+
+.miniverse-name-wrapper {
+  background: rgba(32, 32, 32, 0.5);
+  padding: 8px 70px;
+  border-radius: 8px;
+}
+</style>

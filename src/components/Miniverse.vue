@@ -63,31 +63,16 @@ onLoop(({_, elapsed}) => {
     groupRef.rotation.y = elapsed * 0.05 * rotationSpeed.y;
     groupRef.rotation.z = elapsed * 0.05 * rotationSpeed.z;
   });
-
-  if (miniverseRef.value) {
-    currentScale.value += (targetScale.value - currentScale.value) * 0.1
-    miniverseRef.value.scale.set(currentScale.value, currentScale.value, currentScale.value)
-  }
 });
 
 function setPlayersRef(el, index) {
   playerRefs.value[index] = el
 }
 
-function handleMouseEnter() {
-  targetScale.value = 1.2
-  document.body.style.cursor = 'pointer'
-}
-
-function handleMouseLeave() {
-  targetScale.value = 1
-  document.body.style.cursor = 'default'
-}
-
 </script>
 
 <template>
-  <TresGroup ref="miniverseRef" @pointer-enter="handleMouseEnter" @pointer-leave="handleMouseLeave">
+  <TresGroup ref="miniverseRef">
     <Blob>
       <template v-for="(player, index) in players" :key="player.username">
         <TresGroup :ref="el => setPlayersRef(el, index)" :scale="player.scale">

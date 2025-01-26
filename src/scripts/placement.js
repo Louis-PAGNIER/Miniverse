@@ -1,13 +1,13 @@
-export function calculateGridDistribution(items, gridWidthFactor, spacing) {
+export function calculateGridDistribution(items, gridWidthFactor, horizontal_spacing, vertical_spacing) {
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
   const maxGridWidth = gridWidthFactor * windowWidth / windowHeight;
 
-  const maxColumns = Math.floor(maxGridWidth / spacing);
+  const maxColumns = Math.floor(maxGridWidth / horizontal_spacing);
   const columns = Math.min(items.length, maxColumns);
   const rows = Math.ceil(items.length / columns);
 
-  let startX = -((columns - 1) * spacing) / 2;
+  let startX = -((columns - 1) * horizontal_spacing) / 2;
   const startY = 0;
 
   const newPositions = [];
@@ -23,13 +23,13 @@ export function calculateGridDistribution(items, gridWidthFactor, spacing) {
     const spheresInLastRow = items.length % columns;
 
     if (isLastRow && spheresInLastRow !== 0) {
-      startX = -((spheresInLastRow - 1) * spacing) / 2;
+      startX = -((spheresInLastRow - 1) * horizontal_spacing) / 2;
       if (col > spheresInLastRow - 1)
         col = spheresInLastRow - 1;
     }
 
-    const x = startX + col * spacing;
-    const y = startY - row * spacing;
+    const x = startX + col * horizontal_spacing;
+    const y = startY - row * vertical_spacing;
 
     newPositions.push([x, y, 0]);
 
