@@ -25,19 +25,14 @@ function setMiniversesRef(el, index) {
   miniversesRefs.value[index] = el
 }
 
-function distributeMiniverses(miniverses, skipId = null) {
-  const n = miniverses.length - (skipId ? 1 : 0);
-  const maxFactor = skipId ? 60 : 22;
-
-  const sphereRadius = 8;
-  const spacing = sphereRadius * 1.3;
+function calculateGridDistribution(items, gridWidthFactor = 22, spacing = 10.4) {
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
-  const maxGridWidth = maxFactor * windowWidth / windowHeight;
+  const maxGridWidth = gridWidthFactor * windowWidth / windowHeight;
 
   const maxColumns = Math.floor(maxGridWidth / spacing);
-  const columns = Math.min(n, maxColumns);
-  const rows = Math.ceil(n / columns);
+  const columns = Math.min(items.length, maxColumns);
+  const rows = Math.ceil(items.length / columns);
 
   let startX = -((columns - 1) * spacing) / 2;
   const startY = 0;
@@ -48,16 +43,11 @@ function distributeMiniverses(miniverses, skipId = null) {
   let col = 0;
   let row = 0;
   let even = true;
-  while (i < n) {
-    if (miniverses[i].id === skipId) {
-      i++;
-      newPositions.push([0, 0, 0]); // Ignored position (value doesn't matter)
-      continue;
-    }
-
+  while (i < items.length) {
     const currentRow = Math.floor(i / columns);
     const isLastRow = currentRow === rows - 1;
-    const spheresInLastRow = n % columns;
+    const spheresInLastRow = items.length % columns;
+
     if (isLastRow && spheresInLastRow !== 0) {
       startX = -((spheresInLastRow - 1) * spacing) / 2;
       if (col > spheresInLastRow - 1)
@@ -86,23 +76,24 @@ function distributeMiniverses(miniverses, skipId = null) {
     i++;
   }
 
+  return [newPositions, rows];
+}
+
+function distributeMiniverses(animated = true) {
+  const skipId = focusedMiniverse.value ? focusedMiniverse.value.id : null;
+  const gridWidthFactor = focusedMiniverse.value ? 60 : 22;
+  const filteredMiniverses = skipId ? miniverses.filter(miniverse => miniverse.id !== skipId) : miniverses;
+  const [positions, rows] = calculateGridDistribution(filteredMiniverses, gridWidthFactor);
   gridRows.value = rows;
-  return newPositions;
+  filteredMiniverses.forEach((miniverse, i) =>
+      miniverse.position.setGoalPosition(...positions[i], animated ? 1000 + Math.random() * 700 : 0, 'ease-out'));
+
+  checkCameraBounds();
 }
 
 function focusMiniverse(miniverse) {
   focusedMiniverse.value = miniverse;
   setFocusPositions();
-}
-
-function setGridPositions(animated = true) {
-  const skipId = focusedMiniverse.value ? focusedMiniverse.value.id : null;
-  const positions = distributeMiniverses(miniverses, skipId);
-  for (let i = 0; i < positions.length; i++)
-    if (skipId !== miniverses[i].id)
-      miniverses[i].position.setGoalPosition(...positions[i], animated ? 1000 + Math.random() * 700 : 0, 'ease-out');
-
-  checkCameraBounds();
 }
 
 function checkCameraBounds() {
@@ -123,11 +114,11 @@ function checkCameraBounds() {
 function setFocusPositions() {
   focusedMiniverse.value.position.setGoalPosition(0, 25, 80, 1000, 'ease-out');
   cameraPos.setGoalPosition(cameraPos.value[0], 20, 120, 1000, 'ease-out');
-  setGridPositions();
+  distributeMiniverses();
 }
 
 function handleResize() {
-  setGridPositions();
+  distributeMiniverses();
 }
 
 function handleScroll(event) {
@@ -137,7 +128,7 @@ function handleScroll(event) {
 }
 
 onMounted(() => {
-  setGridPositions(false);
+  distributeMiniverses(false);
 
   window.addEventListener("resize", handleResize);
   document.addEventListener("wheel", handleScroll);
