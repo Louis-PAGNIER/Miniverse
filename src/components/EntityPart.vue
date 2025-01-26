@@ -1,10 +1,10 @@
 <script setup>
 import EntityPart from "./EntityPart.vue";
-import {addArray, negArray} from "@/math.js";
+import {addArray, negArray} from "@/scripts/math.js";
 import {DoubleSide, FrontSide} from "three";
 import {shallowRef} from "vue";
 import {useLoop} from "@tresjs/core";
-import {interpolateRotation} from "@/animations.js";
+import {interpolateRotation} from "@/scripts/animations.js";
 
 const props = defineProps({
   template: Object,

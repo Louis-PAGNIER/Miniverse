@@ -4,7 +4,7 @@ import {onBeforeUpdate, ref, shallowRef, watch} from 'vue';
 import Player from "@/components/Player.vue";
 import floatAnimationTemplate from "@/assets/minecraftAnimations/PlayerFloat.json";
 import Blob from "@/components/Blob.vue";
-import {generateFibonacciSphere} from "@/math.js";
+import {generateFibonacciSphere} from "@/scripts/math.js";
 
 const props = defineProps({
   usernames: {type: Array, required: true},
