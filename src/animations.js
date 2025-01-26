@@ -84,15 +84,16 @@ export class PositionAnimator {
     this.z = z;
   }
 
-  setGoalPosition(x, y, z, duration = 1000, type = 'linear') {
-    if (duration === 0)
-      return this.setCurrentPosition(x, y, z);
-
-    this.type = type;
+  setGoalPosition(x, y, z, duration = 0, type = 'linear') {
     this.endX = x;
     this.endY = y;
     this.endZ = z;
     this.duration = duration;
+
+    if (duration === 0)
+      return this.setCurrentPosition(x, y, z);
+
+    this.type = type;
     this.setStartPosition(this.x, this.y, this.z);
     this.t = 0;
     this.finished = false;

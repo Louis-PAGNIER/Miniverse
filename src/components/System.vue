@@ -6,80 +6,134 @@ import {onBeforeUnmount, onMounted, ref, shallowRef} from "vue";
 import {PositionAnimator} from "@/animations.js";
 
 const miniverses = [
-  { name: "Miniverse 1", players: ['louisleroisoleil'], position: new PositionAnimator() },
-  { name: "Miniverse 2", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator() },
-  { name: "Miniverse 3", players: ['Notch'], position: new PositionAnimator() },
-  { name: "Miniverse 1", players: ['louisleroisoleil'], position: new PositionAnimator() },
-  { name: "Miniverse 2", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator() },
-  { name: "Miniverse 3", players: ['Notch'], position: new PositionAnimator() },
+  { id: 1, name: "Miniverse 1", players: ['louisleroisoleil'], position: new PositionAnimator() },
+  { id: 2, name: "Miniverse 2", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator() },
+  { id: 3, name: "Miniverse 3", players: ['Notch'], position: new PositionAnimator() },
+  { id: 4, name: "Miniverse 4", players: ['louisleroisoleil'], position: new PositionAnimator() },
+  { id: 5, name: "Miniverse 5", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator() },
+  { id: 6, name: "Miniverse 6", players: ['Notch'], position: new PositionAnimator() },
 ]
 
 const cameraRef = ref()
 const cameraPos = new PositionAnimator(0, 0, 40)
 const focusedMiniverse = shallowRef()
+const gridRows = shallowRef(0)
 
 const miniversesRefs = ref([])
 
-const setMiniversesRef = (el, index) => {
+function setMiniversesRef(el, index) {
   miniversesRefs.value[index] = el
 }
 
-const distributeMiniverses = (miniverses) => {
-  const sphereRadius = 8; // Rayon des sphères en vue 3D
-  const spacing = sphereRadius * 1.3; // Espacement entre sphères
+function distributeMiniverses(miniverses, skipId = null) {
+  const n = miniverses.length - (skipId ? 1 : 0);
+  const maxFactor = skipId ? 60 : 22;
+
+  const sphereRadius = 8;
+  const spacing = sphereRadius * 1.3;
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
-  const maxGridWidth = 22 * windowWidth / windowHeight; // Largeur maximale en unités 3D
+  const maxGridWidth = maxFactor * windowWidth / windowHeight;
 
-  const maxColumns = Math.floor(maxGridWidth / spacing); // Nombre maximal de colonnes
-  const columns = Math.min(miniverses.length, maxColumns); // Colonnes limitées au nombre de sphères ou au max possible
-  const rows = Math.ceil(miniverses.length / columns); // Nombre de lignes nécessaires
+  const maxColumns = Math.floor(maxGridWidth / spacing);
+  const columns = Math.min(n, maxColumns);
+  const rows = Math.ceil(n / columns);
 
-  const startX = -((columns - 1) * spacing) / 2; // Départ X (centré)
-  const startY = 0 // ((rows - 1) * spacing) / 2; // Départ Y (centré)
+  let startX = -((columns - 1) * spacing) / 2;
+  const startY = 0;
 
   const newPositions = [];
 
-  for (let i = 0; i < miniverses.length; i++) {
-    const col = i % columns; // Colonne actuelle
-    const row = Math.floor(i / columns); // Ligne actuelle
+  let i = 0;
+  let col = 0;
+  let row = 0;
+  let even = true;
+  while (i < n) {
+    if (miniverses[i].id === skipId) {
+      i++;
+      newPositions.push([0, 0, 0]); // Ignored position (value doesn't matter)
+      continue;
+    }
 
-    const x = startX + col * spacing; // Position X
-    const y = startY - row * spacing; // Position Y
+    const currentRow = Math.floor(i / columns);
+    const isLastRow = currentRow === rows - 1;
+    const spheresInLastRow = n % columns;
+    if (isLastRow && spheresInLastRow !== 0) {
+      startX = -((spheresInLastRow - 1) * spacing) / 2;
+      if (col > spheresInLastRow - 1)
+        col = spheresInLastRow - 1;
+    }
 
-    newPositions.push([x, y, 0]); // Position dans le plan 2D
+    const x = startX + col * spacing;
+    const y = startY - row * spacing;
+
+    newPositions.push([x, y, 0]);
+
+    if (even) {
+      if (++col === maxColumns) {
+        row++;
+        even = false;
+        col--;
+      }
+    } else {
+      if (--col === -1) {
+        row++;
+        even = true;
+        col++;
+      }
+    }
+
+    i++;
   }
 
+  gridRows.value = rows;
   return newPositions;
-};
+}
 
 function focusMiniverse(miniverse) {
   focusedMiniverse.value = miniverse;
   setFocusPositions();
 }
 
-const setGridPositions = (animated = true) => {
-  const positions = distributeMiniverses(miniverses);
+function setGridPositions(animated = true) {
+  const skipId = focusedMiniverse.value ? focusedMiniverse.value.id : null;
+  const positions = distributeMiniverses(miniverses, skipId);
   for (let i = 0; i < positions.length; i++)
-    miniverses[i].position.setGoalPosition(...positions[i], animated ? 1000 + Math.random() * 700 : 0, 'ease-out');
-};
+    if (skipId !== miniverses[i].id)
+      miniverses[i].position.setGoalPosition(...positions[i], animated ? 1000 + Math.random() * 700 : 0, 'ease-out');
 
-const setFocusPositions = () => {
-  focusedMiniverse.value.position.setGoalPosition(0, 25, 80, 1000, 'ease-out');
-  cameraPos.setGoalPosition(cameraPos.value[0], 20, 120, 1000, 'ease-out');
+  checkCameraBounds();
 }
 
-const handleResize = () => {
-  if (focusedMiniverse.value) {
+function checkCameraBounds() {
+  const cameraY = cameraPos.endY;
+  if (!focusedMiniverse.value) {
+    const rows = gridRows.value;
+    const rowHeight = 1.3 * 8;
+    const minCameraY = -rowHeight * (rows - 1);
+    const maxCameraY = 0
 
-  } else {
-    setGridPositions()
+    if (cameraY > maxCameraY)
+      cameraPos.setGoalPosition(cameraPos.value[0], maxCameraY, cameraPos.value[2], 0);
+    else if (cameraY < minCameraY)
+      cameraPos.setGoalPosition(cameraPos.value[0], minCameraY, cameraPos.value[2], 0);
   }
 }
 
-const handleScroll = (event) => {
+function setFocusPositions() {
+  focusedMiniverse.value.position.setGoalPosition(0, 25, 80, 1000, 'ease-out');
+  cameraPos.setGoalPosition(cameraPos.value[0], 20, 120, 1000, 'ease-out');
+  setGridPositions();
+}
+
+function handleResize() {
+  setGridPositions();
+}
+
+function handleScroll(event) {
   if (!focusedMiniverse.value)
-    cameraPos.setCurrentPosition(cameraPos.value[0], cameraPos.value[1] - event.deltaY * 0.01, cameraPos.value[2]);
+    cameraPos.setGoalPosition(cameraPos.value[0], cameraPos.value[1] - event.deltaY * 0.01, cameraPos.value[2]);
+  checkCameraBounds();
 }
 
 onMounted(() => {
@@ -108,7 +162,6 @@ onBeforeRender(({delta, _}) => {
 
   cameraPos.updatePosition(delta);
   cameraRef.value.position.set(...cameraPos.value);
-  console.log(cameraRef.value.position, cameraPos.value)
 });
 </script>
 
