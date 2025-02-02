@@ -155,7 +155,8 @@ defineExpose({
   <Stars :size="0.4" />
 
   <template v-for="(miniverse, index) in miniverses" :key="miniverse.id">
-    <TresGroup :ref="el => setMiniversesRef(el, index)">
+    <TresGroup :ref="el => setMiniversesRef(el, index)"
+               v-if="!focusedMiniverse || focusedMiniverse === miniverse">
       <Miniverse @click="handleMiniverseClick(miniverse)"
                  @pointer-enter="handleMouseEnter(miniverse)"
                  @pointer-leave="handleMouseLeave(miniverse)"
