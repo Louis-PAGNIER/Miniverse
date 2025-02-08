@@ -120,6 +120,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize);
   document.removeEventListener("wheel", handleScroll);
+  document.body.style.cursor = "default";
 });
 
 /* -------------------- Animation Loop -------------------- */
