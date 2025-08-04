@@ -3,7 +3,7 @@ import Entity from "@/components/Entity.vue";
 import playerTemplate from "@/assets/minecraftTemplates/PlayerTemplate.json";
 import oldPlayerTemplate from "@/assets/minecraftTemplates/OldPlayerTemplate.json";
 import veryOldTemplate from "@/assets/minecraftTemplates/VeryOldPlayerTemplate.json";
-import { ref, computed, watch } from "vue";
+import {ref, computed, watch, onUnmounted} from "vue";
 
 const props = defineProps({
   username: String,
@@ -75,14 +75,35 @@ watch(
 );
 
 const entityTemplate = ref(playerTemplate);
+
+const groupRef = ref()
+
+onUnmounted(() => {
+  const obj = groupRef.value
+  if (obj && obj.parent) {
+    obj.parent.remove(obj)
+    obj.traverse(child => {
+      if (child.geometry) child.geometry.dispose?.()
+      if (child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(m => m.dispose?.())
+        } else {
+          child.material.dispose?.()
+        }
+      }
+    })
+  }
+})
 </script>
 
 <template>
-  <Entity
-      v-if="imgDimensions"
-      :entityTemplate="entityTemplate"
-      :entityTexture="skinUrl"
-      :position="position"
-      :animation="animation"
-  />
+  <TresGroup ref="groupRef">
+    <Entity
+        v-if="imgDimensions"
+        :entityTemplate="entityTemplate"
+        :entityTexture="skinUrl"
+        :position="position"
+        :animation="animation"
+    />
+  </TresGroup>
 </template>

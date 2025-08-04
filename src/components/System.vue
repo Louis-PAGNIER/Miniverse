@@ -1,10 +1,12 @@
 <script setup>
 import Miniverse from "@/components/Miniverse.vue";
-import { Stars, Html } from "@tresjs/cientos";
-import { useLoop } from "@tresjs/core";
-import { onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
-import { PositionAnimator } from "@/scripts/animations.js";
-import { calculateGridDistribution } from "@/scripts/placement.js";
+import {Html, Stars} from "@tresjs/cientos";
+import {useLoop} from "@tresjs/core";
+import {onBeforeUnmount, onMounted, ref, shallowRef} from "vue";
+import {PositionAnimator} from "@/scripts/animations.js";
+import {useMiniverseGrid} from '@/composables/useMiniverseGrid.js';
+import {useAuthStore} from "@/stores/authStore.js";
+import {fetchMiniverses} from "@/api/api.js";
 
 /* -------------------- Constants -------------------- */
 const DEFAULT_CAMERA_POSITION = [0, 0, 40];
@@ -17,99 +19,70 @@ const GRID_HORIZONTAL_SPACING = 10;
 const GRID_VERTICAL_SPACING = 13;
 
 /* -------------------- State -------------------- */
-const miniverses = [
-  { id: 1, name: "Miniverse 1", players: ['louisleroisoleil'], position: new PositionAnimator(), scale: 1 },
-  { id: 2, name: "Miniverse 2", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator(), scale: 1 },
-  { id: 3, name: "Miniverse 3", players: ['Notch'], position: new PositionAnimator(), scale: 1 },
-  { id: 4, name: "Miniverse 4", players: ['louisleroisoleil'], position: new PositionAnimator(), scale: 1 },
-  { id: 5, name: "Miniverse 5", players: ['Malix08', 'HelmDeepYT'], position: new PositionAnimator(), scale: 1 },
-  { id: 6, name: "Miniverse 6", players: ['Notch'], position: new PositionAnimator(), scale: 1 },
-];
+const auth = useAuthStore();
 
 const cameraRef = ref();
 const cameraPos = new PositionAnimator(...DEFAULT_CAMERA_POSITION);
+
+const miniverses = ref([])
 const focusedMiniverse = shallowRef(null);
-const gridRows = shallowRef(0);
 const miniversesRefs = ref([]);
 
-/* -------------------- Utility Functions -------------------- */
-const setMiniversesRef = (el, index) => {
-  miniversesRefs.value[index] = el;
-};
+const {
+  wrapMiniverses,
+  distributeMiniverses,
+  focusMiniverse,
+  handleMouseEnter,
+  handleMouseLeave,
+  handleMiniverseClick,
+  setMiniversesRef,
+  handleScroll,
+  handleResize,
+} = useMiniverseGrid({ cameraPos, focusedMiniverse, miniverses, miniversesRefs });
 
-const distributeMiniverses = (animated = true) => {
-  const skipId = focusedMiniverse.value?.id || null;
-  const gridWidthFactor = focusedMiniverse.value ? GRID_WIDTH_FACTOR_FOCUS : GRID_WIDTH_FACTOR_DEFAULT;
-  const filteredMiniverses = skipId
-      ? miniverses.filter((miniverse) => miniverse.id !== skipId)
-      : miniverses;
 
-  const [positions, rows] = calculateGridDistribution(filteredMiniverses, gridWidthFactor, GRID_HORIZONTAL_SPACING, GRID_VERTICAL_SPACING);
-  gridRows.value = rows;
+function updateMiniverses(current, raw) {
+  const currentById = Object.fromEntries(current.map(m => [m.id, m]));
+  const rawById = Object.fromEntries(raw.map(m => [m.id, m]));
 
-  filteredMiniverses.forEach((miniverse, i) => {
-    const animationDuration = animated ? 1000 + Math.random() * 700 : 0;
-    miniverse.position.setGoalPosition(...positions[i], animationDuration, 'ease-out');
-  });
+  const updated = [];
 
-  checkCameraBounds();
-};
+  for (const m of raw) {
+    const existing = currentById[m.id];
 
-const checkCameraBounds = () => {
-  if (!focusedMiniverse.value) {
-    const cameraY = cameraPos.endY;
-    const rows = gridRows.value;
-    const minCameraY = -GRID_VERTICAL_SPACING * (rows - 1);
-    const maxCameraY = 0;
-
-    if (cameraY > maxCameraY) {
-      cameraPos.setGoalPosition(cameraPos.value[0], maxCameraY, cameraPos.value[2], 0);
-    } else if (cameraY < minCameraY) {
-      cameraPos.setGoalPosition(cameraPos.value[0], minCameraY, cameraPos.value[2], 0);
+    if (existing) {
+      // Met à jour les champs (exclure les champs locaux comme `position`, `scale`)
+      Object.assign(existing, m);
+      updated.push(existing);
+    } else {
+      // Nouveau miniverse → on wrap
+      updated.push({
+        ...m,
+        position: new PositionAnimator(),
+        scale: 1,
+      });
     }
   }
-};
 
-const focusMiniverse = (miniverse) => {
-  focusedMiniverse.value = miniverse;
-  setFocusPositions();
-};
-
-const setFocusPositions = () => {
-  if (!focusedMiniverse.value) {
-    cameraPos.setGoalPosition(...DEFAULT_CAMERA_POSITION, 1000, 'ease-out');
-  } else {
-    cameraPos.setGoalPosition(...FOCUS_CAMERA_POSITION, 1000, 'ease-out');
-    focusedMiniverse.value.position.setGoalPosition(...FOCUS_MINIVERSE_POSITION, 1000, 'ease-out');
-  }
-
-  distributeMiniverses();
-};
-
-/* -------------------- Event Handlers -------------------- */
-const handleResize = () => distributeMiniverses();
-const handleScroll = (event) => {
-  if (!focusedMiniverse.value) {
-    cameraPos.setGoalPosition(cameraPos.value[0], cameraPos.value[1] - event.deltaY * 0.01, cameraPos.value[2]);
-    checkCameraBounds();
-  }
-};
-
-const handleMouseEnter = (miniverse) => {
-  miniverse.scale = 1.2;
-  document.body.style.cursor = "pointer";
+  return updated;
 }
-
-const handleMouseLeave = (miniverse) => {
-  miniverse.scale = 1;
-  document.body.style.cursor = "default";
-}
-
-const handleMiniverseClick = (miniverse) => focusMiniverse(miniverse);
 
 /* -------------------- Lifecycle Hooks -------------------- */
-onMounted(() => {
-  distributeMiniverses(false);
+let updateMiniversesIntervalId = undefined;
+onMounted(async () => {
+  const _updateMiniverses = async () => {
+    try {
+      const fetched = await fetchMiniverses();
+      miniverses.value = updateMiniverses(miniverses.value, fetched);
+      distributeMiniverses(false);
+    } catch (error) {
+      console.error("Failed to fetch miniverses:", error);
+    }
+  };
+
+  await _updateMiniverses();
+
+  updateMiniversesIntervalId = window.setInterval(_updateMiniverses, 5000);
 
   window.addEventListener("resize", handleResize);
   document.addEventListener("wheel", handleScroll);
@@ -118,6 +91,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  if (updateMiniversesIntervalId) { clearInterval(updateMiniversesIntervalId); }
+
   window.removeEventListener("resize", handleResize);
   document.removeEventListener("wheel", handleScroll);
 });
@@ -125,7 +100,7 @@ onBeforeUnmount(() => {
 /* -------------------- Animation Loop -------------------- */
 const { onBeforeRender } = useLoop();
 onBeforeRender(({ delta }) => {
-  miniverses.forEach((miniverse, i) => {
+  miniverses.value.forEach((miniverse, i) => {
     miniverse.position.updatePosition(delta);
     const miniverseRef = miniversesRefs.value[i];
 
@@ -142,7 +117,6 @@ onBeforeRender(({ delta }) => {
 });
 
 /* -------------------- Exposes -------------------- */
-
 defineExpose({
   focusedMiniverse,
   focusMiniverse
@@ -160,7 +134,7 @@ defineExpose({
       <Miniverse @click="handleMiniverseClick(miniverse)"
                  @pointer-enter="handleMouseEnter(miniverse)"
                  @pointer-leave="handleMouseLeave(miniverse)"
-                 :usernames="miniverse.players" />
+                 :miniverse="miniverse" />
       <Html v-if="!focusedMiniverse"
             transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
         <div class="miniverse-name-wrapper">

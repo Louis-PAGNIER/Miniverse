@@ -74,13 +74,21 @@ onLoop(({delta, _}) => {
 </script>
 
 <template>
-  <TresMesh :position="[0, 0, 0]" :renderOrder="1" ref="blobRef">
+  <TresGroup>
+    <TresMesh :position="[0, 0, 0]" :renderOrder="1" ref="blobRef">
+      <TresSphereGeometry :args="[4, 28, 28]" />
+      <TresShaderMaterial
+          :vertexShader="vertexShader"
+          :fragmentShader="fragmentShader"
+          :uniforms="uniforms"
+          transparent
+      />
+    </TresMesh>
 
-    <TresSphereGeometry :args="[4, 28, 28]"/>
-    <TresShaderMaterial :vertexShader="vertexShader" :fragmentShader="fragmentShader" :uniforms="uniforms" transparent/>
-
-    <slot></slot>
-  </TresMesh>
+    <TresGroup>
+      <slot />
+    </TresGroup>
+  </TresGroup>
 </template>
 
 <style scoped>

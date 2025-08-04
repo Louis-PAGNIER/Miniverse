@@ -1,5 +1,8 @@
 <script setup>
+import {useAuthStore} from "@/stores/authStore.js";
 
+const auth = useAuthStore();
+auth.initialize();
 </script>
 
 <template>

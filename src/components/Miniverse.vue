@@ -1,32 +1,43 @@
 <script setup>
-import {useRenderLoop} from "@tresjs/core";
-import {onBeforeUpdate, ref, shallowRef, watch} from 'vue';
+import {computed, onBeforeUpdate, ref, shallowRef, watch} from 'vue';
 import Player from "@/components/Player.vue";
 import floatAnimationTemplate from "@/assets/minecraftAnimations/PlayerFloat.json";
 import Blob from "@/components/Blob.vue";
 import {generateFibonacciSphere} from "@/scripts/math.js";
+import {useRenderLoop} from "@tresjs/core";
 
 const props = defineProps({
-  usernames: {type: Array, required: true},
+  miniverse: {type: Object, required: true},
   position: { type: Array, default: () => [0, 0, 0] }
 });
 
+const numberOfPlayers = computed(() => { return props.miniverse.infos.connected_players.length; });
+
 const players = ref([]);
 const playerRefs = ref([]);
-const currentScale = shallowRef(1)
-const targetScale = shallowRef(1)
 const miniverseRef = shallowRef()
 
 onBeforeUpdate(() => {
   playerRefs.value = []
 })
 
-function distributePlayers(usernames) {
-  const radius = 2.3;
-  const fibonacciPositions = generateFibonacciSphere(usernames.length, radius);
-  const scaleFactor = usernames.length > 1 ? 1 / Math.pow(usernames.length, 0.35) : 1;
+function arePlayersEqual(a, b) {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
 
-  return usernames.map((username, index) => ({
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function distributePlayers() {
+  const radius = 2.3;
+  console.log("start", numberOfPlayers.value)
+  const fibonacciPositions = generateFibonacciSphere(numberOfPlayers.value, radius);
+  const scaleFactor = numberOfPlayers.value > 1 ? 1 / Math.pow(numberOfPlayers.value, 0.35) : 1;
+
+  return props.miniverse.infos.connected_players.map((username, index) => ({
     username,
     position: {...fibonacciPositions[index]},
     basePosition: {...fibonacciPositions[index]},
@@ -39,13 +50,13 @@ function distributePlayers(usernames) {
 }
 
 watch(
-    () => props.usernames,
-    (newUsernames) => {
-      const distributedPlayers = distributePlayers(newUsernames);
-      players.value = distributedPlayers;
-      playerRefs.value = distributedPlayers.map(() => ref(null));
+    () => props.miniverse.infos.connected_players,
+    (newPlayers, oldPlayers) => {
+      if (!oldPlayers || !arePlayersEqual(newPlayers, oldPlayers)) {
+        players.value = distributePlayers();
+      }
     },
-    {immediate: true}
+    { immediate: true }
 );
 
 const {onLoop} = useRenderLoop();
@@ -74,12 +85,11 @@ function setPlayersRef(el, index) {
 <template>
   <TresGroup ref="miniverseRef">
     <Blob>
-      <template v-for="(player, index) in players" :key="player.username">
-        <TresGroup :ref="el => setPlayersRef(el, index)" :scale="player.scale">
-          <Player :username="player.username"
-                  :animation="{ ...floatAnimationTemplate, start: player.animationStart }"/>
-        </TresGroup>
-      </template>
     </Blob>
+    <template v-for="(player, index) in players" :key="player.username">
+      <TresGroup :ref="el => setPlayersRef(el, index)" :scale="player.scale">
+        <Player :username="player.username" :animation="{ ...floatAnimationTemplate, start: player.animationStart }"/>
+      </TresGroup>
+    </template>
   </TresGroup>
 </template>

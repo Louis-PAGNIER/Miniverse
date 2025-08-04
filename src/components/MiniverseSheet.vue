@@ -1,6 +1,43 @@
 <script setup>
+import {computed} from "vue";
+
 const props = defineProps({
   miniverse: { type: Object, required: true },
+})
+
+const numberOfPlayers = computed(() => {
+  return props.miniverse.infos.connected_players.length;
+});
+
+function titleCase(str) {
+  return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+}
+
+function formatMemory(memory) {
+  if (memory === 0) { return '0M'; }
+  if (memory < 1_000_000) { return (memory / 1_000_000).toFixed(2) + 'M'; }
+  return (memory / 1_000_000_000).toFixed(2) + 'G';
+}
+
+const loaderIcon = computed(() => {
+  return new URL(`../assets/icons/${props.miniverse.server_type.toLowerCase()}.png`, import.meta.url).pathname;
+})
+
+const statusIcons = computed(() => {
+  let url;
+  switch (props.miniverse.status.toLowerCase()) {
+    case 'running':
+      url = '../assets/icons/running.png';
+      break;
+    case 'stopped':
+    case 'exited':
+      url = '../assets/icons/stopped.png';
+      break;
+    default:
+      url = '../assets/icons/restarting.png';
+      break;
+  }
+  return new URL(url, import.meta.url).pathname;
 })
 </script>
 
@@ -11,42 +48,50 @@ const props = defineProps({
     <div class="details">
 
       <div class="tile">
-        <div class="icon"><img src="@/assets/images/steve.png" alt="Player Icon"></div>
+        <div class="icon"><img src="@/assets/icons/version.png" alt="Version icon"></div>
         <div class="column">
-          <div class="value">1.21.2</div>
+          <div class="value">{{ miniverse.mc_version }}</div>
           <div class="label">MC Version</div>
         </div>
       </div>
 
       <div class="tile">
-        <div class="icon"><img src="@/assets/images/steve.png" alt="Player Icon"></div>
+        <div class="icon"><img src="@/assets/icons/player-head.png" alt="Player icon"></div>
         <div class="column">
-          <div class="value">5/20</div>
+          <div class="value">{{ numberOfPlayers }}/{{ miniverse.max_players }}</div>
           <div class="label">Players</div>
         </div>
       </div>
 
       <div class="tile">
-        <div class="icon"><img src="@/assets/images/steve.png" alt="Player Icon"></div>
+        <div class="icon"><img :src="loaderIcon" alt="Loader icon"></div>
         <div class="column">
-          <div class="value">5/20</div>
-          <div class="label">Players</div>
+          <div class="value">{{ titleCase(miniverse.server_type) }}</div>
+          <div class="label">Loader</div>
         </div>
       </div>
 
       <div class="tile">
-        <div class="icon"><img src="@/assets/images/steve.png" alt="Player Icon"></div>
+        <div class="icon"><img :src="statusIcons" alt="Status icon"></div>
         <div class="column">
-          <div class="value">5/20</div>
-          <div class="label">Players</div>
+          <div class="value">{{ titleCase(miniverse.status) }}</div>
+          <div class="label">Status</div>
         </div>
       </div>
 
       <div class="tile">
-        <div class="icon"><img src="@/assets/images/steve.png" alt="Player Icon"></div>
+        <div class="icon"><img src="@/assets/icons/cpu.png" alt="CPU icon"></div>
         <div class="column">
-          <div class="value">5/20</div>
-          <div class="label">Players</div>
+          <div class="value">{{ miniverse.infos.cpu_usage }}%</div>
+          <div class="label">CPU</div>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="icon"><img src="@/assets/icons/ram.png" alt="RAM icon"></div>
+        <div class="column">
+          <div class="value">{{ formatMemory(miniverse.infos.memory_used) }}/{{ formatMemory(miniverse.infos.memory_limit) }}</div>
+          <div class="label">RAM</div>
         </div>
       </div>
 
