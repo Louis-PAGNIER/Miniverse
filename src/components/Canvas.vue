@@ -4,14 +4,20 @@ import {TresCanvas} from "@tresjs/core";
 import System from "@/components/System.vue";
 import {computed, ref, shallowRef} from "vue";
 import MiniverseSheet from "@/components/MiniverseSheet.vue";
+import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 
 const systemRef = ref(null);
 const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse);
+const newMiniverseDialogRef = ref();
 
 const handleOverlayClick = (event) => {
   if (focusedMiniverse.value && event.target.id === "main-overlay") {
     systemRef.value?.focusMiniverse(null);
   }
+};
+
+const openNewMiniverseDialog = () => {
+  newMiniverseDialogRef.value?.open();
 };
 </script>
 
@@ -23,7 +29,9 @@ const handleOverlayClick = (event) => {
     <div class="header">
       <span class="logo">Miniverse</span>
       <div class="spacer"></div>
-      <button><img class="svg-icon" src="@/assets/icons/plus.svg"></button>
+      <button @click="openNewMiniverseDialog">
+        <img class="svg-icon" src="@/assets/icons/plus.svg" />
+      </button>
       <router-link class="button" to="settings"><img class="svg-icon" src="@/assets/icons/settings.svg"></router-link>
       <button><img class="svg-icon" src="@/assets/icons/account.svg"></button>
     </div>
@@ -33,6 +41,8 @@ const handleOverlayClick = (event) => {
       </div>
     </transition>
   </div>
+
+  <AddMiniversePopup ref="newMiniverseDialogRef"/>
 </template>
 
 <style scoped>

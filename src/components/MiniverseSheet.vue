@@ -45,7 +45,7 @@ const statusIcons = computed(() => {
   <div class="presentation">
     <h1 class="title">{{ miniverse.name }}</h1>
     <div class="navigator"><span class="path">Home</span> ⟩ <span class="path">Settings</span></div>
-    <div class="details">
+    <div class="summary">
 
       <div class="tile">
         <div class="icon"><img src="@/assets/icons/version.png" alt="Version icon"></div>
@@ -96,6 +96,15 @@ const statusIcons = computed(() => {
       </div>
 
     </div>
+    <div class="mods">
+      <h2>Installed mods</h2>
+      <ul>
+        <li v-for="mod in miniverse.infos.mods" :key="mod.name">
+          <span class="mod-name">{{ mod.name }}</span>
+          <span class="mod-version">v{{ mod.version }}</span>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -120,7 +129,7 @@ const statusIcons = computed(() => {
   }
 }
 
-.details {
+.summary {
   display: flex;
   flex-wrap: wrap;
   width: 100%;

@@ -1,15 +1,24 @@
 <script setup>
 import {Vector2} from "three";
-import {shallowRef} from "vue";
+import {shallowRef, watch} from "vue";
 import {useRenderLoop} from "@tresjs/core";
+import * as THREE from "three";
 
 const {onLoop} = useRenderLoop()
 
 const uniforms = {
-  uTime: {value: 0},
-  uAmplitude: {value: new Vector2(0.15, 0.15)},
-  uFrequency: {value: new Vector2(35, 35)},
-}
+  uTime: { value: 0 },
+  uAmplitude: { value: new Vector2(0.15, 0.15) },
+  uFrequency: { value: new Vector2(35, 35) },
+  uColor1: { value: new THREE.Color(0.6, 0.2, 1.0) },
+  uColor2: { value: new THREE.Color(0.2, 1.0, 0.6) },
+};
+
+const props = defineProps({
+  color1: {type: Array, default: () => [0.6, 0.2, 1.0]},
+  color2: {type: Array, default: () => [0.2, 1.0, 0.6]},
+  speed: {type: Number, default: 1.0},
+});
 
 const blobRef = shallowRef()
 
@@ -38,6 +47,8 @@ void main() {
 `
 
 const fragmentShader = `
+uniform vec3 uColor1;
+uniform vec3 uColor2;
 precision mediump float;
 
 varying vec2 vUv;
@@ -55,9 +66,7 @@ void main() {
 
     float gradient = smoothstep(0.0, 1.0, vUv.y + fresnel * 0.3);
 
-    vec3 color1 = vec3(0.6, 0.2, 1.0); // Violet avec une touche de douceur
-    vec3 color2 = vec3(0.2, 1.0, 0.6); // Vert légèrement atténué
-    vec3 baseColor = mix(color1, color2, gradient);
+    vec3 baseColor = mix(uColor1, uColor2, gradient);
 
     vec3 lighting = baseColor * (0.5 + diff * 0.2) + vec3(fresnel * 1.8);
 
@@ -65,9 +74,17 @@ void main() {
 }
 `
 
+watch(() => props.color1, (val) => {
+  uniforms.uColor1.value.set(val[0], val[1], val[2]);
+}, { immediate: true });
+
+watch(() => props.color2, (val) => {
+  uniforms.uColor2.value.set(val[0], val[1], val[2]);
+}, { immediate: true });
+
 onLoop(({delta, _}) => {
   if (blobRef.value) {
-    blobRef.value.material.uniforms.uTime.value += delta
+    blobRef.value.material.uniforms.uTime.value += delta * props.speed;
   }
 })
 

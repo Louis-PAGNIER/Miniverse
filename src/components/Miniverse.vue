@@ -17,6 +17,22 @@ const players = ref([]);
 const playerRefs = ref([]);
 const miniverseRef = shallowRef()
 
+const blobColors = computed(() => {
+  if (props.miniverse.status.toLowerCase() !== 'running') {
+    return [[0.5, 0.5, 0.5], [0.7, 0.7, 0.7]];
+  } else {
+    return [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]];
+  }
+});
+
+const blobSpeed = computed(() => {
+  if (props.miniverse.status.toLowerCase() !== 'running') {
+    return 0.5;
+  } else {
+    return 1.0;
+  }
+});
+
 onBeforeUpdate(() => {
   playerRefs.value = []
 })
@@ -33,7 +49,6 @@ function arePlayersEqual(a, b) {
 
 function distributePlayers() {
   const radius = 2.3;
-  console.log("start", numberOfPlayers.value)
   const fibonacciPositions = generateFibonacciSphere(numberOfPlayers.value, radius);
   const scaleFactor = numberOfPlayers.value > 1 ? 1 / Math.pow(numberOfPlayers.value, 0.35) : 1;
 
@@ -84,8 +99,7 @@ function setPlayersRef(el, index) {
 
 <template>
   <TresGroup ref="miniverseRef">
-    <Blob>
-    </Blob>
+    <Blob :color1="blobColors[0]" :color2="blobColors[1]" :speed="blobSpeed"></Blob>
     <template v-for="(player, index) in players" :key="player.username">
       <TresGroup :ref="el => setPlayersRef(el, index)" :scale="player.scale">
         <Player :username="player.username" :animation="{ ...floatAnimationTemplate, start: player.animationStart }"/>
