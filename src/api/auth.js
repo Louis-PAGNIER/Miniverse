@@ -1,13 +1,17 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:5004";
+const API_BASE = "http://localhost:8000";
 
 export async function login(username, password) {
-  const form = new FormData();
-  form.append("username", username);
-  form.append("password", password);
+  const params = new URLSearchParams();
+  params.append("username", username);
+  params.append("password", password);
 
-  const response = await axios.post(`${API_BASE}/login/token`, form);
+  const response = await axios.post(`${API_BASE}/login`, params, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  });
   const token = response.data.access_token;
 
   localStorage.setItem("access_token", token);
@@ -25,6 +29,7 @@ export function logout() {
 export function initAuth() {
   const token = localStorage.getItem("access_token");
   if (token) {
+    console.log("token: ", token);
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
     console.warn("No access token found in localStorage.");

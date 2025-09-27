@@ -3,6 +3,7 @@ import {useAuthStore} from "@/stores/authStore.js";
 
 const auth = useAuthStore();
 auth.initialize();
+console.log("Auth initialized");
 </script>
 
 <template>

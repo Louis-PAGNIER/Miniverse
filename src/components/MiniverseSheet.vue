@@ -6,7 +6,7 @@ const props = defineProps({
 })
 
 const numberOfPlayers = computed(() => {
-  return props.miniverse.infos.connected_players.length;
+  return 0;// props.miniverse.infos.connected_players.length;
 });
 
 function titleCase(str) {
@@ -20,12 +20,13 @@ function formatMemory(memory) {
 }
 
 const loaderIcon = computed(() => {
-  return new URL(`../assets/icons/${props.miniverse.server_type.toLowerCase()}.png`, import.meta.url).pathname;
+  return new URL(`../assets/icons/${props.miniverse.type.toLowerCase()}.png`, import.meta.url).pathname;
 })
 
 const statusIcons = computed(() => {
   let url;
-  switch (props.miniverse.status.toLowerCase()) {
+  url = '../assets/icons/running.png'
+  /*switch (props.miniverse.status.toLowerCase()) {
     case 'running':
       url = '../assets/icons/running.png';
       break;
@@ -36,7 +37,7 @@ const statusIcons = computed(() => {
     default:
       url = '../assets/icons/restarting.png';
       break;
-  }
+  }*/
   return new URL(url, import.meta.url).pathname;
 })
 </script>
@@ -55,31 +56,31 @@ const statusIcons = computed(() => {
         </div>
       </div>
 
-      <div class="tile">
+<!--      <div class="tile">
         <div class="icon"><img src="@/assets/icons/player-head.png" alt="Player icon"></div>
         <div class="column">
           <div class="value">{{ numberOfPlayers }}/{{ miniverse.max_players }}</div>
           <div class="label">Players</div>
         </div>
-      </div>
+      </div>-->
 
-      <div class="tile">
+<!--      <div class="tile">
         <div class="icon"><img :src="loaderIcon" alt="Loader icon"></div>
         <div class="column">
           <div class="value">{{ titleCase(miniverse.server_type) }}</div>
           <div class="label">Loader</div>
         </div>
-      </div>
+      </div>-->
 
-      <div class="tile">
+<!--      <div class="tile">
         <div class="icon"><img :src="statusIcons" alt="Status icon"></div>
         <div class="column">
           <div class="value">{{ titleCase(miniverse.status) }}</div>
           <div class="label">Status</div>
         </div>
-      </div>
+      </div>-->
 
-      <div class="tile">
+<!--      <div class="tile">
         <div class="icon"><img src="@/assets/icons/cpu.png" alt="CPU icon"></div>
         <div class="column">
           <div class="value">{{ miniverse.infos.cpu_usage }}%</div>
@@ -93,13 +94,13 @@ const statusIcons = computed(() => {
           <div class="value">{{ formatMemory(miniverse.infos.memory_used) }}/{{ formatMemory(miniverse.infos.memory_limit) }}</div>
           <div class="label">RAM</div>
         </div>
-      </div>
+      </div>-->
 
     </div>
     <div class="mods">
       <h2>Installed mods</h2>
       <ul>
-        <li v-for="mod in miniverse.infos.mods" :key="mod.name">
+        <li v-for="mod in miniverse.mods" :key="mod.name">
           <span class="mod-name">{{ mod.name }}</span>
           <span class="mod-version">v{{ mod.version }}</span>
         </li>

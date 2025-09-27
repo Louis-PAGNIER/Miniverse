@@ -1,10 +1,14 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:5004";
+const API_BASE = "http://localhost:8000";
 
 export async function fetchMiniverses() {
-  const response = await axios.get(`${API_BASE}/miniverses/`);
-  return response.data.filter(miniverse => miniverse.infos.connected_players);
+  console.log(axios.defaults.headers.common["Authorization"])
+  return (await axios.get(`${API_BASE}/miniverses/`)).data;
+}
+
+export async function fetchPlayers() {
+  return (await axios.get(`${API_BASE}/miniverses/players/`)).data;
 }
 
 export async function createMiniverse(name, description, type, MCVersion, maxPlayers, subDomain) {

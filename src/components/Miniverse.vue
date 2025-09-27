@@ -11,26 +11,28 @@ const props = defineProps({
   position: { type: Array, default: () => [0, 0, 0] }
 });
 
-const numberOfPlayers = computed(() => { return props.miniverse.infos.connected_players.length; });
+const numberOfPlayers = computed(() => { return 0 });// props.miniverse.infos.connected_players.length; });
 
 const players = ref([]);
 const playerRefs = ref([]);
 const miniverseRef = shallowRef()
 
 const blobColors = computed(() => {
-  if (props.miniverse.status.toLowerCase() !== 'running') {
+  return [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]];
+/*  if (props.miniverse.status.toLowerCase() !== 'running') {
     return [[0.5, 0.5, 0.5], [0.7, 0.7, 0.7]];
   } else {
     return [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]];
-  }
+  }*/
 });
 
 const blobSpeed = computed(() => {
-  if (props.miniverse.status.toLowerCase() !== 'running') {
+  return 1.0;
+  /*if (props.miniverse.status.toLowerCase() !== 'running') {
     return 0.5;
   } else {
     return 1.0;
-  }
+  }*/
 });
 
 onBeforeUpdate(() => {
@@ -52,7 +54,9 @@ function distributePlayers() {
   const fibonacciPositions = generateFibonacciSphere(numberOfPlayers.value, radius);
   const scaleFactor = numberOfPlayers.value > 1 ? 1 / Math.pow(numberOfPlayers.value, 0.35) : 1;
 
-  return props.miniverse.infos.connected_players.map((username, index) => ({
+  return [];
+
+  /*return props.miniverse.infos.connected_players.map((username, index) => ({
     username,
     position: {...fibonacciPositions[index]},
     basePosition: {...fibonacciPositions[index]},
@@ -61,10 +65,10 @@ function distributePlayers() {
     positionPhase: Math.random() * Math.PI * 2,
     animationStart: Math.random(),
     rotationSpeed: {x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() * 2 - 1},
-  }));
+  }));*/
 }
 
-watch(
+/*watch(
     () => props.miniverse.infos.connected_players,
     (newPlayers, oldPlayers) => {
       if (!oldPlayers || !arePlayersEqual(newPlayers, oldPlayers)) {
@@ -72,7 +76,7 @@ watch(
       }
     },
     { immediate: true }
-);
+);*/
 
 const {onLoop} = useRenderLoop();
 
