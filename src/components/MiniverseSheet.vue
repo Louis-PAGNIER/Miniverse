@@ -1,19 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import {computed} from "vue";
+import {Miniverse} from "@/models/miniverse";
 
-const props = defineProps({
-  miniverse: { type: Object, required: true },
-})
+const props = defineProps<{
+  miniverse: Miniverse,
+}>();
 
 const numberOfPlayers = computed(() => {
   return 0;// props.miniverse.infos.connected_players.length;
 });
 
-function titleCase(str) {
+function titleCase(str: string): string {
   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
 }
 
-function formatMemory(memory) {
+function formatMemory(memory: number): string {
   if (memory === 0) { return '0M'; }
   if (memory < 1_000_000) { return (memory / 1_000_000).toFixed(2) + 'M'; }
   return (memory / 1_000_000_000).toFixed(2) + 'G';
@@ -24,20 +25,7 @@ const loaderIcon = computed(() => {
 })
 
 const statusIcons = computed(() => {
-  let url;
-  url = '../assets/icons/running.png'
-  /*switch (props.miniverse.status.toLowerCase()) {
-    case 'running':
-      url = '../assets/icons/running.png';
-      break;
-    case 'stopped':
-    case 'exited':
-      url = '../assets/icons/stopped.png';
-      break;
-    default:
-      url = '../assets/icons/restarting.png';
-      break;
-  }*/
+  const url: string = props.miniverse.started ? '../assets/icons/running.png' : '../assets/icons/stopped.png';
   return new URL(url, import.meta.url).pathname;
 })
 </script>
@@ -64,21 +52,21 @@ const statusIcons = computed(() => {
         </div>
       </div>-->
 
-<!--      <div class="tile">
+      <div class="tile">
         <div class="icon"><img :src="loaderIcon" alt="Loader icon"></div>
         <div class="column">
-          <div class="value">{{ titleCase(miniverse.server_type) }}</div>
+          <div class="value">{{ titleCase(miniverse.type) }}</div>
           <div class="label">Loader</div>
         </div>
-      </div>-->
+      </div>
 
-<!--      <div class="tile">
+      <div class="tile">
         <div class="icon"><img :src="statusIcons" alt="Status icon"></div>
         <div class="column">
-          <div class="value">{{ titleCase(miniverse.status) }}</div>
+          <div class="value">{{ titleCase(miniverse.started ? 'Started' : 'Stoped') }}</div>
           <div class="label">Status</div>
         </div>
-      </div>-->
+      </div>
 
 <!--      <div class="tile">
         <div class="icon"><img src="@/assets/icons/cpu.png" alt="CPU icon"></div>
@@ -97,12 +85,11 @@ const statusIcons = computed(() => {
       </div>-->
 
     </div>
-    <div class="mods">
+    <div class="mods" v-if="miniverse.mods.length > 0">
       <h2>Installed mods</h2>
       <ul>
         <li v-for="mod in miniverse.mods" :key="mod.name">
-          <span class="mod-name">{{ mod.name }}</span>
-          <span class="mod-version">v{{ mod.version }}</span>
+          <span class="mod-name">{{ mod.title }}</span>
         </li>
       </ul>
     </div>

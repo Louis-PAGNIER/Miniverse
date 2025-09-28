@@ -1,15 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import {computed, onBeforeUpdate, ref, shallowRef, watch} from 'vue';
 import Player from "@/components/Player.vue";
 import floatAnimationTemplate from "@/assets/minecraftAnimations/PlayerFloat.json";
 import Blob from "@/components/Blob.vue";
 import {generateFibonacciSphere} from "@/scripts/math.js";
 import {useRenderLoop} from "@tresjs/core";
+import {Miniverse} from "@/models/miniverse";
 
-const props = defineProps({
-  miniverse: {type: Object, required: true},
-  position: { type: Array, default: () => [0, 0, 0] }
-});
+const props = defineProps<{
+  miniverse: Miniverse
+}>();
 
 const numberOfPlayers = computed(() => { return 0 });// props.miniverse.infos.connected_players.length; });
 
@@ -18,21 +18,11 @@ const playerRefs = ref([]);
 const miniverseRef = shallowRef()
 
 const blobColors = computed(() => {
-  return [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]];
-/*  if (props.miniverse.status.toLowerCase() !== 'running') {
-    return [[0.5, 0.5, 0.5], [0.7, 0.7, 0.7]];
-  } else {
-    return [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]];
-  }*/
+  return props.miniverse.started ? [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]] : [[0.5, 0.5, 0.5], [0.7, 0.7, 0.7]];
 });
 
 const blobSpeed = computed(() => {
-  return 1.0;
-  /*if (props.miniverse.status.toLowerCase() !== 'running') {
-    return 0.5;
-  } else {
-    return 1.0;
-  }*/
+  return props.miniverse.started ? 1.0 : 0.5;
 });
 
 onBeforeUpdate(() => {

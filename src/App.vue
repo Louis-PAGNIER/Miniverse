@@ -1,9 +1,15 @@
-<script setup>
-import {useAuthStore} from "@/stores/authStore.js";
+<script setup lang="ts">
+import {useAuthStore} from "@/stores/authStore";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const auth = useAuthStore();
 auth.initialize();
 console.log("Auth initialized");
+
+const miniverseStore = useMiniverseStore();
+miniverseStore.fetchMiniverses();
+miniverseStore.connectWebSocket();
+miniverseStore.closeWebSocket();
 </script>
 
 <template>

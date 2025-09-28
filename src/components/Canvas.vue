@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 import {TresCanvas} from "@tresjs/core";
 import System from "@/components/System.vue";
@@ -7,7 +7,7 @@ import MiniverseSheet from "@/components/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 
 const systemRef = ref(null);
-const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse);
+const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse?.miniverse);
 const newMiniverseDialogRef = ref();
 
 const handleOverlayClick = (event) => {

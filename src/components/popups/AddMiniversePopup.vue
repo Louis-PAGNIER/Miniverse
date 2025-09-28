@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { createMiniverse } from "@/api/api";
+import { apiCreateMiniverse } from "@/api/miniverse";
 
 defineExpose({ open });
 
@@ -28,7 +28,7 @@ function close() {
 
 function submit() {
   const values = form.value;
-  createMiniverse(values.name, values.description, values.type, values.version, values.maxPlayers, values.subdomain).then((result) => {
+  apiCreateMiniverse(values.name, values.description, values.type, values.version, values.subdomain).then((result) => {
     if (result.success) {
       console.log("Miniverse créé avec succès :", result.data);
     } else {

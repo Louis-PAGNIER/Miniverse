@@ -4,7 +4,7 @@ import {shallowRef, watch} from "vue";
 import {useRenderLoop} from "@tresjs/core";
 import * as THREE from "three";
 
-const {onLoop} = useRenderLoop()
+const {onLoop} = useRenderLoop();
 
 const uniforms = {
   uTime: { value: 0 },
@@ -103,7 +103,6 @@ onLoop(({delta, _}) => {
     </TresMesh>
 
     <TresGroup>
-      <slot />
     </TresGroup>
   </TresGroup>
 </template>

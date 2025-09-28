@@ -2,11 +2,12 @@ import '../assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from "pinia";
-import { createRouter, createWebHistory } from "vue-router";
-import Tres from '@tresjs/core'
-import routes from "~pages";
 
-import App from '../App.vue'
+import App from "@/App.vue";
+
+import { createRouter, createWebHistory } from "vue-router";
+import Tres from '@tresjs/core';
+import routes from "~pages";
 
 const router = createRouter({
     history: createWebHistory(),

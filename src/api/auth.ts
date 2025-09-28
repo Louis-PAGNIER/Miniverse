@@ -1,8 +1,7 @@
 import axios from "axios";
+import {API_BASE} from "@/api/api";
 
-const API_BASE = "http://localhost:8000";
-
-export async function login(username, password) {
+export async function apiLogin(username: string, password: string): Promise<string> {
   const params = new URLSearchParams();
   params.append("username", username);
   params.append("password", password);
@@ -10,7 +9,8 @@ export async function login(username, password) {
   const response = await axios.post(`${API_BASE}/login`, params, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
-    }
+    },
+    withCredentials: true
   });
   const token = response.data.access_token;
 
@@ -21,20 +21,20 @@ export async function login(username, password) {
   return token;
 }
 
-export function logout() {
+export function apiLogout() {
   localStorage.removeItem("access_token");
   delete axios.defaults.headers.common["Authorization"];
 }
 
 export function initAuth() {
-  const token = localStorage.getItem("access_token");
-  if (token) {
+  const token: string | null = localStorage.getItem("access_token");
+  if (false && token) {
     console.log("token: ", token);
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
     console.warn("No access token found in localStorage.");
     console.log("Logging with default credentials...");
-    login("Louis", "1234").then(() => {
+    apiLogin("Louis", "1234").then(() => {
       console.log("Default credentials logged in successfully.");
     }).catch(error => {
       console.error("Failed to log in with default credentials:", error);

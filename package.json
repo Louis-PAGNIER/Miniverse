@@ -20,9 +20,12 @@
     "vue-router": "^4.0.13"
   },
   "devDependencies": {
+    "@types/node": "^24.5.2",
     "@types/three": "^0.171.0",
     "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.9.2",
     "vite": "^6.0.5",
+    "vite-plugin-mkcert": "^1.17.8",
     "vite-plugin-vue-devtools": "^7.6.8"
   }
 }

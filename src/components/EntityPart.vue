@@ -4,7 +4,7 @@ import {addArray, negArray} from "@/scripts/math.js";
 import {DoubleSide, FrontSide} from "three";
 import {shallowRef} from "vue";
 import {useLoop} from "@tresjs/core";
-import {interpolateRotation} from "@/scripts/animations.js";
+import {interpolateRotation} from "@/scripts/animations.ts";
 
 const props = defineProps({
   template: Object,
