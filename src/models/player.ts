@@ -15,6 +15,7 @@ export class PlayerAnimator {
   positionPhase: number;
 
   rotationSpeed: Vector3;
+  rotationPhase: number;
 
   scale: NumberAnimator;
 
@@ -31,6 +32,7 @@ export class PlayerAnimator {
       Math.random() * 2 - 1,
       Math.random() * 2 - 1
     ));
+    this.rotationPhase = Math.random() * Math.PI * 2;
     this.scale = markRaw(new NumberAnimator(1));
     this.animationStart = Math.random();
   }

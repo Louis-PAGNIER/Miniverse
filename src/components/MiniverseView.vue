@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {computed, ComputedRef, ref, watch} from 'vue';
 import Player from "@/components/Player.vue";
-import floatAnimationTemplate from "@/assets/minecraftAnimations/PlayerFloat.json";
 import Blob from "@/components/Blob.vue";
 import {generateFibonacciSphere} from "@/scripts/math";
 import {useLoop} from "@tresjs/core";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import {arePlayerListsEqual, PlayerAnimator} from "@/models/player";
-import {Group} from "three";
+import {Color, Group} from "three";
 import {InterpolationType} from "@/scripts/animations";
+import {PlayerFloatAnimation} from "@/assets/minecraftAnimations/PlayerFloat";
 
 const props = defineProps<{
   miniverse: Miniverse
@@ -23,7 +23,15 @@ const miniversePlayers: ComputedRef<PlayerAnimator[]> = computed(() => {
 const playerRefs = ref(new Map<string, Group>())
 
 const blobColors = computed(() => {
-  return props.miniverse.started ? [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]] : [[0.5, 0.5, 0.5], [0.7, 0.7, 0.7]];
+  if (props.miniverse.started) {
+    return [
+      new Color(0.6, 0.2, 1.0), new Color(0.2, 1.0, 0.6)
+    ];
+  } else {
+    return [
+      new Color(0.5, 0.5, 0.5), new Color(0.7, 0.7, 0.7)
+    ];
+  }
 });
 
 const blobSpeed = computed(() => {
@@ -65,6 +73,7 @@ onBeforeRender(({delta, elapsed}) => {
       positionPhase,
       centerPositionAnimator,
       rotationSpeed,
+      rotationPhase,
       scale
     } = playerAnimator;
 
@@ -77,7 +86,7 @@ onBeforeRender(({delta, elapsed}) => {
     groupRef.position.y = pos.y + Math.cos(elapsed * positionFrequency + positionPhase) * 0.5;
     groupRef.position.z = pos.z + Math.sin(elapsed * positionFrequency + positionPhase) * 0.5;
 
-    groupRef.rotation.setFromVector3(rotationSpeed.clone().multiplyScalar(elapsed * 0.05));
+    groupRef.rotation.setFromVector3(rotationSpeed.clone().multiplyScalar(elapsed * 0.05 + rotationPhase * 1000));
     groupRef.scale.setScalar(scale.value);
   });
 });
@@ -97,7 +106,7 @@ function setPlayersRef(el: any | null, id: string) {
     <Blob :color1="blobColors[0]" :color2="blobColors[1]" :speed="blobSpeed"></Blob>
     <template v-for="playerAnimator in miniversePlayers" :key="playerAnimator.player.id">
       <TresGroup :ref="el => setPlayersRef(el, playerAnimator.player.id)">
-        <Player :username="playerAnimator.player.name" :animation="{ ...floatAnimationTemplate, start: playerAnimator.animationStart }"/>
+        <Player :username="playerAnimator.player.name" :animation="{ ...PlayerFloatAnimation, start: playerAnimator.animationStart }"/>
       </TresGroup>
     </template>
   </TresGroup>

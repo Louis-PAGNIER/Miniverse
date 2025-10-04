@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Entity from "@/components/Entity.vue";
-import playerTemplate from "@/assets/minecraftTemplates/PlayerTemplate.json";
-import oldPlayerTemplate from "@/assets/minecraftTemplates/OldPlayerTemplate.json";
-import veryOldTemplate from "@/assets/minecraftTemplates/VeryOldPlayerTemplate.json";
-import {ref, computed, watch} from "vue";
+import {PlayerTemplate} from "@/assets/minecraftTemplates/PlayerTemplate";
+import {OldPlayerTemplate} from "@/assets/minecraftTemplates/OldPlayerTemplate";
+import {VeryOldPlayerTemplate} from "@/assets/minecraftTemplates/VeryOldPlayerTemplate";
+import {ref, computed, watch, Ref} from "vue";
 import {Vector3} from "three";
 
 const MINESKIN_BASE_URL = "https://mineskin.eu/skin";
@@ -15,10 +15,10 @@ const props = defineProps<{
   animation?: any,
 }>();
 
-const skinData: Ref<SkinData> = ref(null);
+const skinData: Ref<SkinData | null> = ref(null);
 const skinUrl = computed(() => `${MINESKIN_BASE_URL}/${props.username}`);
 
-async function loadSkinImage(url): Promise<SkinData | null> {
+async function loadSkinImage(url: string): Promise<SkinData | null> {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "Anonymous";
@@ -27,8 +27,12 @@ async function loadSkinImage(url): Promise<SkinData | null> {
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      resolve({ width: img.width, height: img.height, ctx });
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        resolve({ width: img.width, height: img.height, ctx });
+      } else {
+        resolve(null);
+      }
     };
     img.onerror = () => resolve(null);
     img.src = url;
@@ -36,7 +40,7 @@ async function loadSkinImage(url): Promise<SkinData | null> {
 }
 
 // Check for very old skin having black hat instead of transparent pixels
-function areRectanglesBlack(ctx): boolean {
+function areRectanglesBlack(ctx: CanvasRenderingContext2D): boolean {
   const rectangles = [[48, 8, 56, 16], [32, 8, 40, 16], [40, 0, 48, 8], [48, 0, 56, 8], [40, 8, 48, 16], [56, 8, 64, 16]];
 
   for (const [x1, y1, x2, y2] of rectangles) {
@@ -60,11 +64,11 @@ watch(
       const skinImage = await loadSkinImage(newUrl);
       if (skinImage) {
         if (skinImage.height === 64) {
-          entityTemplate.value = playerTemplate;
+          entityTemplate.value = PlayerTemplate;
         } else if (areRectanglesBlack(skinImage.ctx)) {
-          entityTemplate.value = veryOldTemplate;
+          entityTemplate.value = VeryOldPlayerTemplate;
         } else {
-          entityTemplate.value = oldPlayerTemplate;
+          entityTemplate.value = OldPlayerTemplate;
         }
 
         skinData.value = skinImage;
@@ -73,7 +77,7 @@ watch(
     { immediate: true }
 );
 
-const entityTemplate = ref(playerTemplate);
+const entityTemplate = ref(PlayerTemplate);
 </script>
 
 <template>

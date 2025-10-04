@@ -1,13 +1,5 @@
 import {Vector3} from "three";
 
-export function addArray(arr1, arr2) {
-  return arr1.map((x, i) => { return x + arr2[i] })
-}
-
-export function negArray(arr) {
-  return arr.map(x => { return -x })
-}
-
 export function generateFibonacciSphere(numPoints: number, radius: number): Vector3[] {
   if (numPoints === 1) return [new Vector3(0, 0, 0)];
 

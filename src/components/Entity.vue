@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {NearestFilter, TextureLoader, Vector3} from "three";
-import {computed, onMounted, ref, shallowRef, watch} from "vue";
+import {NearestFilter, TextureLoader, Vector3, Vector4} from "three";
+import {computed, onMounted, Ref, ref, watch} from "vue";
 import EntityPart from "@/components/EntityPart.vue";
+import {ModelTemplate} from "@/models/modelTemplate";
 
 const props = defineProps<{
-  entityTemplate: any,
+  entityTemplate: ModelTemplate,
   entityTexture: string,
   position?: Vector3,
   animation?: any
@@ -17,12 +18,13 @@ const textureLoader: TextureLoader = new TextureLoader();
 const entityPosition = computed(() => {
   const pos = props.position?.clone() ?? new Vector3(0, 0, 0);
   if (props.animation?.offset) {
-    pos.add(new Vector3(...props.animation.offset));
+    pos.add(props.animation.offset);
   }
   return pos;
 });
 
-const loadFaceTexture = (x1, y1, x2, y2, flip = false) => {
+const loadFaceTexture = (coords: Vector4, flip: boolean = false) => {
+  const {x1, y1, x2, y2} = {x1: coords.x, y1: coords.y, x2: coords.z, y2: coords.w};
   return new Promise((resolve) => {
     const w = x2 - x1;
     const h = y2 - y1;
@@ -42,20 +44,13 @@ const loadFaceTexture = (x1, y1, x2, y2, flip = false) => {
   });
 };
 
-const loadPartTextures = async (part, reference = null) => {
-  const loadedPartMaterials = reference ?? {};
+const loadPartTextures = async (part: ModelTemplate, reference: any | null = null) => {
+  const loadedPartMaterials: any = reference ?? {};
 
   for (let i = 0; i < part.coords.length; i++) {
-    const coords = part.coords[i];
     loadedPartMaterials[part.id] = loadedPartMaterials[part.id] || [];
     loadedPartMaterials[part.id].push(
-        await loadFaceTexture(
-            coords[0],
-            coords[1],
-            coords[2],
-            coords[3],
-            i === 3 // Flip only for bottom face
-        )
+        await loadFaceTexture(part.coords[i],i === 3) // Flip only for bottom face
     );
   }
 

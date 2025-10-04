@@ -1,5 +1,6 @@
 import {Ref} from "vue";
 import {Vector3} from "three";
+import {ModelAnimationKeyframe} from "@/models/modelAnimation";
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const easeIn = (t: number) => t * t;
@@ -30,8 +31,8 @@ export const interpolate = (a: number, b: number, t: number, type: Interpolation
   return lerp(a, b, t);
 };
 
-export const interpolateRotation = (time: number, keyframes: any, currentIndex: Ref<number>) => {
-  if (!keyframes || keyframes.length === 0) return [0, 0, 0];
+export const interpolateRotation = (time: number, keyframes: ModelAnimationKeyframe[], currentIndex: Ref<number>) => {
+  if (!keyframes || keyframes.length === 0) return new Vector3(0, 0, 0);
   if (keyframes.length === 1) return keyframes[0].rotation;
 
   while (currentIndex.value < keyframes.length - 1 && time > keyframes[currentIndex.value + 1].time)
@@ -43,20 +44,17 @@ export const interpolateRotation = (time: number, keyframes: any, currentIndex: 
   const startFrame = keyframes[currentIndex.value];
   const endFrame = keyframes[currentIndex.value + 1] || keyframes[0];
 
-  if (!startFrame || !endFrame) return [0, 0, 0];
+  if (!startFrame || !endFrame) return new Vector3(0, 0, 0);
 
   const startTime = startFrame.time
   const endTime = endFrame.time >= startTime ? endFrame.time : 1;
 
   const t = (time - startTime) / (endTime - startTime);
 
-  return startFrame.rotation.map((start: number, i: number) =>
-    interpolate(
-      start,
-      endFrame.rotation[i],
-      t,
-      startFrame.interpolation || 'linear'
-    )
+  return new Vector3(
+    interpolate(startFrame.rotation.x, endFrame.rotation.x, t, startFrame.interpolation || 'linear'),
+    interpolate(startFrame.rotation.y, endFrame.rotation.y, t, startFrame.interpolation || 'linear'),
+    interpolate(startFrame.rotation.z, endFrame.rotation.z, t, startFrame.interpolation || 'linear')
   );
 }
 

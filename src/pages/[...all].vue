@@ -2,12 +2,11 @@
 import {TresCanvas} from "@tresjs/core";
 import {OrbitControls} from '@tresjs/cientos'
 import Player from "@/components/Player.vue";
-import floatAnimation from "@/assets/minecraftAnimations/PlayerFloat.json";
 
 </script>
 
 <template>
-  <TresCanvas window-size clear-color="#010101">
+<!--  <TresCanvas window-size clear-color="#010101">
     <TresPerspectiveCamera :position="[0, 8, 12]" :look-at="[0, 0, 0]"/>
 
     <Suspense>
@@ -18,7 +17,7 @@ import floatAnimation from "@/assets/minecraftAnimations/PlayerFloat.json";
     <TresPointLight :intensity="40" :position="[5, 5, 5]"/>
 
     <OrbitControls/>
-  </TresCanvas>
+  </TresCanvas>-->
 </template>
 
 <style scoped>
