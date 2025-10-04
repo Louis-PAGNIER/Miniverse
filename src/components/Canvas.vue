@@ -3,7 +3,7 @@
 import {TresCanvas} from "@tresjs/core";
 import System from "@/components/System.vue";
 import {computed, ref, ShallowRef, shallowRef} from "vue";
-import MiniverseSheet from "@/components/MiniverseSheet.vue";
+import MiniverseSheet from "@/components/MiniverseSheet/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 
 const systemRef: ShallowRef<System | null> = shallowRef(null);

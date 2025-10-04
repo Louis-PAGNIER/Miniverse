@@ -2,7 +2,7 @@
 import {computed, ComputedRef, ref, watch} from 'vue';
 import Player from "@/components/Player.vue";
 import Blob from "@/components/Blob.vue";
-import {generateFibonacciSphere} from "@/scripts/math";
+import {generateFibonacciSphere} from "@/scripts/utils";
 import {useLoop} from "@tresjs/core";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
