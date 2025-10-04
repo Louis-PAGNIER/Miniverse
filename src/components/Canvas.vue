@@ -5,14 +5,19 @@ import System from "@/components/System.vue";
 import {computed, ref, ShallowRef, shallowRef} from "vue";
 import MiniverseSheet from "@/components/MiniverseSheet/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
+import {useRoute, useRouter} from "vue-router";
 
-const systemRef: ShallowRef<System | null> = shallowRef(null);
+const router = useRouter();
+const route = useRoute();
+
+const systemRef: ShallowRef = shallowRef(null);
 const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse?.miniverse);
 const newMiniverseDialogRef = ref();
 
-const handleOverlayClick = (event) => {
-  if (focusedMiniverse.value && event.target.id === "main-overlay") {
-    systemRef.value?.focusMiniverse(null);
+const handleOverlayClick = (event: MouseEvent) => {
+  if (focusedMiniverse.value && event.target?.id === "main-overlay") {
+    //systemRef.value?.focusMiniverse(null);
+    router.push("/");
   }
 };
 
@@ -23,7 +28,7 @@ const openNewMiniverseDialog = () => {
 
 <template>
   <TresCanvas window-size clear-color="black" :antialias="false">
-    <System ref="systemRef"></System>
+    <System ref="systemRef" :router="router" :route="route"></System>
   </TresCanvas>
   <div id="overlays-wrapper">
     <div class="header">
@@ -32,7 +37,7 @@ const openNewMiniverseDialog = () => {
       <button @click="openNewMiniverseDialog">
         <img class="svg-icon" src="@/assets/icons/plus.svg" />
       </button>
-      <router-link class="button" to="settings"><img class="svg-icon" src="@/assets/icons/settings.svg"></router-link>
+<!--      <router-link class="button" to="settings"><img class="svg-icon" src="@/assets/icons/settings.svg"></router-link>-->
       <button><img class="svg-icon" src="@/assets/icons/account.svg"></button>
     </div>
     <transition name="fade">

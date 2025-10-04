@@ -9,12 +9,11 @@ const GRID_WIDTH_FACTOR_FOCUS: number = 50;
 const GRID_HORIZONTAL_SPACING: number = 10;
 const GRID_VERTICAL_SPACING: number = 13;
 
-const miniverseStore = useMiniverseStore();
-
 export class MiniverseAnimatorManager {
   camera: Vector3Animator;
   focusedMiniverse: Ref<MiniverseAnimator | null>;
   gridRows: number;
+  miniverseStore = useMiniverseStore();
 
   constructor(camera: Vector3Animator, focusedMiniverse: Ref<MiniverseAnimator | null>) {
     this.camera = camera;
@@ -113,7 +112,7 @@ export class MiniverseAnimatorManager {
   };
 
   distributeMiniverses = (animated: boolean = true) => {
-    const miniverseAnimators: Map<string, MiniverseAnimator> = miniverseStore.miniverseAnimators;
+    const miniverseAnimators: Map<string, MiniverseAnimator> = this.miniverseStore.miniverseAnimators;
     if (this.focusedMiniverse.value) {
       this.camera.setGoal(new Vector3(0, 20, 100), 1000, InterpolationType.EASE_IN_OUT);
     } else {
@@ -127,6 +126,8 @@ export class MiniverseAnimatorManager {
   };
 
   focusMiniverse = (miniverse: MiniverseAnimator | null, animated: boolean = true) => {
+    if (this.focusedMiniverse.value === miniverse)
+      return;
     if (miniverse === null)
     {
       this.focusedMiniverse.value?.scaleAnimator?.setGoal(1.0, 1000, InterpolationType.LINEAR);
@@ -156,9 +157,5 @@ export class MiniverseAnimatorManager {
   handleMouseLeave = (m: MiniverseAnimator) => {
     m.scaleAnimator.setGoal(1.0, 100, InterpolationType.LINEAR);
     document.body.style.cursor = "default";
-  };
-
-  handleMiniverseClick = (miniverse: MiniverseAnimator) => {
-    this.focusMiniverse(miniverse);
   };
 }

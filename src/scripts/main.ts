@@ -7,11 +7,21 @@ import App from "@/App.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import Tres from '@tresjs/core';
-import routes from "~pages";
+import Canvas from "@/components/Canvas.vue";
 
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes: [
+        {
+            path: '/',
+            name: 'Home',
+            component: Canvas
+        },
+        {
+            path: '/miniverse/:catchAll(.*)',
+            component: Canvas,
+        }
+    ]
 })
 
 const app = createApp(App)

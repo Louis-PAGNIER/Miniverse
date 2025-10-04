@@ -1,57 +1,28 @@
 <script setup lang="ts">
-import {computed} from "vue";
-import {Miniverse} from "@/models/miniverse";
-import {useMiniverseStore} from "@/stores/miniverseStore";
-import MiniverseSheetTile from "@/components/MiniverseSheet/MiniverseSheetTile.vue";
+import { Miniverse } from "@/models/miniverse";
+import { provide } from "vue";
 
-const miniverseStore = useMiniverseStore();
-const props = defineProps<{
-  miniverse: Miniverse,
-}>();
+import Navigator from "@/components/MiniverseSheet/Navigator.vue";
+import HomeSheetPage from "@/components/MiniverseSheet/HomeSheetPage.vue";
+import PlayersSheetPage from "@/components/MiniverseSheet/PlayersSheetPage.vue";
 
-const numberOfPlayers = computed(() => {
-  return miniverseStore.miniversePlayersLists.get(props.miniverse.id)?.length || 0;
-});
+const props = defineProps<{ miniverse: Miniverse }>();
 
-function titleCase(str: string): string {
-  return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-}
+provide('miniverse', props.miniverse);
 
-function formatMemory(memory: number): string {
-  if (memory === 0) { return '0M'; }
-  if (memory < 1_000_000) { return (memory / 1_000_000).toFixed(2) + 'M'; }
-  return (memory / 1_000_000_000).toFixed(2) + 'G';
-}
-
-const loaderIcon = computed(() => {
-  return props.miniverse.type.toLowerCase() + '.png';
-})
-
-const statusIcon = computed(() => {
-  return props.miniverse.started ? 'running.png' : 'stoped.png';
-})
+const routes = {
+  home: { name: "Home", component: HomeSheetPage },
+  players: { name: "Players", component: PlayersSheetPage }
+};
 </script>
 
 <template>
   <div class="presentation">
     <h1 class="title">{{ miniverse.name }}</h1>
-    <div class="navigator"><span class="path">Home</span> ⟩ <span class="path">Settings</span></div>
-    <div class="summary">
-
-      <MiniverseSheetTile icon="version.png" label="MC Version">{{ miniverse.mc_version }}</MiniverseSheetTile>
-      <MiniverseSheetTile icon="player-head.png" label="Players">{{ numberOfPlayers }}/20</MiniverseSheetTile>
-      <MiniverseSheetTile :icon="loaderIcon" label="Loader">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
-      <MiniverseSheetTile :icon="statusIcon" label="Status">{{ miniverse.started ? 'Started' : 'Stoped' }}</MiniverseSheetTile>
-
-    </div>
-    <div class="mods" v-if="miniverse.mods.length > 0">
-      <h2>Installed mods</h2>
-      <ul>
-        <li v-for="mod in miniverse.mods" :key="mod.id">
-          <span class="mod-name">{{ mod.title }}</span>
-        </li>
-      </ul>
-    </div>
+    <Navigator
+        :basePath="`/miniverse/${miniverse.id}`"
+        :routes="routes"
+    />
   </div>
 </template>
 
@@ -73,28 +44,6 @@ const statusIcon = computed(() => {
     margin: 0;
     padding: 10px 0 0 0;
     font-weight: 600;
-  }
-}
-
-.summary {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  padding: 16px 0;
-  gap: 20px;
-}
-
-.navigator {
-  color: #a0a0a0;
-  font-weight: 600;
-  cursor: default;
-
-  & > .path {
-    cursor: pointer;
-    transition: color 0.2s;
-    &:hover {
-      color: white;
-    }
   }
 }
 </style>

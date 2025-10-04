@@ -8,6 +8,7 @@ import {Vector3Animator} from "@/scripts/animations";
 import {MiniverseAnimatorManager} from "@/composables/useMiniverseGrid";
 import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
 import {Group, Vector3} from "three";
+import {RouteLocation, Router} from "vue-router";
 
 /* -------------------- Constants -------------------- */
 const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
@@ -23,16 +24,42 @@ const miniversesRefs = ref(new Map<string, Group>())
 const miniverseAnimatorManager = new MiniverseAnimatorManager(cameraPos, focusedMiniverse);
 const miniverses = computed(() => Array.from(miniverseStore.miniverses.values()));
 
+const props = defineProps<{ route: RouteLocation, router: Router }>();
+
 /* -------------------- Stores -------------------- */
 const miniverseStore = useMiniverseStore();
 
 /* -------------------- Lifecycle Hooks -------------------- */
 onMounted(async () => {
+
+  function updateMiniverseFocus() {
+    const path = props.route.fullPath;
+    const match = path.match(/^\/miniverse\/([^\/]+)/);
+    if (match) {
+      const id = match[1];
+      const miniverseAnimator = miniverseStore.miniverseAnimators.get(id);
+      if (miniverseAnimator) {
+        miniverseAnimatorManager.focusMiniverse(miniverseAnimator);
+      }
+    } else {
+      miniverseAnimatorManager.focusMiniverse(null);
+    }
+  }
+
   watch(
       miniverses, (newMiniverses, oldMiniverses) => {
         const isAnimated = !!oldMiniverses && oldMiniverses.length > 0;
+        updateMiniverseFocus();
         miniverseAnimatorManager.distributeMiniverses(isAnimated);
   }, { immediate: true });
+
+  watch(
+      () => props.route.fullPath,
+      (newPath) => {
+        updateMiniverseFocus();
+      },
+      { immediate: true }
+  );
 
   window.addEventListener("resize", miniverseAnimatorManager.handleResize);
   document.addEventListener("wheel", miniverseAnimatorManager.handleScroll);
@@ -52,9 +79,6 @@ onBeforeRender(({ delta }) => {
     miniverseAnimator.positionAnimator.update(delta);
     miniverseAnimator.scaleAnimator.update(delta);
     const miniverseRef = miniversesRefs.value.get(miniverseId);
-    /*if (Math.random() < 0.001) {
-      console.log(miniverseRef)
-    }*/
 
     if (miniverseRef) {
       miniverseRef.position.copy(miniverseAnimator.positionAnimator.value);
@@ -89,7 +113,7 @@ const setMiniversesRef = (el: any | null, id: string) => {
   <template v-for="(miniverseAnimator, index) in miniverseStore.miniverseAnimators.values()" :key="miniverseAnimator.miniverse.id">
     <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)"
                v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id">
-      <MiniverseView @click="miniverseAnimatorManager.handleMiniverseClick(miniverseAnimator)"
+      <MiniverseView @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
                  @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"
                  @pointer-leave="miniverseAnimatorManager.handleMouseLeave(miniverseAnimator)"
                  :miniverse="miniverseAnimator.miniverse" />
