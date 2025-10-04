@@ -2,7 +2,7 @@
 import {NearestFilter, TextureLoader} from "three";
 import {onMounted, ref, shallowRef, watch} from "vue";
 import EntityPart from "@/components/EntityPart.vue";
-import {addArray} from "@/scripts/math.js";
+import {addArray} from "@/scripts/math.ts";
 
 const props = defineProps({
   entityTemplate: Object,

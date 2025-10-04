@@ -1,6 +1,6 @@
 <script setup>
 import EntityPart from "./EntityPart.vue";
-import {addArray, negArray} from "@/scripts/math.js";
+import {addArray, negArray} from "@/scripts/math.ts";
 import {DoubleSide, FrontSide} from "three";
 import {shallowRef} from "vue";
 import {useLoop} from "@tresjs/core";

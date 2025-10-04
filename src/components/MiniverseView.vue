@@ -1,21 +1,26 @@
 <script setup lang="ts">
-import {computed, onBeforeUpdate, ref, shallowRef, watch} from 'vue';
+import {computed, ComputedRef, ref, watch} from 'vue';
 import Player from "@/components/Player.vue";
 import floatAnimationTemplate from "@/assets/minecraftAnimations/PlayerFloat.json";
 import Blob from "@/components/Blob.vue";
-import {generateFibonacciSphere} from "@/scripts/math.js";
-import {useRenderLoop} from "@tresjs/core";
+import {generateFibonacciSphere} from "@/scripts/math";
+import {useLoop} from "@tresjs/core";
 import {Miniverse} from "@/models/miniverse";
+import {useMiniverseStore} from "@/stores/miniverseStore";
+import {arePlayerListsEqual, PlayerAnimator} from "@/models/player";
+import {Group} from "three";
+import {InterpolationType} from "@/scripts/animations";
 
 const props = defineProps<{
   miniverse: Miniverse
 }>();
 
-const numberOfPlayers = computed(() => { return 0 });// props.miniverse.infos.connected_players.length; });
+const miniverseStore = useMiniverseStore();
+const miniversePlayers: ComputedRef<PlayerAnimator[]> = computed(() => {
+  return miniverseStore.miniversePlayersLists.get(props.miniverse.id) || [];
+});
 
-const players = ref([]);
-const playerRefs = ref([]);
-const miniverseRef = shallowRef()
+const playerRefs = ref(new Map<string, Group>())
 
 const blobColors = computed(() => {
   return props.miniverse.started ? [[0.6, 0.2, 1.0], [0.2, 1.0, 0.6]] : [[0.5, 0.5, 0.5], [0.7, 0.7, 0.7]];
@@ -25,78 +30,74 @@ const blobSpeed = computed(() => {
   return props.miniverse.started ? 1.0 : 0.5;
 });
 
-onBeforeUpdate(() => {
-  playerRefs.value = []
-})
+function distributePlayerAnimators(playerAnimators: PlayerAnimator[], animated: boolean, radius: number = 2.3) {
+  const count = playerAnimators.length;
+  const fibonacciPositions = generateFibonacciSphere(count, radius);
+  const scaleFactor: number = count == 1 ? 1 : 1 / Math.pow(count, 0.35);
 
-function arePlayersEqual(a, b) {
-  if (a === b) return true;
-  if (a.length !== b.length) return false;
+  const duration: number = animated ? 1000 : 0;
 
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
+  for (let i = 0; i < count; i++) {
+    const playerAnimator = playerAnimators[i];
+    playerAnimator.centerPositionAnimator.setGoal(fibonacciPositions[i], duration, InterpolationType.EASE_IN_OUT);
+    playerAnimator.scale.setGoal(scaleFactor, duration, InterpolationType.EASE_IN_OUT);
   }
-  return true;
 }
 
-function distributePlayers() {
-  const radius = 2.3;
-  const fibonacciPositions = generateFibonacciSphere(numberOfPlayers.value, radius);
-  const scaleFactor = numberOfPlayers.value > 1 ? 1 / Math.pow(numberOfPlayers.value, 0.35) : 1;
-
-  return [];
-
-  /*return props.miniverse.infos.connected_players.map((username, index) => ({
-    username,
-    position: {...fibonacciPositions[index]},
-    basePosition: {...fibonacciPositions[index]},
-    scale: scaleFactor,
-    frequency: 0.2 + Math.random() * 0.3,
-    positionPhase: Math.random() * Math.PI * 2,
-    animationStart: Math.random(),
-    rotationSpeed: {x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() * 2 - 1},
-  }));*/
-}
-
-/*watch(
-    () => props.miniverse.infos.connected_players,
+watch(
+    () => miniversePlayers.value,
     (newPlayers, oldPlayers) => {
-      if (!oldPlayers || !arePlayersEqual(newPlayers, oldPlayers)) {
-        players.value = distributePlayers();
+      if (!oldPlayers || !arePlayerListsEqual(newPlayers, oldPlayers)) {
+        distributePlayerAnimators(newPlayers, true);
       }
     },
     { immediate: true }
-);*/
+);
 
-const {onLoop} = useRenderLoop();
+const {onBeforeRender} = useLoop();
 
-onLoop(({_, elapsed}) => {
-  players.value.forEach((player, index) => {
-    const groupRef = playerRefs.value[index];
-    const {frequency, positionPhase, basePosition, rotationSpeed} = player;
+onBeforeRender(({delta, elapsed}) => {
+  miniversePlayers.value.forEach((playerAnimator) => {
+    const groupRef = playerRefs.value.get(playerAnimator.player.id)
+    if (!groupRef) return;
+    const {
+      positionFrequency,
+      positionPhase,
+      centerPositionAnimator,
+      rotationSpeed,
+      scale
+    } = playerAnimator;
 
-    groupRef.position.x = basePosition.x + Math.sin(elapsed * frequency + positionPhase) * 0.5;
-    groupRef.position.y = basePosition.y + Math.cos(elapsed * frequency + positionPhase) * 0.5;
-    groupRef.position.z = basePosition.z + Math.sin(elapsed * frequency + positionPhase) * 0.5;
+    centerPositionAnimator.update(delta);
+    scale.update(delta);
 
-    groupRef.rotation.x = elapsed * 0.05 * rotationSpeed.x;
-    groupRef.rotation.y = elapsed * 0.05 * rotationSpeed.y;
-    groupRef.rotation.z = elapsed * 0.05 * rotationSpeed.z;
+    const pos = centerPositionAnimator.value;
+
+    groupRef.position.x = pos.x + Math.sin(elapsed * positionFrequency + positionPhase) * 0.5;
+    groupRef.position.y = pos.y + Math.cos(elapsed * positionFrequency + positionPhase) * 0.5;
+    groupRef.position.z = pos.z + Math.sin(elapsed * positionFrequency + positionPhase) * 0.5;
+
+    groupRef.rotation.setFromVector3(rotationSpeed.clone().multiplyScalar(elapsed * 0.05));
+    groupRef.scale.setScalar(scale.value);
   });
 });
 
-function setPlayersRef(el, index) {
-  playerRefs.value[index] = el
+function setPlayersRef(el: any | null, id: string) {
+  if (el) {
+    playerRefs.value.set(id, el)
+  } else {
+    playerRefs.value.delete(id)
+  }
 }
 
 </script>
 
 <template>
-  <TresGroup ref="miniverseRef">
+  <TresGroup>
     <Blob :color1="blobColors[0]" :color2="blobColors[1]" :speed="blobSpeed"></Blob>
-    <template v-for="(player, index) in players" :key="player.username">
-      <TresGroup :ref="el => setPlayersRef(el, index)" :scale="player.scale">
-        <Player :username="player.username" :animation="{ ...floatAnimationTemplate, start: player.animationStart }"/>
+    <template v-for="playerAnimator in miniversePlayers" :key="playerAnimator.player.id">
+      <TresGroup :ref="el => setPlayersRef(el, playerAnimator.player.id)">
+        <Player :username="playerAnimator.player.name" :animation="{ ...floatAnimationTemplate, start: playerAnimator.animationStart }"/>
       </TresGroup>
     </template>
   </TresGroup>
