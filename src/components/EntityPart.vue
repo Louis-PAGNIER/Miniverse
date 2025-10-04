@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import EntityPart from "./EntityPart.vue";
 import {addArray, negArray} from "@/scripts/math.ts";
 import {DoubleSide, FrontSide} from "three";
@@ -6,14 +6,11 @@ import {shallowRef} from "vue";
 import {useLoop} from "@tresjs/core";
 import {interpolateRotation} from "@/scripts/animations.ts";
 
-const props = defineProps({
-  template: Object,
-  materials: Object,
-  animation: {
-    type: Object,
-    required: false,
-  }
-})
+const props = defineProps<{
+  template: any,
+  materials: any,
+  animation: any
+}>();
 
 const partRef = shallowRef()
 const animationIndex = shallowRef(0);

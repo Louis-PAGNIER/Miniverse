@@ -1,25 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import Entity from "@/components/Entity.vue";
 import playerTemplate from "@/assets/minecraftTemplates/PlayerTemplate.json";
 import oldPlayerTemplate from "@/assets/minecraftTemplates/OldPlayerTemplate.json";
 import veryOldTemplate from "@/assets/minecraftTemplates/VeryOldPlayerTemplate.json";
-import {ref, computed, watch, onUnmounted} from "vue";
+import {ref, computed, watch} from "vue";
+import {Vector3} from "three";
 
-const props = defineProps({
-  username: String,
-  position: { type: Array, default: () => [0, 0, 0] },
-  animation: {
-    type: Object,
-    required: false,
-  },
-});
+const MINESKIN_BASE_URL = "https://mineskin.eu/skin";
+type SkinData = { width: number; height: number; ctx: CanvasRenderingContext2D; };
 
-const mineskinBaseUrl = "https://mineskin.eu/skin/";
+const props = defineProps<{
+  username: string,
+  position?: Vector3,
+  animation?: any,
+}>();
 
-const imgDimensions = ref(null);
-const skinUrl = computed(() => `${mineskinBaseUrl}${props.username}`);
+const skinData: Ref<SkinData> = ref(null);
+const skinUrl = computed(() => `${MINESKIN_BASE_URL}/${props.username}`);
 
-const loadSkinImage = async (url) => {
+async function loadSkinImage(url): Promise<SkinData | null> {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "Anonymous";
@@ -34,10 +33,10 @@ const loadSkinImage = async (url) => {
     img.onerror = () => resolve(null);
     img.src = url;
   });
-};
+}
 
 // Check for very old skin having black hat instead of transparent pixels
-const areRectanglesBlack = (ctx) => {
+function areRectanglesBlack(ctx): boolean {
   const rectangles = [[48, 8, 56, 16], [32, 8, 40, 16], [40, 0, 48, 8], [48, 0, 56, 8], [40, 8, 48, 16], [56, 8, 64, 16]];
 
   for (const [x1, y1, x2, y2] of rectangles) {
@@ -53,7 +52,7 @@ const areRectanglesBlack = (ctx) => {
     }
   }
   return true;
-};
+}
 
 watch(
     () => skinUrl.value,
@@ -68,38 +67,19 @@ watch(
           entityTemplate.value = oldPlayerTemplate;
         }
 
-        imgDimensions.value = skinImage;
+        skinData.value = skinImage;
       }
     },
     { immediate: true }
 );
 
 const entityTemplate = ref(playerTemplate);
-
-const groupRef = ref()
-
-onUnmounted(() => {
-  const obj = groupRef.value
-  if (obj && obj.parent) {
-    obj.parent.remove(obj)
-    obj.traverse(child => {
-      if (child.geometry) child.geometry.dispose?.()
-      if (child.material) {
-        if (Array.isArray(child.material)) {
-          child.material.forEach(m => m.dispose?.())
-        } else {
-          child.material.dispose?.()
-        }
-      }
-    })
-  }
-})
 </script>
 
 <template>
-  <TresGroup ref="groupRef">
+  <TresGroup>
     <Entity
-        v-if="imgDimensions"
+        v-if="skinData"
         :entityTemplate="entityTemplate"
         :entityTexture="skinUrl"
         :position="position"

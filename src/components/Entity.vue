@@ -1,24 +1,26 @@
-<script setup>
-import {NearestFilter, TextureLoader} from "three";
-import {onMounted, ref, shallowRef, watch} from "vue";
+<script setup lang="ts">
+import {NearestFilter, TextureLoader, Vector3} from "three";
+import {computed, onMounted, ref, shallowRef, watch} from "vue";
 import EntityPart from "@/components/EntityPart.vue";
-import {addArray} from "@/scripts/math.ts";
 
-const props = defineProps({
-  entityTemplate: Object,
-  entityTexture: String,
-  position: {type: Array, default: () => [0, 0, 0]},
-  animation: {
-    type: Object,
-    required: false,
+const props = defineProps<{
+  entityTemplate: any,
+  entityTexture: string,
+  position?: Vector3,
+  animation?: any
+}>();
+
+let materials: any = {};
+const texturesLoaded: Ref<boolean> = ref(false);
+
+const textureLoader: TextureLoader = new TextureLoader();
+const entityPosition = computed(() => {
+  const pos = props.position?.clone() ?? new Vector3(0, 0, 0);
+  if (props.animation?.offset) {
+    pos.add(new Vector3(...props.animation.offset));
   }
+  return pos;
 });
-
-let materials = {};
-const groupRef = shallowRef();
-const texturesLoaded = ref(false);
-
-const textureLoader = new TextureLoader();
 
 const loadFaceTexture = (x1, y1, x2, y2, flip = false) => {
   return new Promise((resolve) => {
@@ -66,29 +68,22 @@ const loadPartTextures = async (part, reference = null) => {
   return loadedPartMaterials;
 };
 
-const recalculateTextures = async () => {
+const updateTextures = async () => {
   texturesLoaded.value = false;
   materials = await loadPartTextures(props.entityTemplate);
   texturesLoaded.value = true;
 };
 
-const recalculatePosition = (position) => {
-  const pos = addArray(position, props.animation?.offset ?? [0, 0, 0])
-  groupRef.value.position.set(pos[0], pos[1], pos[2]);
-}
-
 onMounted(() => {
-  recalculateTextures();
-  recalculatePosition(props.position);
+  updateTextures();
 });
 
-watch([() => props.entityTemplate, () => props.entityTexture], () => { recalculateTextures() });
-watch(() => props.position, (newPosition) => { recalculatePosition(newPosition) });
+watch([() => props.entityTemplate, () => props.entityTexture], () => { updateTextures() });
 
 </script>
 
 <template>
-  <TresGroup ref="groupRef">
+  <TresGroup :position="entityPosition">
     <EntityPart v-if="texturesLoaded" :template="entityTemplate" :materials="materials" :animation="animation"/>
   </TresGroup>
 </template>

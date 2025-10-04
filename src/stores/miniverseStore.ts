@@ -78,6 +78,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
 
   const fetchPlayers = async () => {
     const newMiniversePlayersLists = await apiGetPlayers();
+    console.log(newMiniversePlayersLists)
     updatePlayers(newMiniversePlayersLists);
   }
 

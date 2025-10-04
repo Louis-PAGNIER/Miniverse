@@ -7,7 +7,9 @@ auth.initialize();
 console.log("Auth initialized");
 
 const miniverseStore = useMiniverseStore();
-miniverseStore.fetchMiniverses();
+miniverseStore.fetchMiniverses().then(() => {
+  miniverseStore.fetchPlayers();
+});
 miniverseStore.connectWebSocket();
 miniverseStore.closeWebSocket();
 </script>

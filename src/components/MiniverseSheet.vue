@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import {Miniverse} from "@/models/miniverse";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
+const miniverseStore = useMiniverseStore();
 const props = defineProps<{
   miniverse: Miniverse,
 }>();
 
 const numberOfPlayers = computed(() => {
-  return 0;// props.miniverse.infos.connected_players.length;
+  return miniverseStore.miniversePlayersLists.get(props.miniverse.id)?.length || 0;
 });
 
 function titleCase(str: string): string {
@@ -44,13 +46,13 @@ const statusIcons = computed(() => {
         </div>
       </div>
 
-<!--      <div class="tile">
+      <div class="tile">
         <div class="icon"><img src="@/assets/icons/player-head.png" alt="Player icon"></div>
         <div class="column">
           <div class="value">{{ numberOfPlayers }}/{{ miniverse.max_players }}</div>
           <div class="label">Players</div>
         </div>
-      </div>-->
+      </div>
 
       <div class="tile">
         <div class="icon"><img :src="loaderIcon" alt="Loader icon"></div>

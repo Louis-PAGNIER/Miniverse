@@ -1,26 +1,26 @@
-<script setup>
-import {Vector2} from "three";
+<script setup lang="ts">
+import {Mesh, Vector2} from "three";
 import {shallowRef, watch} from "vue";
 import {useRenderLoop} from "@tresjs/core";
 import * as THREE from "three";
 
 const {onLoop} = useRenderLoop();
 
+const props = defineProps<{
+  color1: THREE.Color,
+  color2: THREE.Color,
+  speed: number,
+}>();
+
 const uniforms = {
   uTime: { value: 0 },
   uAmplitude: { value: new Vector2(0.15, 0.15) },
   uFrequency: { value: new Vector2(35, 35) },
-  uColor1: { value: new THREE.Color(0.6, 0.2, 1.0) },
-  uColor2: { value: new THREE.Color(0.2, 1.0, 0.6) },
+  uColor1: { value: props.color1 },
+  uColor2: { value: props.color2 },
 };
 
-const props = defineProps({
-  color1: {type: Array, default: () => [0.6, 0.2, 1.0]},
-  color2: {type: Array, default: () => [0.2, 1.0, 0.6]},
-  speed: {type: Number, default: 1.0},
-});
-
-const blobRef = shallowRef()
+const blobRef: Ref<Mesh | null> = shallowRef(null);
 
 const vertexShader = `
 uniform vec2 uAmplitude;
@@ -49,7 +49,6 @@ void main() {
 const fragmentShader = `
 uniform vec3 uColor1;
 uniform vec3 uColor2;
-precision mediump float;
 
 varying vec2 vUv;
 varying vec3 vNormal;
@@ -75,11 +74,11 @@ void main() {
 `
 
 watch(() => props.color1, (val) => {
-  uniforms.uColor1.value.set(val[0], val[1], val[2]);
+  uniforms.uColor1.value = val;
 }, { immediate: true });
 
 watch(() => props.color2, (val) => {
-  uniforms.uColor2.value.set(val[0], val[1], val[2]);
+  uniforms.uColor2.value = val;
 }, { immediate: true });
 
 onLoop(({delta, _}) => {
@@ -87,12 +86,11 @@ onLoop(({delta, _}) => {
     blobRef.value.material.uniforms.uTime.value += delta * props.speed;
   }
 })
-
 </script>
 
 <template>
   <TresGroup>
-    <TresMesh :position="[0, 0, 0]" :renderOrder="1" ref="blobRef">
+    <TresMesh :renderOrder="1" ref="blobRef">
       <TresSphereGeometry :args="[4, 28, 28]" />
       <TresShaderMaterial
           :vertexShader="vertexShader"
