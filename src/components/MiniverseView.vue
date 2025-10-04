@@ -56,7 +56,8 @@ watch(
     () => miniversePlayers.value,
     (newPlayers, oldPlayers) => {
       if (!oldPlayers || !arePlayerListsEqual(newPlayers, oldPlayers)) {
-        distributePlayerAnimators(newPlayers, true);
+        const isAnimated = !!oldPlayers && oldPlayers.length > 0;
+        distributePlayerAnimators(newPlayers, isAnimated);
       }
     },
     { immediate: true }

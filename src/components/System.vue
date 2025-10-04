@@ -2,7 +2,7 @@
 import MiniverseView from "@/components/MiniverseView.vue";
 import {Html, Stars} from "@tresjs/cientos";
 import {useLoop} from "@tresjs/core";
-import {onBeforeUnmount, onMounted, Ref, ref, ShallowRef, shallowRef, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, Ref, ref, ShallowRef, shallowRef, watch} from "vue";
 import {useMiniverseStore} from "@/stores/miniverseStore.js";
 import {Vector3Animator} from "@/scripts/animations";
 import {MiniverseAnimatorManager} from "@/composables/useMiniverseGrid";
@@ -18,17 +18,20 @@ const cameraRef = ref();
 const cameraPos = new Vector3Animator(DEFAULT_CAMERA_POSITION);
 
 const focusedMiniverse: Ref<MiniverseAnimator | null> = ref(null);
-const miniversesRefs: Ref<Group[]> = ref([]);
+const miniversesRefs = ref(new Map<string, Group>())
 
 const miniverseAnimatorManager = new MiniverseAnimatorManager(cameraPos, focusedMiniverse);
+const miniverses = computed(() => Array.from(miniverseStore.miniverses.values()));
 
 /* -------------------- Stores -------------------- */
 const miniverseStore = useMiniverseStore();
 
 /* -------------------- Lifecycle Hooks -------------------- */
 onMounted(async () => {
-  watch(miniverseStore.miniverses, (miniverses: Miniverse[]) => {
-    miniverseAnimatorManager.distributeMiniverses(true);
+  watch(
+      miniverses, (newMiniverses, oldMiniverses) => {
+        const isAnimated = !!oldMiniverses && oldMiniverses.length > 0;
+        miniverseAnimatorManager.distributeMiniverses(isAnimated);
   }, { immediate: true });
 
   window.addEventListener("resize", miniverseAnimatorManager.handleResize);
@@ -45,10 +48,13 @@ onBeforeUnmount(() => {
 /* -------------------- Animation Loop -------------------- */
 const { onBeforeRender } = useLoop();
 onBeforeRender(({ delta }) => {
-  miniverseStore.miniverseAnimators.forEach((miniverseAnimator, i) => {
+  miniverseStore.miniverseAnimators.forEach((miniverseAnimator, miniverseId) => {
     miniverseAnimator.positionAnimator.update(delta);
     miniverseAnimator.scaleAnimator.update(delta);
-    const miniverseRef = miniversesRefs.value[i];
+    const miniverseRef = miniversesRefs.value.get(miniverseId);
+    /*if (Math.random() < 0.001) {
+      console.log(miniverseRef)
+    }*/
 
     if (miniverseRef) {
       miniverseRef.position.copy(miniverseAnimator.positionAnimator.value);
@@ -66,8 +72,12 @@ defineExpose({
   focusMiniverse: miniverseAnimatorManager.focusMiniverse
 })
 
-const setMiniversesRef = (el: any, index: number) => {
-  miniversesRefs.value[index] = el;
+const setMiniversesRef = (el: any | null, id: string) => {
+  if (el) {
+    miniversesRefs.value.set(id, el)
+  } else {
+    miniversesRefs.value.delete(id)
+  }
 };
 
 </script>
@@ -76,8 +86,8 @@ const setMiniversesRef = (el: any, index: number) => {
   <TresPerspectiveCamera ref="cameraRef" :position="DEFAULT_CAMERA_POSITION" :fov="CAMERA_FOV" />
   <Stars :size="0.1" :radius="20"/>
 
-  <template v-for="(miniverseAnimator, index) in miniverseStore.miniverseAnimators" :key="miniverseAnimator.miniverse.id">
-    <TresGroup :ref="el => setMiniversesRef(el, index)"
+  <template v-for="(miniverseAnimator, index) in miniverseStore.miniverseAnimators.values()" :key="miniverseAnimator.miniverse.id">
+    <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)"
                v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id">
       <MiniverseView @click="miniverseAnimatorManager.handleMiniverseClick(miniverseAnimator)"
                  @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"

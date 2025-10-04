@@ -6,6 +6,7 @@ import {Player, PlayerAnimator} from "@/models/player";
 import {apiGetPlayers} from "@/api/player";
 import {WS_BASE} from "@/api/api";
 
+type MiniverseAnimatorsMap = Map<string, MiniverseAnimator>
 type MiniversePlayersMap = Map<string, PlayerAnimator[]>
 
 export const useMiniverseStore = defineStore('miniverse', () => {
@@ -14,7 +15,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
   const wsStatus = ref<'connecting' | 'open' | 'closed' | 'error'>('closed');
 
   const miniverses = ref<Miniverse[]>([]);
-  const miniverseAnimators = ref<MiniverseAnimator[]>([]);
+  const miniverseAnimators = reactive<MiniverseAnimatorsMap>(new Map());
 
   const miniversePlayersLists = reactive<MiniversePlayersMap>(new Map());
 
@@ -34,7 +35,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
         i++
       } else {
         miniverses.value.splice(i, 1); // remove if not in new data
-        miniverseAnimators.value.splice(i, 1);
+        miniverseAnimators.delete(existing.id);
       }
     }
 
@@ -42,9 +43,11 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     for (const m of newById.values()) {
       const animator = new MiniverseAnimator(m);
       miniverses.value.push(m);
-      miniverseAnimators.value.push(animator);
+      miniverseAnimators.set(m.id, animator);
       miniversePlayersLists.set(m.id, []);
     }
+
+    miniverses.value = [...miniverses.value]
   }
 
   const updatePlayers = (newMiniversePlayersLists: Map<string, Player[]>) => {

@@ -113,13 +113,17 @@ export class MiniverseAnimatorManager {
   };
 
   distributeMiniverses = (animated: boolean = true) => {
-    const miniverseAnimators = miniverseStore.miniverseAnimators;
+    const miniverseAnimators: Map<string, MiniverseAnimator> = miniverseStore.miniverseAnimators;
     if (this.focusedMiniverse.value) {
       this.camera.setGoal(new Vector3(0, 20, 100), 1000, InterpolationType.EASE_IN_OUT);
     } else {
       this.camera.setGoal(new Vector3(0, 0, 40), 1000, InterpolationType.EASE_IN_OUT);
     }
-    this.setDistribution(miniverseAnimators, animated);
+    const sortedMiniverseAnimators: MiniverseAnimator[] = Array.from(miniverseAnimators.values()).sort((a, b) => {
+      return a.miniverse.name.localeCompare(b.miniverse.name);
+    });
+    console.log(sortedMiniverseAnimators)
+    this.setDistribution(sortedMiniverseAnimators, animated);
   };
 
   focusMiniverse = (miniverse: MiniverseAnimator | null, animated: boolean = true) => {
