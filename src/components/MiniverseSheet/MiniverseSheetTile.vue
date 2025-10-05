@@ -5,8 +5,10 @@ const props = defineProps<{
   label: string,
 }>();
 
+const icons = import.meta.glob('@/assets/icons/*', { eager: true, import: 'default' })
+
 function getIconSrc(iconName: string): string {
-  return new URL(`/src/assets/icons/${iconName}`, import.meta.url).pathname;
+  return icons[`/src/assets/icons/${iconName}`] as string
 }
 
 </script>
