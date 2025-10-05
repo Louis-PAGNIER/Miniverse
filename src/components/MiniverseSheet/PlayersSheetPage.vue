@@ -68,6 +68,7 @@ li {
     .player-name {
       font-size: 1.5em;
       line-height: 1em;
+      font-weight: 500;
     }
 
     .player-role {
