@@ -119,6 +119,8 @@ export class MiniverseAnimatorManager {
       this.camera.setGoal(new Vector3(0, 0, 40), 1000, InterpolationType.EASE_IN_OUT);
     }
     const sortedMiniverseAnimators: MiniverseAnimator[] = Array.from(miniverseAnimators.values()).sort((a, b) => {
+      if (a.miniverse.started && !b.miniverse.started) return -1;
+      if (!a.miniverse.started && b.miniverse.started) return 1;
       return a.miniverse.name.localeCompare(b.miniverse.name);
     });
     console.log(sortedMiniverseAnimators)

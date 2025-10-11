@@ -1,32 +1,47 @@
 :root {
-  --color-primary: white;
-  --color-secondary: #a0a0a0;
+    --color-primary: white;
+    --color-secondary: #a0a0a0;
+    --color-tertiary: #b5b5b5;
 
-  --color-background-primary: #2c2c2c;
-  --color-background-secondary: #3c3c3c;
-  --color-background-tertiary: #484848;
+    --color-background-primary: #2c2c2c;
+    --color-background-secondary: #3c3c3c;
+    --color-background-tertiary: #484848;
 
-  --color-border: #5c5c5c;
+    --color-success: #53cc57;
+    --color-warning: #bf930b;
+    --color-danger: #c54553;
+    --color-info: #3183d3;
+
+    --color-success-secondary: #62c866;
+    --color-warning-secondary: #e6b31e;
+    --color-danger-secondary: #d8515e;
+    --color-info-secondary: #4196e8;
+
+    --color-border: #5c5c5c;
+
+    --padding-primary: 1em;
+    --padding-secondary: 0.75em;
+
+    --cell-height: 5.5em;
+    --cell-gap: 15px;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
+    box-sizing: border-box;
+    margin: 0;
+    font-weight: normal;
 }
 
 body {
-  color: var(--color-primary);
-  background-color: black;
-  min-height: 100vh;
-  transition:
-    color 0.5s,
+    color: var(--color-primary);
+    background-color: black;
+    min-height: 100vh;
+    transition: color 0.5s,
     background-color 0.5s;
-  line-height: 1.6;
-  font-family:
-    Roboto,
+    line-height: 1.6;
+    font-family: Roboto,
     Inter,
     -apple-system,
     BlinkMacSystemFont,
@@ -38,8 +53,41 @@ body {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
-  font-size: 15px;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-size: 15px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+.svg-blue {
+    filter: invert(39%) sepia(98%) saturate(749%) hue-rotate(169deg) brightness(91%) contrast(87%);
+}
+
+.svg-green {
+    filter: invert(57%) sepia(83%) saturate(749%) hue-rotate(93deg) brightness(91%) contrast(87%);
+}
+
+.svg-red {
+    filter: invert(34%) sepia(91%) saturate(749%) hue-rotate(358deg) brightness(91%) contrast(87%);
+}
+
+.svg-primary {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(91%) contrast(87%);
+}
+
+.svg-secondary {
+    filter: invert(57%) sepia(0%) saturate(7452%) hue-rotate(62deg) brightness(101%) contrast(87%);
+}
+
+.svg-background-primary {
+    filter: invert(12%) sepia(5%) saturate(18%) hue-rotate(2deg) brightness(97%) contrast(86%);
+}
+
+.svg-background-secondary {
+    filter: invert(18%) sepia(1%) saturate(2813%) hue-rotate(15deg) brightness(100%) contrast(83%);
 }

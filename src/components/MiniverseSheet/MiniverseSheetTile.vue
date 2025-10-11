@@ -15,7 +15,7 @@ function getIconSrc(iconName: string): string {
 
 <template>
   <div class="tile">
-    <div class="icon"><img :src="getIconSrc(icon)" alt=""></div>
+    <img :src="getIconSrc(icon)" alt="">
     <div class="column">
       <div class="value"><slot></slot></div>
       <div class="label">{{ label }}</div>
@@ -26,15 +26,15 @@ function getIconSrc(iconName: string): string {
 <style scoped>
 .tile {
   background: var(--color-background-secondary);
-  height: 6.5em;
+  height: var(--cell-height);
   display: flex;
-  gap: 20px;
-  padding: 23px;
+  gap: var(--cell-gap);
+  padding: var(--padding-secondary);
   border-radius: 16px;
   align-items: center;
   flex: 1;
-  min-width: 16em;
-  max-width: 18em;
+  min-width: 18.23em;
+  max-width: 18.23em;
   cursor: pointer;
   transition: background 0.2s;
   overflow: hidden;
@@ -43,16 +43,14 @@ function getIconSrc(iconName: string): string {
     background: var(--color-background-tertiary);
   }
 
-  & > .icon, & > .icon > img {
-    width: 4em;
-    height: 4em;
+  img {
+    aspect-ratio: 1 / 1;
     image-rendering: pixelated;
-    border-radius: 8px;
-    user-select: none;
-    -webkit-user-drag: none;
+    border-radius: 15%;
+    height: 100%;
   }
 
-  & .column {
+  .column {
     display: flex;
     flex-direction: column;
     justify-content: left;
@@ -60,10 +58,16 @@ function getIconSrc(iconName: string): string {
     white-space: nowrap;
   }
 
-  & .value {
+  .value {
     font-size: 1.5em;
     font-weight: bold;
     cursor: auto;
   }
+
+  .label {
+    color: var(--color-secondary);
+  }
+
+
 }
 </style>

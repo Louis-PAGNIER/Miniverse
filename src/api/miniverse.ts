@@ -24,3 +24,11 @@ export async function apiCreateMiniverse(
     });
     return response.data;
 }
+
+export async function apiStartMiniverse(miniverseId: string): Promise<void> {
+    await axios.post(`${API_BASE}/miniverses/${miniverseId}/start/`);
+}
+
+export async function apiStopMiniverse(miniverseId: string): Promise<void> {
+    await axios.post(`${API_BASE}/miniverses/${miniverseId}/stop/`);
+}

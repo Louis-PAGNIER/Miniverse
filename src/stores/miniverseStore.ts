@@ -31,11 +31,15 @@ export const useMiniverseStore = defineStore('miniverse', () => {
       if (incoming) {
         Object.assign(existing, incoming); // update in-place
         newById.delete(existing.id); // Mark as processed
-        miniversePlayersLists.delete(existing.id);
+        if (!incoming.started)
+        {
+          miniversePlayersLists.set(existing.id, []); // Clear players if miniverse is stopped
+        }
         i++
       } else {
         miniverses.value.splice(i, 1); // remove if not in new data
         miniverseAnimators.delete(existing.id);
+        miniversePlayersLists.delete(existing.id);
       }
     }
 
@@ -81,7 +85,6 @@ export const useMiniverseStore = defineStore('miniverse', () => {
 
   const fetchPlayers = async () => {
     const newMiniversePlayersLists = await apiGetPlayers();
-    console.log(newMiniversePlayersLists)
     updatePlayers(newMiniversePlayersLists);
   }
 
@@ -100,17 +103,21 @@ export const useMiniverseStore = defineStore('miniverse', () => {
       console.log("WebSocket connected");
     };
 
-    wsSocket.value.onmessage = (event) => {
+    wsSocket.value.onmessage = async (event) => {
       try {
         const data = JSON.parse(event.data);
         console.log('Websocket message', data)
+        const miniverseId: string | undefined = data['miniverse-id'];
         if (data.type === 'players')
         {
-          const miniverseId: string = data['miniverse-id'];
-          const players: Player[] = data['data'];
           const map = new Map<string, Player[]>();
-          map.set(miniverseId, players);
+          map.set(miniverseId!, data['data']);
           updatePlayers(map);
+          console.log(miniversePlayersLists);
+        }
+        else if (['created', 'deleted', 'updated'].includes(data.type))
+        {
+          await fetchMiniverses();
         }
       } catch (e) {
         console.error('Error while parsing WS message', e);

@@ -45,9 +45,9 @@ li {
   list-style: none;
   margin-bottom: 10px;
   width: 100%;
-  height: 80px;
+  height: 4.5em;
   background: var(--color-background-secondary);
-  padding: 8px;
+  padding: var(--padding-secondary);
   border-radius: 10px;
   transition: background 0.2s;
   cursor: pointer;
@@ -67,12 +67,12 @@ li {
 
     .player-name {
       font-size: 1.5em;
-      line-height: 1em;
+      line-height: 0.75em;
       font-weight: 500;
     }
 
     .player-role {
-      font-size: 1.15em;
+      font-size: 1em;
       color: var(--color-secondary);
       line-height: 1em;
     }

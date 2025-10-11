@@ -3,6 +3,7 @@ import {computed, inject} from "vue";
 import { Miniverse } from "@/models/miniverse";
 import { useMiniverseStore } from "@/stores/miniverseStore";
 import MiniverseSheetTile from "@/components/MiniverseSheet/MiniverseSheetTile.vue";
+import MiniverseStartButton from "@/components/MiniverseStartButton.vue";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 const miniverseStore = useMiniverseStore();
@@ -26,9 +27,7 @@ const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.p
 </script>
 
 <template>
-  <div class="start-button-container">
-    <button class="start-button">Start</button>
-  </div>
+  <MiniverseStartButton :miniverse="miniverse"/>
 
   <div class="summary">
     <MiniverseSheetTile icon="version.png" label="MC Version">{{ miniverse.mc_version }}</MiniverseSheetTile>
@@ -53,6 +52,6 @@ const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.p
   flex-wrap: wrap;
   width: 100%;
   padding: 16px 0;
-  gap: 20px;
+  gap: var(--cell-gap);
 }
 </style>
