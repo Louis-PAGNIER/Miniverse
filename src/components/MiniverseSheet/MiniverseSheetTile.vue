@@ -25,7 +25,7 @@ function getIconSrc(iconName: string): string {
 
 <style scoped>
 .tile {
-  background: #3c3c3c;
+  background: var(--color-background-secondary);
   height: 6.5em;
   display: flex;
   gap: 20px;
@@ -40,7 +40,7 @@ function getIconSrc(iconName: string): string {
   overflow: hidden;
 
   &:hover {
-    background: #484848;
+    background: var(--color-background-tertiary);
   }
 
   & > .icon, & > .icon > img {

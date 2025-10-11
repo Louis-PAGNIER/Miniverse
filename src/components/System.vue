@@ -135,11 +135,11 @@ const setMiniversesRef = (el: any | null, id: string) => {
 <style scoped>
 .miniverse-name {
   cursor: text;
-  color: white;
 }
 
 .miniverse-name-wrapper {
-  background: rgba(32, 32, 32, 0.5);
+  background: var(--color-background-primary);
+  opacity: 0.8;
   padding: 8px 70px;
   border-radius: 8px;
 }

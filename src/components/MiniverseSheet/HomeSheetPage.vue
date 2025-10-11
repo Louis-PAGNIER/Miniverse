@@ -26,6 +26,10 @@ const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.p
 </script>
 
 <template>
+  <div class="start-button-container">
+    <button class="start-button">Start</button>
+  </div>
+
   <div class="summary">
     <MiniverseSheetTile icon="version.png" label="MC Version">{{ miniverse.mc_version }}</MiniverseSheetTile>
     <MiniverseSheetTile icon="player-head.png" label="Players" @click="$router.push(`/miniverse/${miniverse.id}/players`)">{{ numberOfPlayers }}/20</MiniverseSheetTile>

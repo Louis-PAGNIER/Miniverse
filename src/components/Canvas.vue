@@ -16,7 +16,6 @@ const newMiniverseDialogRef = ref();
 
 const handleOverlayClick = (event: MouseEvent) => {
   if (focusedMiniverse.value && event.target?.id === "main-overlay") {
-    //systemRef.value?.focusMiniverse(null);
     router.push("/");
   }
 };
@@ -34,11 +33,11 @@ const openNewMiniverseDialog = () => {
     <div class="header">
       <span class="logo">Miniverse</span>
       <div class="spacer"></div>
-      <button @click="openNewMiniverseDialog">
+      <button class="overlay-button" @click="openNewMiniverseDialog">
         <img class="svg-icon" src="@/assets/icons/plus.svg" />
       </button>
 <!--      <router-link class="button" to="settings"><img class="svg-icon" src="@/assets/icons/settings.svg"></router-link>-->
-      <button><img class="svg-icon" src="@/assets/icons/account.svg"></button>
+      <button class="overlay-button"><img class="svg-icon" src="@/assets/icons/account.svg"></button>
     </div>
     <transition name="fade">
       <div id="main-overlay" v-if="focusedMiniverse" @click="handleOverlayClick($event, null)">
@@ -91,5 +90,30 @@ const openNewMiniverseDialog = () => {
 
 .spacer {
   flex: 1;
+}
+
+.overlay-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background-primary);
+  border: var(--color-border) 1px solid;;
+  color: var(--color-primary);
+  font-size: 1em;
+  padding: 1em;
+  margin: 0.5em;
+  height: 3.5em;
+  outline: none;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0.8;
+
+  &:hover {
+    background: var(--color-background-secondary);
+  }
+
+  &:active {
+    opacity: 1;
+  }
 }
 </style>

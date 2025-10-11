@@ -46,7 +46,7 @@ li {
   margin-bottom: 10px;
   width: 100%;
   height: 80px;
-  background: #3c3c3c;
+  background: var(--color-background-secondary);
   padding: 8px;
   border-radius: 10px;
   transition: background 0.2s;
@@ -56,7 +56,7 @@ li {
   gap: 15px;
 
   &:hover {
-    background: #484848;
+    background: var(--color-background-tertiary);
   }
 
   .text-info {
@@ -73,7 +73,7 @@ li {
 
     .player-role {
       font-size: 1.15em;
-      color: #b5b5b5;
+      color: var(--color-secondary);
       line-height: 1em;
     }
   }

@@ -7,39 +7,6 @@
   font-weight: normal;
 }
 
-button, .button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #2c2c2c;
-    border: #5e5e5e 1px solid;;
-    color: white;
-    font-size: 1em;
-    padding: 1em;
-    margin: 0.5em;
-    height: 3.5em;
-    outline: none;
-    border-radius: 5px;
-    cursor: pointer;
-    opacity: 0.8;
-
-    &:hover {
-        background: #3c3c3c;
-    }
-
-    &:has(.svg-icon) {
-        aspect-ratio: 1/1;
-    }
-
-    &:not(:has(.svg-icon)) {
-        min-width: 8em;
-    }
-
-    &:active {
-        opacity: 1;
-    }
-}
-
 .svg-icon {
     width: 1.5em;
     height: 1.5em;

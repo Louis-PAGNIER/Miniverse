@@ -31,12 +31,11 @@ const routes = {
   width: calc(100% - 40px);
   max-width: 1400px;
   padding: 10px 20px;
-  background: #2c2c2c;
+  background: var(--color-background-primary);
   border-radius: 10px;
   margin: 0 auto;
   min-height: calc(100% - 40px);
-  border: #5e5e5e 1px solid;
-  color: white;
+  border: var(--color-border) 1px solid;
   font-size: 1.2em;
 
   & > .title {

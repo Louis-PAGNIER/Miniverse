@@ -89,7 +89,7 @@ const breadcrumbs = computed(() => {
 
 <style scoped>
 .navigator {
-  color: #a0a0a0;
+  color: var(--color-secondary);
   font-weight: 600;
   cursor: default;
   padding-bottom: 10px;
@@ -100,11 +100,7 @@ const breadcrumbs = computed(() => {
   }
 
   .path:hover {
-    color: white;
-  }
-
-  .active {
-    color: white;
+    color: var(--color-primary);
   }
 }
 </style>
