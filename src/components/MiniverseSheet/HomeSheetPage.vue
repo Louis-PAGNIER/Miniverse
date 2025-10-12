@@ -4,6 +4,7 @@ import { Miniverse } from "@/models/miniverse";
 import { useMiniverseStore } from "@/stores/miniverseStore";
 import MiniverseSheetTile from "@/components/MiniverseSheet/MiniverseSheetTile.vue";
 import MiniverseStartButton from "@/components/MiniverseStartButton.vue";
+import {MiniverseType} from "@/models/enums/miniverseType";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 const miniverseStore = useMiniverseStore();
@@ -11,6 +12,10 @@ const miniverseStore = useMiniverseStore();
 const numberOfPlayers = computed(() =>
     miniverseStore.miniversePlayersLists.get(miniverse.id)?.length || 0
 );
+
+const supportMods = computed(() => {
+  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.type);
+})
 
 function titleCase(str: string): string {
   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
@@ -33,16 +38,7 @@ const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.p
     <MiniverseSheetTile icon="version.png" label="MC Version" @click="$router.push(`/miniverse/${miniverse.id}/version`)">{{ miniverse.mc_version }}</MiniverseSheetTile>
     <MiniverseSheetTile icon="player-head.png" label="Players" @click="$router.push(`/miniverse/${miniverse.id}/players`)">{{ numberOfPlayers }}/20</MiniverseSheetTile>
     <MiniverseSheetTile :icon="loaderIcon" label="Loader">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
-    <MiniverseSheetTile :icon="statusIcon" label="Status">{{ miniverse.started ? 'Started' : 'Stopped' }}</MiniverseSheetTile>
-
-    <div class="mods" v-if="miniverse.mods.length > 0">
-      <h2>Installed mods</h2>
-      <ul>
-        <li v-for="mod in miniverse.mods" :key="mod.id">
-          <span class="mod-name">{{ mod.title }}</span>
-        </li>
-      </ul>
-    </div>
+    <MiniverseSheetTile v-if="supportMods" icon="mods.png" label="Mods" @click="$router.push(`/miniverse/${miniverse.id}/mods`)">{{ miniverse.mods.length }}</MiniverseSheetTile>
   </div>
 </template>
 
