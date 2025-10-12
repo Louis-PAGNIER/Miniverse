@@ -5,6 +5,7 @@ import { provide } from "vue";
 import Navigator from "@/components/MiniverseSheet/Navigator.vue";
 import HomeSheetPage from "@/components/MiniverseSheet/HomeSheetPage.vue";
 import PlayersSheetPage from "@/components/MiniverseSheet/PlayersSheetPage.vue";
+import VersionSheetPage from "@/components/MiniverseSheet/VersionSheetPage.vue";
 
 const props = defineProps<{ miniverse: Miniverse }>();
 
@@ -12,7 +13,8 @@ provide('miniverse', props.miniverse);
 
 const routes = {
   home: { name: "Home", component: HomeSheetPage },
-  players: { name: "Players", component: PlayersSheetPage }
+  players: { name: "Players", component: PlayersSheetPage },
+  version: { name: "Version", component: VersionSheetPage },
 };
 </script>
 

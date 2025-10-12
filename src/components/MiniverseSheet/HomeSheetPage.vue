@@ -30,7 +30,7 @@ const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.p
   <MiniverseStartButton :miniverse="miniverse"/>
 
   <div class="summary">
-    <MiniverseSheetTile icon="version.png" label="MC Version">{{ miniverse.mc_version }}</MiniverseSheetTile>
+    <MiniverseSheetTile icon="version.png" label="MC Version" @click="$router.push(`/miniverse/${miniverse.id}/version`)">{{ miniverse.mc_version }}</MiniverseSheetTile>
     <MiniverseSheetTile icon="player-head.png" label="Players" @click="$router.push(`/miniverse/${miniverse.id}/players`)">{{ numberOfPlayers }}/20</MiniverseSheetTile>
     <MiniverseSheetTile :icon="loaderIcon" label="Loader">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
     <MiniverseSheetTile :icon="statusIcon" label="Status">{{ miniverse.started ? 'Started' : 'Stopped' }}</MiniverseSheetTile>

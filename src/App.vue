@@ -3,13 +3,14 @@ import {useAuthStore} from "@/stores/authStore";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const auth = useAuthStore();
-auth.initialize();
-
 const miniverseStore = useMiniverseStore();
-miniverseStore.fetchMiniverses().then(() => {
-  miniverseStore.fetchPlayers();
+
+auth.initialize().then(() => {
+  miniverseStore.fetchMiniverses().then(() => {
+    miniverseStore.fetchPlayers();
+  });
+  miniverseStore.connectWebSocket();
 });
-miniverseStore.connectWebSocket();
 </script>
 
 <template>

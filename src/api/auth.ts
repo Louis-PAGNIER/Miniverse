@@ -1,7 +1,7 @@
 import axios from "axios";
 import {API_BASE} from "@/api/api";
 
-export async function apiLogin(username: string, password: string): Promise<string> {
+export async function apiLogin(username: string, password: string): Promise<any[]> {
   const params = new URLSearchParams();
   params.append("username", username);
   params.append("password", password);
@@ -13,12 +13,15 @@ export async function apiLogin(username: string, password: string): Promise<stri
     withCredentials: true
   });
   const token = response.data.access_token;
+  const decodedToken = atob(token.split(".")[1]);
+  const user = JSON.parse(decodedToken)['extras']['user'];
 
   localStorage.setItem("access_token", token);
-  console.log("storage: ", localStorage.getItem("access_token"));
+  localStorage.setItem("user", JSON.stringify(user));
+
   axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-  return token;
+  return [token, user];
 }
 
 export function apiLogout() {
@@ -26,10 +29,10 @@ export function apiLogout() {
   delete axios.defaults.headers.common["Authorization"];
 }
 
+/*
 export function initAuth() {
   const token: string | null = localStorage.getItem("access_token");
   if (false && token) {
-    console.log("token: ", token);
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
     console.warn("No access token found in localStorage.");
@@ -41,3 +44,4 @@ export function initAuth() {
     });
   }
 }
+*/

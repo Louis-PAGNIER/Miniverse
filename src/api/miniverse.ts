@@ -36,3 +36,9 @@ export async function apiStopMiniverse(miniverseId: string): Promise<void> {
 export async function apiRestartMiniverse(miniverseId: string): Promise<void> {
     await axios.post(`${API_BASE}/miniverses/${miniverseId}/restart/`);
 }
+
+export async function apiUpdateMiniverseMCVersion(miniverseId: string, mcVersion: string): Promise<void> {
+    await axios.post(`${API_BASE}/miniverses/${miniverseId}/update_mc_version`, {
+        mc_version: mcVersion,
+    });
+}

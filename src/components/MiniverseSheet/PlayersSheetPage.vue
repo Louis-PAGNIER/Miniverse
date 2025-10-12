@@ -78,11 +78,4 @@ li {
     }
   }
 }
-
-h2 {
-  font-size: 1.75em;
-  margin: 0;
-  padding: 10px 0 0 0;
-  font-weight: 500;
-}
 </style>

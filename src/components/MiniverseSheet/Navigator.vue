@@ -9,7 +9,7 @@ interface RouteNode {
 }
 
 const props = defineProps<{
-  basePath: string; // exemple: /miniverse/1234
+  basePath: string;
   routes: Record<string, RouteNode>;
 }>();
 

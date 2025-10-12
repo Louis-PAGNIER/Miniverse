@@ -7,15 +7,15 @@
     --color-background-secondary: #3c3c3c;
     --color-background-tertiary: #484848;
 
-    --color-success: #53cc57;
-    --color-warning: #bf930b;
-    --color-danger: #c54553;
-    --color-info: #3183d3;
+    --color-success-secondary: #45914a;
+    --color-warning-secondary: #cc8823;
+    --color-danger-secondary: #ae3939;
+    --color-info-secondary: #2b79ca;
 
-    --color-success-secondary: #62c866;
-    --color-warning-secondary: #e6b31e;
-    --color-danger-secondary: #d8515e;
-    --color-info-secondary: #4196e8;
+    --color-success: #2f8035;
+    --color-warning: #c37503;
+    --color-danger: #a82d2d;
+    --color-info: #1c65ae;
 
     --color-border: #5c5c5c;
 
