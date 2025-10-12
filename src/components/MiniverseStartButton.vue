@@ -1,11 +1,12 @@
 <script setup lang="ts">
 
 import {Miniverse} from "@/models/miniverse";
-import {computed, onMounted, ref, Ref, watch} from "vue";
-import {apiStartMiniverse, apiStopMiniverse} from "@/api/miniverse";
+import {computed, onMounted, onUnmounted, ref, Ref, watch} from "vue";
+import {apiRestartMiniverse, apiStartMiniverse, apiStopMiniverse} from "@/api/miniverse";
 
-let stopping: Ref<boolean> = ref(false);
-let starting: Ref<boolean> = ref(false);
+const stopping: Ref<boolean> = ref(false);
+const starting: Ref<boolean> = ref(false);
+const showOptions = ref(false);
 
 const props = defineProps<{
   miniverse: Miniverse
@@ -25,6 +26,20 @@ async function stopMiniverse() {
   await apiStopMiniverse(props.miniverse.id);
 }
 
+async function restartMiniverse() {
+  showOptions.value = false;
+  if (stopping.value || starting.value) return;
+  starting.value = true;
+  await apiRestartMiniverse(props.miniverse.id);
+}
+
+function clickEvent(e: PointerEvent) {
+  const target = e.target as HTMLElement;
+  if (!target.closest(".options-container")) {
+    showOptions.value = false;
+  }
+}
+
 onMounted(() => {
   watch(() => props.miniverse.started, (newVal) => {
     if (!newVal && stopping.value) {
@@ -33,6 +48,12 @@ onMounted(() => {
       starting.value = false;
     }
   });
+
+  document.addEventListener('click', clickEvent);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', clickEvent);
 });
 </script>
 
@@ -43,20 +64,31 @@ onMounted(() => {
     <img v-else class="icon svg-green" src="@/assets/icons/play.svg">
     <span class="label">{{ started ? 'Stop' : 'Start' }}</span>
   </button>
-  <button class="options">
-    <span class="label">
-      ...
-    </span>
-  </button>
+
+  <div class="options-container" @click.stop>
+    <button class="options" @click="showOptions = !showOptions">
+      <span class="ellipsis">...</span>
+    </button>
+
+    <div v-if="showOptions" class="popup">
+      <button @click="restartMiniverse">
+        <img class="icon svg-primary" src="@/assets/icons/restart.svg">
+        <span class="label">Restart</span>
+      </button>
+    </div>
+  </div>
 </div>
 </template>
 
 <style scoped>
 .container {
   width: 135px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   gap: 2px;
+  user-select: none;
+  -webkit-user-select: none;
 
   &.disabled {
     opacity: 0.6;
@@ -88,10 +120,6 @@ onMounted(() => {
     }
   }
 
-  .icon {
-    width: 30px;
-  }
-
   .primary {
     flex: 1;
     display: flex;
@@ -100,21 +128,65 @@ onMounted(() => {
     align-items: center;
     border-radius: 10px 0 0 10px;
 
+    .icon {
+      width: 30px;
+    }
+
     .label {
       margin-left: 5px;
     }
   }
 
-  .options {
-    width: 40px;
-    border-radius: 0 10px 10px 0;
+  .options-container {
+    position: relative;
+    height: 100%;
 
-    .label {
+    .options {
+      width: 40px;
+      height: 100%;
+      border-radius: 0 10px 10px 0;
+
+      .ellipsis {
+        display: flex;
+        justify-content: center;
+        font-size: 1.75em;
+        margin-top: -20px;
+        margin-left: -1px;
+      }
+    }
+
+    .popup {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--color-background-secondary);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
       display: flex;
-      justify-content: center;
-      font-size: 1.75em;
-      margin-top: -20px;
-      margin-left: -1px;
+      flex-direction: column;
+      min-width: 135px;
+      z-index: 10;
+      overflow: hidden;
+
+      button {
+        width: 100%;
+        text-align: left;
+        padding: 8px 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+        display: flex;
+        gap: 10px;
+
+        &:hover {
+          background: var(--color-background-tertiary);
+        }
+
+        .icon {
+          width: 15px;
+        }
+      }
     }
   }
 }

@@ -123,7 +123,6 @@ export class MiniverseAnimatorManager {
       if (!a.miniverse.started && b.miniverse.started) return 1;
       return a.miniverse.name.localeCompare(b.miniverse.name);
     });
-    console.log(sortedMiniverseAnimators)
     this.setDistribution(sortedMiniverseAnimators, animated);
   };
 
