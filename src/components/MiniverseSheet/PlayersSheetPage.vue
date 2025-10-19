@@ -22,7 +22,7 @@ const players: ComputedRef<Player[]> = computed(() => {
     </div>
     <ul v-else>
       <li v-for="player in players" :key="player.id">
-        <FlatPlayerHead :username="player.name" />
+        <FlatPlayerHead :id="player.id" />
         <div class="text-info">
           <span class="player-name">{{ player.name }}</span>
           <span class="player-role">Operator</span>

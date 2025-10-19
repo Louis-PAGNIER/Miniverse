@@ -107,7 +107,7 @@ function setPlayersRef(el: any | null, id: string) {
     <Blob :color1="blobColors[0]" :color2="blobColors[1]" :speed="blobSpeed"></Blob>
     <template v-for="playerAnimator in miniversePlayers" :key="playerAnimator.player.id">
       <TresGroup :ref="el => setPlayersRef(el, playerAnimator.player.id)">
-        <Player :username="playerAnimator.player.name" :animation="{ ...PlayerFloatAnimation, start: playerAnimator.animationStart }"/>
+        <Player :id="playerAnimator.player.id" :animation="{ ...PlayerFloatAnimation, start: playerAnimator.animationStart }"/>
       </TresGroup>
     </template>
   </TresGroup>

@@ -2,15 +2,15 @@
 import {computed} from "vue";
 
 const props = defineProps<{
-  username: string;
+  id: string;
 }>();
 
 const MINESKIN_BASE_URL = "https://mineskin.eu/helm/";
-const skinUrl = computed(() => `${MINESKIN_BASE_URL}/${props.username}`);
+const skinUrl = computed(() => `${MINESKIN_BASE_URL}/${props.id}`);
 </script>
 
 <template>
-  <img :src="skinUrl" :alt="`${username} player head`" />
+  <img :src="skinUrl" :alt="`${id} player head`" />
 </template>
 
 <style scoped>

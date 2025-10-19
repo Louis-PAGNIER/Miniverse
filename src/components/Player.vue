@@ -10,13 +10,13 @@ const MINESKIN_BASE_URL = "https://mineskin.eu/skin";
 type SkinData = { width: number; height: number; ctx: CanvasRenderingContext2D; };
 
 const props = defineProps<{
-  username: string,
+  id: string,
   position?: Vector3,
   animation?: any,
 }>();
 
 const skinData: Ref<SkinData | null> = ref(null);
-const skinUrl = computed(() => `${MINESKIN_BASE_URL}/${props.username}`);
+const skinUrl = computed(() => `${MINESKIN_BASE_URL}/${props.id}`);
 
 async function loadSkinImage(url: string): Promise<SkinData | null> {
   return new Promise((resolve) => {
