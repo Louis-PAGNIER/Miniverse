@@ -26,6 +26,10 @@ const miniverses = computed(() => Array.from(miniverseStore.miniverses.values())
 
 const props = defineProps<{ route: RouteLocation, router: Router }>();
 
+const miniverseAnimatorsArray = computed(() =>
+    Array.from(miniverseStore.miniverseAnimators.values())
+);
+
 /* -------------------- Stores -------------------- */
 const miniverseStore = useMiniverseStore();
 
@@ -111,10 +115,10 @@ const setMiniversesRef = (el: any | null, id: string) => {
   <Stars :size="0.1" :radius="20"/>
 
   <TresGroup>
-    <template v-for="(miniverseAnimator, index) in miniverseStore.miniverseAnimators.values()" :key="miniverseAnimator.miniverse.id">
-      <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)"
-                 v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id">
-        <MiniverseView @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
+    <template v-for="miniverseAnimator in miniverseAnimatorsArray" :key="miniverseAnimator.miniverse.id">
+      <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)">
+        <MiniverseView v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id"
+                       @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
                        @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"
                        @pointer-leave="miniverseAnimatorManager.handleMouseLeave(miniverseAnimator)"
                        :miniverse="miniverseAnimator.miniverse" />
