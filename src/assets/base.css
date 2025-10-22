@@ -7,15 +7,21 @@
     --color-background-secondary: #3c3c3c;
     --color-background-tertiary: #484848;
 
+    --color-success: #2f8035;
+    --color-warning: #c37503;
+    --color-danger: #a82d2d;
+    --color-info: #1c65ae;
+
     --color-success-secondary: #45914a;
     --color-warning-secondary: #cc8823;
     --color-danger-secondary: #ae3939;
     --color-info-secondary: #2b79ca;
 
-    --color-success: #2f8035;
-    --color-warning: #c37503;
-    --color-danger: #a82d2d;
-    --color-info: #1c65ae;
+    --color-success-tertiary: #6bbf6b;
+    --color-warning-tertiary: #e0a153;
+    --color-danger-tertiary: #ea9595;
+    --color-info-tertiary: #7faedc;
+
 
     --color-border: #5c5c5c;
 
@@ -73,7 +79,7 @@ img {
 }
 
 .svg-red {
-    filter: invert(34%) sepia(91%) saturate(749%) hue-rotate(358deg) brightness(91%) contrast(87%);
+    filter: brightness(0) saturate(100%) invert(30%) sepia(36%) saturate(1789%) hue-rotate(329deg) brightness(98%) contrast(84%);
 }
 
 .svg-primary {

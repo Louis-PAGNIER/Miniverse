@@ -2,15 +2,20 @@
 
 import {Miniverse} from "@/models/miniverse";
 import {computed, onMounted, onUnmounted, ref, Ref, watch} from "vue";
-import {apiRestartMiniverse, apiStartMiniverse, apiStopMiniverse} from "@/api/miniverse";
+import {apiDeleteMiniverse, apiRestartMiniverse, apiStartMiniverse, apiStopMiniverse} from "@/api/miniverse";
+import MessagePopup from "@/components/popups/MessagePopup.vue";
+import {useRouter} from "vue-router";
 
 const stopping: Ref<boolean> = ref(false);
 const starting: Ref<boolean> = ref(false);
 const showOptions = ref(false);
+const showDeletePopup = ref(false);
 
 const props = defineProps<{
   miniverse: Miniverse
 }>();
+
+const router = useRouter();
 
 const started = computed(() => props.miniverse.started);
 
@@ -31,6 +36,17 @@ async function restartMiniverse() {
   if (stopping.value || starting.value) return;
   starting.value = true;
   await apiRestartMiniverse(props.miniverse.id);
+}
+
+async function deleteMiniverse() {
+  showDeletePopup.value = false;
+  await apiDeleteMiniverse(props.miniverse.id);
+  await router.push("/")
+}
+
+async function showDeleteMiniversePopup() {
+  showOptions.value = false;
+  showDeletePopup.value = true;
 }
 
 function clickEvent(e: PointerEvent) {
@@ -58,6 +74,10 @@ onUnmounted(() => {
 </script>
 
 <template>
+<MessagePopup v-model="showDeletePopup" title="Delete Miniverse ?" @ok="deleteMiniverse"
+              severity="danger" primary-button-text="Delete">
+  Are you sure you want to delete miniverse ?
+</MessagePopup>
 <div class="container" :class="{ disabled: starting || stopping }">
   <button class="primary" :class="{ danger: started }" @click="started ? stopMiniverse() : startMiniverse()">
     <img v-if="started" class="icon svg-primary" src="@/assets/icons/stop.svg">
@@ -74,6 +94,10 @@ onUnmounted(() => {
       <button @click="restartMiniverse">
         <img class="icon svg-primary" src="@/assets/icons/restart.svg">
         <span class="label">Restart</span>
+      </button>
+      <button @click="showDeleteMiniversePopup">
+        <img class="icon svg-red" src="@/assets/icons/delete.svg">
+        <span class="label danger">Delete</span>
       </button>
     </div>
   </div>
@@ -185,6 +209,10 @@ onUnmounted(() => {
 
         .icon {
           width: 15px;
+        }
+
+        .label.danger {
+          color: var(--color-danger-secondary);
         }
       }
     }

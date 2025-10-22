@@ -13,7 +13,8 @@ export async function apiCreateMiniverse(
     description: string,
     type: MiniverseType,
     MCVersion: string,
-    subdomain: string
+    subdomain: string,
+    liteProxy: boolean,
 ): Promise<Miniverse> {
     const response = await axios.post(`${API_BASE}/miniverses/`, {
         name: name,
@@ -21,6 +22,7 @@ export async function apiCreateMiniverse(
         mc_version: MCVersion,
         description: description,
         subdomain: subdomain,
+        is_on_lite_proxy: liteProxy,
     });
     return response.data;
 }
@@ -41,4 +43,8 @@ export async function apiUpdateMiniverseMCVersion(miniverseId: string, mcVersion
     await axios.post(`${API_BASE}/miniverses/${miniverseId}/update_mc_version`, {
         mc_version: mcVersion,
     });
+}
+
+export async function apiDeleteMiniverse(miniverseId: string): Promise<void> {
+    await axios.delete(`${API_BASE}/miniverses/${miniverseId}/`);
 }

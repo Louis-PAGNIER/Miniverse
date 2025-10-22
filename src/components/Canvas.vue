@@ -12,7 +12,7 @@ const route = useRoute();
 
 const systemRef: ShallowRef = shallowRef(null);
 const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse?.miniverse);
-const newMiniverseDialogRef = ref();
+const showAddMiniversePopup = ref<boolean>(false);
 
 const handleOverlayClick = (event: MouseEvent) => {
   if (focusedMiniverse.value && event.target?.id === "main-overlay") {
@@ -21,7 +21,7 @@ const handleOverlayClick = (event: MouseEvent) => {
 };
 
 const openNewMiniverseDialog = () => {
-  newMiniverseDialogRef.value?.open();
+  showAddMiniversePopup.value = true;
 };
 </script>
 
@@ -46,7 +46,7 @@ const openNewMiniverseDialog = () => {
     </transition>
   </div>
 
-  <AddMiniversePopup ref="newMiniverseDialogRef"/>
+  <AddMiniversePopup v-model="showAddMiniversePopup"/>
 </template>
 
 <style scoped>

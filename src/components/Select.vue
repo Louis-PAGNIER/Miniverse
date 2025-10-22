@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import {computed, nextTick, onMounted, onUnmounted, ref} from "vue";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   options: string[];
   disabled?: boolean;
-}>();
+  allowSearch?: boolean;
+}>(), {
+  disabled: false,
+  allowSearch: true,
+});
 
 const selected = defineModel<string>({ default: '' });
 
@@ -68,10 +72,11 @@ onUnmounted(() => document.removeEventListener("click", handleClickOutside));
     </div>
 
     <div v-if="isOpen" class="dropdown">
-      <input ref="searchInput"
+      <input v-if="allowSearch"
+             ref="searchInput"
              type="text"
              v-model="search"
-             placeholder="Search version..."
+             placeholder="Search..."
              class="search-input"
       />
 

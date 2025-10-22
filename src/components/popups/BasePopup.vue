@@ -1,38 +1,45 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted, onUnmounted } from "vue";
+import Button from "@/components/Button.vue";
 
-const props = defineProps<{
-  show: boolean;
+const props = withDefaults(defineProps<{
   title?: string;
-  closeOnOutsideClick?: boolean;
-  showFooter?: boolean;
-}>();
+  closeOnOutsideClick: boolean;
+  showFooter: boolean;
+}>(), {
+  closeOnOutsideClick: true,
+  showFooter: true,
+});
+
+const show = defineModel<boolean>({ default: false });
 
 const emit = defineEmits<{
-  (e: "update:show", value: boolean): void;
   (e: "ok"): void;
   (e: "cancel"): void;
 }>();
 
 function close() {
-  emit("update:show", false);
+  show.value = false;
   emit("cancel");
 }
 
 function confirm() {
+  show.value = false;
   emit("ok");
-  emit("update:show", false);
 }
 
 const popupRef = ref<HTMLElement | null>(null);
 function handleClickOutside(e: MouseEvent) {
-  if (
-      props.closeOnOutsideClick !== false && popupRef.value &&
+  if ("buttons" in e && e.buttons !== 1) return; // consider only left mouse button clicks
+  if (props.closeOnOutsideClick &&
+      popupRef.value &&
       !popupRef.value.contains(e.target as Node)
   ) {
     close();
   }
 }
+
+defineExpose({ close, confirm });
 
 onMounted(() => document.addEventListener("mousedown", handleClickOutside));
 onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside));
@@ -52,8 +59,8 @@ onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside))
 
         <footer v-if="showFooter" class="popup-actions">
           <slot name="footer">
-            <button class="btn cancel" @click="close">Cancel</button>
-            <button class="btn ok" @click="confirm">OK</button>
+            <Button @click="close">Cancel</Button>
+            <Button @click="confirm">OK</Button>
           </slot>
         </footer>
       </div>
@@ -78,7 +85,7 @@ onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside))
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 16437346;
 }
 
 .popup {
@@ -96,7 +103,7 @@ onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside))
 
 .popup-title {
   margin: 0 0 10px 0;
-  font-size: 1.1em;
+  font-size: 1.35em;
   font-weight: bold;
 }
 
@@ -105,30 +112,5 @@ onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside))
   justify-content: flex-end;
   gap: 10px;
   margin-top: 15px;
-}
-
-.btn {
-  padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background-primary);
-  color: var(--color-primary);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.85em;
-}
-
-.btn:hover {
-  border-color: var(--color-primary);
-}
-
-.btn.ok {
-  background: var(--color-primary);
-  color: var(--color-background-secondary);
-  border-color: var(--color-primary);
-}
-
-.btn.ok:hover {
-  opacity: 0.9;
 }
 </style>

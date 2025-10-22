@@ -55,9 +55,9 @@ async function updateServer() {
       Update
     </ActionButton>
 
-    <MessagePopup v-model:show="showPopup"
-                  title="Update Server ?"
-                  :message="`Are you sure you want to update your server to ${selectedVersion} ?`"
+    <MessagePopup v-model="showPopup"
+                  title="Update Miniverse ?"
+                  :message="`Are you sure you want to update your miniverse to ${selectedVersion} ?`"
                   @ok="updateServer">
     </MessagePopup>
   </div>

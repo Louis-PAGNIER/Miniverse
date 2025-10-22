@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {Mesh, Vector2} from "three";
-import {shallowRef, watch} from "vue";
+import {Ref, shallowRef, watch} from "vue";
 import {useRenderLoop} from "@tresjs/core";
 import * as THREE from "three";
 

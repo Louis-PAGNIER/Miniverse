@@ -110,23 +110,24 @@ const setMiniversesRef = (el: any | null, id: string) => {
   <TresPerspectiveCamera ref="cameraRef" :position="DEFAULT_CAMERA_POSITION" :fov="CAMERA_FOV" />
   <Stars :size="0.1" :radius="20"/>
 
-  <template v-for="(miniverseAnimator, index) in miniverseStore.miniverseAnimators.values()" :key="miniverseAnimator.miniverse.id">
-    <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)"
-               v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id">
-      <MiniverseView @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
-                 @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"
-                 @pointer-leave="miniverseAnimatorManager.handleMouseLeave(miniverseAnimator)"
-                 :miniverse="miniverseAnimator.miniverse" />
-      <Html v-if="!focusedMiniverse"
-            transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
+  <TresGroup>
+    <template v-for="(miniverseAnimator, index) in miniverseStore.miniverseAnimators.values()" :key="miniverseAnimator.miniverse.id">
+      <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)"
+                 v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id">
+        <MiniverseView @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
+                       @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"
+                       @pointer-leave="miniverseAnimatorManager.handleMouseLeave(miniverseAnimator)"
+                       :miniverse="miniverseAnimator.miniverse" />
+        <Html v-if="!focusedMiniverse" transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
         <div class="miniverse-name-wrapper">
           <h1 class="miniverse-name">
             {{ miniverseAnimator.miniverse.name }}
           </h1>
         </div>
-      </Html>
-    </TresGroup>
-  </template>
+        </Html>
+      </TresGroup>
+    </template>
+  </TresGroup>
 
   <TresAmbientLight :intensity="0.7" />
   <TresPointLight :position="[5, 5, 2]" :intensity="75" />

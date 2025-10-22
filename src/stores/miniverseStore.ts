@@ -59,6 +59,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
       const existingAnimators = miniversePlayersLists.get(miniverseId);
 
       // If the miniverse is not known, we skip it
+      // TODO: Fetch miniverse data & players again
       if (existingAnimators === undefined) continue;
 
       // We build a new array of animators for reactivity
@@ -89,12 +90,12 @@ export const useMiniverseStore = defineStore('miniverse', () => {
   }
 
   const connectWebSocket = () => {
+    // TODO: Repair connection/close logic
+    // There is a bug with the websocket being opened/closed multiple times due to app lifecycle
     if (wsSocket.value) {
       return;
       //wsSocket.value.close();
     }
-    const token = localStorage.getItem('access_token');
-    //document.cookie = `access_token=${token}; path=/; Secure; SameSite=None`;
     wsStatus.value = 'connecting';
     wsSocket.value = new WebSocket(wsUrl);
 
