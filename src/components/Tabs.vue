@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, useSlots, computed } from "vue";
+import { useSlots, computed } from "vue";
 
 const props = defineProps<{
   modelValue: string;
