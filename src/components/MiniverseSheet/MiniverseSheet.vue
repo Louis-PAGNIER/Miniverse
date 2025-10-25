@@ -7,6 +7,7 @@ import HomeSheetPage from "@/components/MiniverseSheet/HomeSheetPage.vue";
 import PlayersSheetPage from "@/components/MiniverseSheet/PlayersSheetPage.vue";
 import VersionSheetPage from "@/components/MiniverseSheet/VersionSheetPage.vue";
 import ModsSheetPage from "@/components/MiniverseSheet/ModsSheetPage.vue";
+import ConsoleSheetPage from "@/components/MiniverseSheet/ConsoleSheetPage.vue";
 
 const props = defineProps<{ miniverse: Miniverse }>();
 
@@ -17,6 +18,7 @@ const routes = {
   players: { name: "Players", component: PlayersSheetPage },
   version: { name: "Version", component: VersionSheetPage },
   mods: { name: "Mods", component: ModsSheetPage },
+  console: { name: "Console", component: ConsoleSheetPage },
 };
 </script>
 
