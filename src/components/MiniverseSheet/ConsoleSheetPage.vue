@@ -1,27 +1,56 @@
 <script setup lang="ts">
 import {inject, ref, watch} from "vue";
 import {Miniverse} from "@/models/miniverse";
+import {WS_BASE} from "@/api/api";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 
-const lines = ref<string[]>([
-    "[INFO] Console initialized.",
-    `[INFO] Starting Miniverse: ${miniverse.name}`,
-    "[INFO] Loading world...",
-    "[INFO] World loaded successfully.",
-    "[INFO] Server is now running.",
-]);
+const lines = ref<string[]>([]);
+
+function getWebsocketUrl(miniverseId: string): string {
+  return `${WS_BASE}/miniverse/logs/${miniverseId}`;
+}
+
+const websocket = ref<WebSocket | null>(null);
+watch(miniverse, (newMiniverse) => {
+  if (websocket.value) {
+    console.log("Miniverse changed, closing previous WebSocket");
+    websocket.value.close();
+  }
+
+  websocket.value = new WebSocket(getWebsocketUrl(newMiniverse.id));
+
+  websocket.value.onmessage = (event) => {
+    const chunk = event.data as string;
+    const newLines = chunk.split('\n');
+    // Check if the last previous line is incomplete
+    if (lines.value.length > 0 && !lines.value[0].endsWith('\n')) {
+      // Append the first new line to the last previous line
+      lines.value[0] += newLines.shift() || '';
+    }
+    lines.value.unshift(...newLines);
+  };
+
+  websocket.value.onclose = () => {
+    websocket.value = null;
+  };
+
+  websocket.value.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    websocket.value?.close();
+  };
+}, {immediate: true});
 </script>
 
 <template>
-<div class="console-sheet-page">
-  <h2>Console</h2>
-  <div class="console-wrapper">
-    <div class="console-screen">
-      <div v-for="(line, index) in lines" :key="index">{{ line }}</div>
+  <div class="console-sheet-page">
+    <h2>Console</h2>
+    <div class="console-wrapper">
+      <div class="console-screen">
+        <div v-for="(line, index) in lines" :key="index">{{ line }}</div>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <style scoped>
@@ -45,7 +74,9 @@ const lines = ref<string[]>([
     font-family: monospace;
     padding: 10px;
     font-size: 0.75em;
-    overflow-y: auto;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column-reverse;
   }
 }
 </style>
