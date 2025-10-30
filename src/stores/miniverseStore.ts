@@ -108,7 +108,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
       try {
         const data = JSON.parse(event.data);
         console.log('Websocket message', data)
-        const miniverseId: string | undefined = data['miniverse-id'];
+        const miniverseId: string | undefined = data['miniverse_id'];
         if (data.type === 'players')
         {
           const map = new Map<string, Player[]>();
