@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {inject, ref, watch} from "vue";
+import {inject, onUnmounted, ref, watch} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {WS_BASE} from "@/api/api";
 
@@ -40,14 +40,26 @@ watch(miniverse, (newMiniverse) => {
     websocket.value?.close();
   };
 }, {immediate: true});
+
+onUnmounted(() => {
+  if (websocket.value) {
+    websocket.value.close();
+  }
+});
 </script>
 
 <template>
   <div class="console-sheet-page">
     <h2>Console</h2>
     <div class="console-wrapper">
-      <div class="console-screen">
-        <div v-for="(line, index) in lines" :key="index">{{ line }}</div>
+      <div class="screen-wrapper">
+        <div class="console-screen">
+          <div v-for="(line, index) in lines" :key="index">{{ line }}</div>
+        </div>
+      </div>
+
+      <div class="screen-wrapper">
+        <input type="text" class="console-input" />
       </div>
     </div>
   </div>
@@ -56,27 +68,49 @@ watch(miniverse, (newMiniverse) => {
 <style scoped>
 .console-wrapper {
   width: 100%;
-  height: 60vh;
-  background: var(--color-background-secondary);
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.screen-wrapper {
   border-radius: 10px;
   border: var(--color-border) 1px solid;
   padding: 10px;
   box-sizing: border-box;
+  background: var(--color-background-secondary);
+  min-height: 0;
   display: flex;
-
-  .console-screen {
-    width: 100%;
-    height: 100%;
-    background: black;
-    border-radius: 10px;
-    box-sizing: border-box;
-    color: white;
-    font-family: monospace;
-    padding: 10px;
-    font-size: 0.75em;
-    overflow-y: scroll;
-    display: flex;
-    flex-direction: column-reverse;
-  }
+  flex-direction: column;
 }
+
+.console-screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+  width: 100%;
+  background: black;
+  border-radius: 10px;
+  color: white;
+  font-family: monospace;
+  padding: 10px;
+  font-size: 0.75em;
+}
+
+.console-input {
+  height: 40px;
+  width: 100%;
+  background: black;
+  border-radius: 10px;
+  color: white;
+  font-family: monospace;
+  padding: 0 10px;
+  font-size: 0.75em;
+  outline: none;
+  border: none;
+}
+
 </style>

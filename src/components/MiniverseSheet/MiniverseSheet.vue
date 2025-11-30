@@ -25,22 +25,24 @@ const routes = {
 <template>
   <div class="presentation">
     <h1 class="title">{{ miniverse.name }}</h1>
-    <Navigator
-        :basePath="`/miniverse/${miniverse.id}`"
-        :routes="routes"
-    />
+    <div class="content">
+      <Navigator
+          :basePath="`/miniverse/${miniverse.id}`"
+          :routes="routes"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .presentation {
   width: calc(100% - 40px);
+  min-height: calc(50vh - 40px);
   max-width: 1400px;
   padding: 10px 20px;
   background: var(--color-background-primary);
   border-radius: 10px;
-  margin: 0 auto;
-  min-height: calc(100% - 40px);
+  margin: auto auto 20px auto;
   border: var(--color-border) 1px solid;
   font-size: 1.2em;
 

@@ -40,8 +40,10 @@ const openNewMiniverseDialog = () => {
       <button class="overlay-button"><img class="svg-icon" src="@/assets/icons/account.svg"></button>
     </div>
     <transition name="fade">
-      <div id="main-overlay" v-if="focusedMiniverse" @click="handleOverlayClick($event, null)">
-        <MiniverseSheet  :miniverse="focusedMiniverse"></MiniverseSheet>
+      <div id="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleOverlayClick($event, null)">
+        <div id="main-overlay">
+          <MiniverseSheet  :miniverse="focusedMiniverse"></MiniverseSheet>
+        </div>
       </div>
     </transition>
   </div>
@@ -60,16 +62,23 @@ const openNewMiniverseDialog = () => {
   pointer-events: none;
 }
 
-#main-overlay {
-  width: 100%;
-  height: 100%;
-  padding-top: 52vh;
-  padding-bottom: 4em;
-  overflow-y: scroll;
-  cursor: auto;
-  pointer-events: all;
+#main-overlay-wrapper {
+  width: 100vw;
+  height: 100vh;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  overflow-y: scroll;
+}
+
+#main-overlay {
+  width: 100%;
+  height: auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 25vh;
+  cursor: auto;
+  pointer-events: all;
 
   &::-webkit-scrollbar {
     display: none;
