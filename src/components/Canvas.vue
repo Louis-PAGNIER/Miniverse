@@ -40,7 +40,7 @@ const openNewMiniverseDialog = () => {
       <button class="overlay-button"><img class="svg-icon" src="@/assets/icons/account.svg"></button>
     </div>
     <transition name="fade">
-      <div id="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleOverlayClick($event, null)">
+      <div id="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleOverlayClick($event)">
         <div id="main-overlay">
           <MiniverseSheet  :miniverse="focusedMiniverse"></MiniverseSheet>
         </div>
