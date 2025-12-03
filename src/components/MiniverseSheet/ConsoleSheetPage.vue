@@ -1,34 +1,71 @@
 <script setup lang="ts">
-import {inject, onUnmounted, ref, watch} from "vue";
+import {inject, onUnmounted, ref, watch, nextTick} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {WS_BASE} from "@/api/api";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 
 const lines = ref<string[]>([]);
+const consoleScreenRef = ref<HTMLElement | null>(null);
+const userScrolledUp = ref(false);
+const inputCommand = ref("");
 
 function getWebsocketUrl(miniverseId: string): string {
   return `${WS_BASE}/miniverse/logs/${miniverseId}`;
 }
 
+function isScrolledToBottom(): boolean {
+  if (!consoleScreenRef.value) return false;
+
+  const el = consoleScreenRef.value;
+  const tolerance = 5;
+  return el.scrollHeight - el.scrollTop - el.clientHeight < tolerance;
+}
+
+function scrollToBottom() {
+  if (consoleScreenRef.value) {
+    consoleScreenRef.value.scrollTop = consoleScreenRef.value.scrollHeight;
+  }
+}
+
+function sendCommand() {
+  if (inputCommand.value) {
+    websocket.value?.send(inputCommand.value)
+    inputCommand.value = "";
+  }
+}
+
+function handleScroll() {
+  if (!consoleScreenRef.value) return;
+  userScrolledUp.value = !isScrolledToBottom();
+}
+
 const websocket = ref<WebSocket | null>(null);
 watch(miniverse, (newMiniverse) => {
   if (websocket.value) {
-    console.log("Miniverse changed, closing previous WebSocket");
     websocket.value.close();
   }
+
+  lines.value = [];
+  userScrolledUp.value = false;
 
   websocket.value = new WebSocket(getWebsocketUrl(newMiniverse.id));
 
   websocket.value.onmessage = (event) => {
     const chunk = event.data as string;
     const newLines = chunk.split('\n');
-    // Check if the last previous line is incomplete
-    if (lines.value.length > 0 && !lines.value[0].endsWith('\n')) {
-      // Append the first new line to the last previous line
-      lines.value[0] += newLines.shift() || '';
+
+    const shouldScrollAuto = !userScrolledUp.value || isScrolledToBottom();
+
+    if (lines.value.length > 0 && !lines.value[lines.value.length - 1].endsWith('\n')) {
+      lines.value[lines.value.length - 1] += newLines.shift() || '';
     }
-    lines.value.unshift(...newLines);
+
+    lines.value.push(...newLines);
+
+    if (shouldScrollAuto) {
+      nextTick(scrollToBottom);
+    }
   };
 
   websocket.value.onclose = () => {
@@ -53,13 +90,13 @@ onUnmounted(() => {
     <h2>Console</h2>
     <div class="console-wrapper">
       <div class="screen-wrapper">
-        <div class="console-screen">
+        <div class="console-screen" ref="consoleScreenRef" @scroll="handleScroll">
           <div v-for="(line, index) in lines" :key="index">{{ line }}</div>
         </div>
       </div>
 
       <div class="screen-wrapper">
-        <input type="text" class="console-input" />
+        <input v-model="inputCommand" type="text" class="console-input" @keyup.enter="sendCommand"/>
       </div>
     </div>
   </div>
@@ -83,13 +120,16 @@ onUnmounted(() => {
   min-height: 0;
   display: flex;
   flex-direction: column;
+
+  &:has(input) {
+    min-height: auto;
+  }
 }
 
 .console-screen {
   flex: 1;
-  min-height: 0;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   overflow-y: auto;
   width: 100%;
   background: black;
@@ -101,7 +141,7 @@ onUnmounted(() => {
 }
 
 .console-input {
-  height: 40px;
+  height: 30px;
   width: 100%;
   background: black;
   border-radius: 10px;
