@@ -1,17 +1,35 @@
 <script setup lang="ts">
-import {computed, inject, ref} from "vue";
+import {computed, ComputedRef, inject, onMounted, Ref, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import Tabs from "@/components/Tabs.vue";
 import Tab from "@/components/Tab.vue";
-import FlatPlayerHead from "@/components/FlatPlayerHead.vue";
+import SearchBar from "@/components/SearchBar.vue";
+import {Mod, ModrinthSearchResult} from "@/models/mod";
+import {apiSearchMods} from "@/api/mods";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 
-const sortedInstalledMods = computed(() => {
-  return [...miniverse.mods].sort((a, b) => a.title.localeCompare(b.title));
+const activeTab = ref("installedMods");
+const search = ref("");
+
+const allModrinthMods: Ref<ModrinthSearchResult[]> = ref([]);
+
+async function updateSearchedModrinthMods() {
+  allModrinthMods.value = (await apiSearchMods(search.value)).hits;
+}
+
+const filteredInstalledMods = computed(() => {
+  const term = search.value.trim().toLowerCase();
+
+  return [...miniverse.mods]
+      .filter(m => m.title.toLowerCase().includes(term))
+      .sort((a, b) => a.title.localeCompare(b.title));
 });
 
-const activeTab = ref("installedMods");
+onMounted(async () => {
+  await updateSearchedModrinthMods();
+});
+
 </script>
 
 <template>
@@ -24,8 +42,9 @@ const activeTab = ref("installedMods");
       </template>
 
       <template #installedMods>
+        <SearchBar class="search-bar" v-model="search"></SearchBar>
         <ul>
-          <li v-for="mod in sortedInstalledMods" :key="mod.id">
+          <li v-for="mod in filteredInstalledMods" :key="mod.id">
             <img class="mod-icon" :src="mod.icon_url">
             <div class="text-info">
               <span class="mod-title">{{ mod.title }}</span>
@@ -36,7 +55,16 @@ const activeTab = ref("installedMods");
       </template>
 
       <template #searchMods>
-        <h2>Search Mods</h2>
+        <SearchBar class="search-bar" v-model="search" @change="updateSearchedModrinthMods" :debounce="1000"></SearchBar>
+        <ul>
+          <li v-for="mod in allModrinthMods" :key="mod.project_id">
+            <img class="mod-icon" :src="mod.icon_url">
+            <div class="text-info">
+              <span class="mod-title">{{ mod.title }}</span>
+              <span class="mod-description">{{ mod.description }}</span>
+            </div>
+          </li>
+        </ul>
       </template>
     </Tabs>
   </div>
@@ -50,6 +78,10 @@ const activeTab = ref("installedMods");
   max-width: 100%;
   max-height: 100%;
   background: var(--color-background-primary);
+}
+
+.search-bar {
+  margin-bottom: 10px;
 }
 
 ul {
@@ -80,20 +112,26 @@ li {
 
   .text-info {
     display: flex;
+    flex: 1;
+    min-width: 0;
     flex-direction: column;
     justify-content: space-between;
     padding: 5px 0;
 
     .mod-title {
-      font-size: 1.5em;
+      font-size: 1.4em;
       line-height: 0.75em;
       font-weight: 500;
     }
 
     .mod-description {
+      width: 100%;
       font-size: 1em;
       color: var(--color-secondary);
       line-height: 1em;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
 }

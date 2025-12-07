@@ -76,13 +76,10 @@ function selectTab(name: string) {
 
 .tab-btn.active {
   background: var(--color-background-secondary);
-  border-bottom-color: var(--color-background-secondary);
-  color: var(--color-primary);
-  font-weight: 500;
 }
 
 .tab-btn:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-secondary);
 }
 
 /* --- Transition entre onglets --- */
