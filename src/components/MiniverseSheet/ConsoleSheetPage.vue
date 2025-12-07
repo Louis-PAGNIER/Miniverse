@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import {AnsiUp} from 'ansi_up';
 import {inject, onUnmounted, ref, watch, nextTick} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {WS_BASE} from "@/api/api";
+
+const ansiUp = new AnsiUp();
+ansiUp.use_classes = true;
 
 const miniverse = inject<Miniverse>('miniverse')!;
 
@@ -61,7 +65,8 @@ watch(miniverse, (newMiniverse) => {
       lines.value[lines.value.length - 1] += newLines.shift() || '';
     }
 
-    lines.value.push(...newLines);
+    const rawLines = newLines.map(line => ansiUp.ansi_to_html(line));
+    lines.value.push(...rawLines);
 
     if (shouldScrollAuto) {
       nextTick(scrollToBottom);
@@ -91,7 +96,7 @@ onUnmounted(() => {
     <div class="console-wrapper">
       <div class="screen-wrapper">
         <div class="console-screen" ref="consoleScreenRef" @scroll="handleScroll">
-          <div v-for="(line, index) in lines" :key="index">{{ line }}</div>
+          <div v-for="(line, index) in lines" :key="index" v-html="line"></div>
         </div>
       </div>
 
@@ -152,5 +157,14 @@ onUnmounted(() => {
   outline: none;
   border: none;
 }
+</style>
 
+<style>
+.ansi-red-fg { color: #ff5555; }
+.ansi-green-fg { color: #50fa7b; }
+.ansi-yellow-fg { color: #f1fa8c; }
+.ansi-blue-fg { color: #6272a4; }
+.ansi-magenta-fg { color: #ff79c6; }
+.ansi-cyan-fg { color: #8be9fd; }
+.ansi-white-fg { color: #f8f8f2; }
 </style>
