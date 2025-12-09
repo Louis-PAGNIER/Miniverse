@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {NearestFilter, TextureLoader, Vector3, Vector4} from "three";
 import {computed, onMounted, Ref, ref, watch} from "vue";
-import EntityPart from "@/components/EntityPart.vue";
+import EntityPart from "@/components/3D/EntityPart.vue";
 import {ModelTemplate} from "@/models/modelTemplate";
 
 const props = defineProps<{

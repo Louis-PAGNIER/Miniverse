@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed, ComputedRef, inject, onMounted, Ref, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
-import Tabs from "@/components/Tabs.vue";
-import Tab from "@/components/Tab.vue";
-import SearchBar from "@/components/SearchBar.vue";
+import Tabs from "@/components/ui/Tabs.vue";
+import Tab from "@/components/ui/Tab.vue";
+import SearchBar from "@/components/ui/SearchBar.vue";
 import {Mod, ModrinthSearchResult} from "@/models/mod";
 import {apiSearchMods} from "@/api/mods";
 

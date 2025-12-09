@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import Button from "@/components/Button.vue";
+import Button from "@/components/ui/Button.vue";
 
 const props = withDefaults(defineProps<{
   title?: string;

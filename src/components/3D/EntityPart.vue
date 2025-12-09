@@ -3,7 +3,7 @@ import EntityPart from "./EntityPart.vue";
 import {DoubleSide, FrontSide, Group} from "three";
 import {computed, ShallowRef, shallowRef} from "vue";
 import {useLoop} from "@tresjs/core";
-import {interpolateRotation} from "@/scripts/animations";
+import {interpolateRotation} from "@/composables/animations";
 import {ModelTemplate} from "@/models/modelTemplate";
 import {ModelAnimation} from "@/models/modelAnimation";
 

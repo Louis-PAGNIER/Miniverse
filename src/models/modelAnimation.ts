@@ -1,5 +1,5 @@
 import {Vector3} from "three";
-import {InterpolationType} from "@/scripts/animations";
+import {InterpolationType} from "@/composables/animations";
 
 export interface ModelAnimationKeyframe {
   time: number;

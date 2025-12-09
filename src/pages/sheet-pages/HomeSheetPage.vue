@@ -2,7 +2,7 @@
 import {computed, inject} from "vue";
 import { Miniverse } from "@/models/miniverse";
 import { useMiniverseStore } from "@/stores/miniverseStore";
-import MiniverseSheetTile from "@/components/MiniverseSheet/MiniverseSheetTile.vue";
+import MiniverseSheetTile from "@/components/miniverse-sheet/MiniverseSheetTile.vue";
 import MiniverseStartButton from "@/components/MiniverseStartButton.vue";
 import {MiniverseType} from "@/models/enums/miniverseType";
 

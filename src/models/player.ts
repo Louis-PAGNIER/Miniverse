@@ -1,4 +1,4 @@
-import {NumberAnimator, Vector3Animator} from "@/scripts/animations";
+import {NumberAnimator, Vector3Animator} from "@/composables/animations";
 import {Vector3} from "three";
 import {markRaw, reactive} from "vue";
 

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {computed, ComputedRef, ref, watch} from 'vue';
-import Player from "@/components/Player.vue";
-import Blob from "@/components/Blob.vue";
-import {generateFibonacciSphere} from "@/scripts/utils";
+import Player from "@/components/3D/Player.vue";
+import Blob from "@/components/3D/Blob.vue";
+import {generateFibonacciSphere} from "@/composables/maths";
 import {useLoop} from "@tresjs/core";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import {arePlayerListsEqual, PlayerAnimator} from "@/models/player";
 import {Color, Group} from "three";
-import {InterpolationType} from "@/scripts/animations";
-import {PlayerFloatAnimation} from "@/assets/minecraftAnimations/PlayerFloat";
+import {InterpolationType} from "@/composables/animations";
+import {PlayerFloatAnimation} from "@/assets/minecraft-animations/PlayerFloat";
 
 const props = defineProps<{
   miniverse: Miniverse

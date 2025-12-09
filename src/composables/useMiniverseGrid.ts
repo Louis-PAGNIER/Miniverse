@@ -1,5 +1,5 @@
 import {Ref} from 'vue';
-import {InterpolationType, Vector3Animator} from "@/scripts/animations";
+import {InterpolationType, Vector3Animator} from "@/composables/animations";
 import {MiniverseAnimator} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import {Vector3} from "three";

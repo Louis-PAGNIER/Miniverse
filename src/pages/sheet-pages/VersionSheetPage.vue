@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {computed, inject, onMounted, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
-import Select from "@/components/Select.vue";
-import Checkbox from "@/components/Checkbox.vue";
+import Select from "@/components/ui/Select.vue";
+import Checkbox from "@/components/ui/Checkbox.vue";
 import {apiGetMinecraftVersions} from "@/api/minecraft";
 import {MinecraftVersion} from "@/models/minecraftVersion";
 import {MinecraftVersionType} from "@/models/enums/minecraftVersionType";
-import {isReleaseVersion} from "@/scripts/utils";
-import ActionButton from "@/components/ActionButton.vue";
+import {isReleaseVersion} from "@/composables/mcVersions";
+import ActionButton from "@/components/ui/ActionButton.vue";
 import MessagePopup from "@/components/popups/MessagePopup.vue";
 import {apiUpdateMiniverseMCVersion} from "@/api/miniverse";
 import {useAuthStore} from "@/stores/authStore";

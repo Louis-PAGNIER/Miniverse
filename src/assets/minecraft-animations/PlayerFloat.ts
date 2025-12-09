@@ -1,6 +1,6 @@
 import {ModelAnimation} from "@/models/modelAnimation";
 import {Vector3} from "three";
-import {InterpolationType} from "@/scripts/animations";
+import {InterpolationType} from "@/composables/animations";
 
 export const PlayerFloatAnimation: ModelAnimation = {
   duration: 10.0,

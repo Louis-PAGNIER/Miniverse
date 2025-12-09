@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import MiniverseView from "@/components/MiniverseView.vue";
+import MiniverseView from "@/components/3D/MiniverseView.vue";
 import {Html, Stars} from "@tresjs/cientos";
 import {useLoop} from "@tresjs/core";
 import {computed, onBeforeUnmount, onMounted, Ref, ref, ShallowRef, shallowRef, watch} from "vue";
-import {useMiniverseStore} from "@/stores/miniverseStore.js";
-import {Vector3Animator} from "@/scripts/animations";
+import {useMiniverseStore} from "@/stores/miniverseStore";
+import {Vector3Animator} from "@/composables/animations";
 import {MiniverseAnimatorManager} from "@/composables/useMiniverseGrid";
 import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
 import {Group, Vector3} from "three";

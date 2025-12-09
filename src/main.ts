@@ -1,4 +1,4 @@
-import '../assets/main.css'
+import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from "pinia";
@@ -7,21 +7,11 @@ import App from "@/App.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import Tres from '@tresjs/core';
-import Canvas from "@/components/Canvas.vue";
+import {mainRoutes} from "@/router";
 
 const router = createRouter({
     history: createWebHistory(),
-    routes: [
-        {
-            path: '/',
-            name: 'Home',
-            component: Canvas
-        },
-        {
-            path: '/miniverse/:catchAll(.*)',
-            component: Canvas,
-        }
-    ]
+    routes: mainRoutes
 })
 
 const app = createApp(App)

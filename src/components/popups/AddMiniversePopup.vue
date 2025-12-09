@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import BasePopup from "./BasePopup.vue";
 import {computed, onMounted, ref, watch} from "vue";
-import Select from "@/components/Select.vue";
+import Select from "@/components/ui/Select.vue";
 import {MiniverseType} from "@/models/enums/miniverseType";
 import {MinecraftVersionType} from "@/models/enums/minecraftVersionType";
 import {apiGetMinecraftVersions} from "@/api/minecraft";
 import {MinecraftVersion} from "@/models/minecraftVersion";
-import Checkbox from "@/components/Checkbox.vue";
-import Input from "@/components/Input.vue";
-import Button from "@/components/Button.vue";
+import Checkbox from "@/components/ui/Checkbox.vue";
+import Input from "@/components/ui/Input.vue";
+import Button from "@/components/ui/Button.vue";
 import {apiCreateMiniverse} from "@/api/miniverse";
 
 const popupRef = ref<InstanceType<typeof BasePopup> | null>(null);

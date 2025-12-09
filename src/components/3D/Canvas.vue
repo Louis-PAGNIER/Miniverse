@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
 import {TresCanvas} from "@tresjs/core";
-import System from "@/components/System.vue";
+import MiniversesListDisplay from "@/components/3D/MiniversesListDisplay.vue";
 import {computed, ref, ShallowRef, shallowRef} from "vue";
-import MiniverseSheet from "@/components/MiniverseSheet/MiniverseSheet.vue";
+import MiniverseSheet from "@/components/miniverse-sheet/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 import {useRoute, useRouter} from "vue-router";
 
@@ -27,17 +27,17 @@ const openNewMiniverseDialog = () => {
 
 <template>
   <TresCanvas window-size clear-color="black" :antialias="false">
-    <System ref="systemRef" :router="router" :route="route"></System>
+    <MiniversesListDisplay ref="systemRef" :router="router" :route="route"></MiniversesListDisplay>
   </TresCanvas>
   <div id="overlays-wrapper">
     <div class="header">
       <span class="logo">Miniverse</span>
       <div class="spacer"></div>
       <button class="overlay-button" @click="openNewMiniverseDialog">
-        <img class="svg-icon" src="@/assets/icons/plus.svg" />
+        <img class="svg-icon" src="../../assets/icons/plus.svg" />
       </button>
 <!--      <router-link class="button" to="settings"><img class="svg-icon" src="@/assets/icons/settings.svg"></router-link>-->
-      <button class="overlay-button"><img class="svg-icon" src="@/assets/icons/account.svg"></button>
+      <button class="overlay-button"><img class="svg-icon" src="../../assets/icons/account.svg"></button>
     </div>
     <transition name="fade">
       <div id="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleOverlayClick($event)">

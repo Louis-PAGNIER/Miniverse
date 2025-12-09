@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Entity from "@/components/Entity.vue";
-import {PlayerTemplate} from "@/assets/minecraftTemplates/PlayerTemplate";
-import {OldPlayerTemplate} from "@/assets/minecraftTemplates/OldPlayerTemplate";
-import {VeryOldPlayerTemplate} from "@/assets/minecraftTemplates/VeryOldPlayerTemplate";
+import Entity from "@/components/3D/Entity.vue";
+import {PlayerTemplate} from "@/assets/minecraft-templates/PlayerTemplate";
+import {OldPlayerTemplate} from "@/assets/minecraft-templates/OldPlayerTemplate";
+import {VeryOldPlayerTemplate} from "@/assets/minecraft-templates/VeryOldPlayerTemplate";
 import {ref, computed, watch, Ref} from "vue";
 import {Vector3} from "three";
 

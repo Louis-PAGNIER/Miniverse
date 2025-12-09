@@ -1,4 +1,4 @@
-import {NumberAnimator, Vector3Animator} from "@/scripts/animations";
+import {NumberAnimator, Vector3Animator} from "@/composables/animations";
 import {MiniverseType} from "@/models/enums/miniverseType";
 import {MiniverseUserRole} from "@/models/miniverseUserRole";
 import {Mod} from "@/models/mod";

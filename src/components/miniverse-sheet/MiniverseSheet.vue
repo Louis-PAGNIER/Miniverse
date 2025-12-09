@@ -2,24 +2,13 @@
 import { Miniverse } from "@/models/miniverse";
 import { provide } from "vue";
 
-import Navigator from "@/components/MiniverseSheet/Navigator.vue";
-import HomeSheetPage from "@/components/MiniverseSheet/HomeSheetPage.vue";
-import PlayersSheetPage from "@/components/MiniverseSheet/PlayersSheetPage.vue";
-import VersionSheetPage from "@/components/MiniverseSheet/VersionSheetPage.vue";
-import ModsSheetPage from "@/components/MiniverseSheet/ModsSheetPage.vue";
-import ConsoleSheetPage from "@/components/MiniverseSheet/ConsoleSheetPage.vue";
+import Navigator from "@/components/miniverse-sheet/Navigator.vue";
+import {sheetPagesRoutes} from "@/router";
 
 const props = defineProps<{ miniverse: Miniverse }>();
 
 provide('miniverse', props.miniverse);
 
-const routes = {
-  home: { name: "Home", component: HomeSheetPage },
-  players: { name: "Players", component: PlayersSheetPage },
-  version: { name: "Version", component: VersionSheetPage },
-  mods: { name: "Mods", component: ModsSheetPage },
-  console: { name: "Console", component: ConsoleSheetPage },
-};
 </script>
 
 <template>
@@ -28,7 +17,7 @@ const routes = {
     <div class="content">
       <Navigator
           :basePath="`/miniverse/${miniverse.id}`"
-          :routes="routes"
+          :routes="sheetPagesRoutes"
       />
     </div>
   </div>

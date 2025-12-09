@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BasePopup from "./BasePopup.vue";
-import Button from "@/components/Button.vue";
+import Button from "@/components/ui/Button.vue";
 import {ref} from "vue";
 
 const popupRef = ref<InstanceType<typeof BasePopup> | null>(null);
