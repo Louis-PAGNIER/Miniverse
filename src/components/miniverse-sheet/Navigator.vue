@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import {computed, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 
 interface RouteNode {
   name: string;
@@ -19,29 +19,32 @@ const route = useRoute();
 const currentPath = ref("");
 
 watch(
-    () => route.fullPath,
+    () => route.path,
     (path) => {
-      const clean = path.replace(props.basePath, "").replace(/^\/+/, "");
-      currentPath.value = clean;
+      currentPath.value = path.replace(props.basePath, "").replace(/^\/+/, "");
     },
     { immediate: true }
 );
 
-function navigateTo(subPath: string) {
-  const newPath = `${props.basePath}/${subPath}`;
-  router.push(newPath);
+function navigateTo(segments: string[]) {
+  router.push({
+    path: `${props.basePath}/${segments.join("/")}`,
+  });
 }
 
 function resolveRouteNode(path: string): RouteNode | null {
   const parts = path.split("/").filter(Boolean);
+  console.log("parts", parts)
+  console.log(props.routes)
   let node: RouteNode | null = null;
   let current = props.routes;
 
   for (const part of parts) {
     node = current[part];
     if (!node) break;
-    current = node.children || {};
   }
+
+  console.log(node)
 
   return node || props.routes.home; // fallback
 }
@@ -50,20 +53,19 @@ const currentNode = computed(() => resolveRouteNode(currentPath.value));
 
 const breadcrumbs = computed(() => {
   const parts = currentPath.value.split("/").filter(Boolean);
-  const crumbs: { name: string; path: string }[] = [];
+  const crumbs: { name: string; segments: string[] }[] = [];
   let current = props.routes;
-  let currentPathAcc = "";
+  let acc: string[] = [];
 
   for (const part of parts) {
     const node = current[part];
     if (!node) break;
-    currentPathAcc += (currentPathAcc ? "/" : "") + part;
-    crumbs.push({ name: node.name, path: currentPathAcc });
-    current = node.children || {};
+
+    acc = [...acc, part];
+    crumbs.push({ name: node.name, segments: acc });
   }
 
-  const homeCrumb = { name: props.routes.home.name, path: "" };
-  return [homeCrumb, ...crumbs];
+  return [{ name: props.routes.home.name, segments: [] }, ...crumbs];
 });
 </script>
 
@@ -71,10 +73,10 @@ const breadcrumbs = computed(() => {
   <div class="navigator-container">
     <div class="navigator">
       <span
-          v-for="(crumb, i) in breadcrumbs"
-          :key="crumb.path"
-          class="path"
-          @click="navigateTo(crumb.path)"
+        v-for="(crumb, i) in breadcrumbs"
+        :key="crumb.segments.join('/')"
+        class="path"
+        @click="navigateTo(crumb.segments)"
       >
         {{ crumb.name }}
         <span v-if="i < breadcrumbs.length - 1"> ⟩ </span>

@@ -69,3 +69,30 @@ export interface ModrinthSearchResults {
   limit: number;
   total_hits: number;
 }
+
+export interface ModrinthProject {
+  id: number;
+  slug: string;
+  title: string;
+  description: string;
+  body: string;
+  categories: string[];
+  client_side: ModSideSupport;
+  server_side: ModSideSupport;
+  issues_url: string;
+  source_url: string;
+  wiki_url: string;
+  discord_url: string;
+  color?: number;
+  team: string;
+  published: number;
+  updated: number;
+  followers: number;
+  project_type: ModrinthProjectType;
+  downloads: number;
+  icon_url: string;
+  versions: string[];
+  game_versions: string[];
+  loaders: string[];
+  gallery: any[];
+}

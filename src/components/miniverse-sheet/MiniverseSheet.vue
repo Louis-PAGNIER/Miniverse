@@ -16,8 +16,8 @@ provide('miniverse', props.miniverse);
     <h1 class="title">{{ miniverse.name }}</h1>
     <div class="content">
       <Navigator
-          :basePath="`/miniverse/${miniverse.id}`"
-          :routes="sheetPagesRoutes"
+        :basePath="`/miniverse/${miniverse.id}`"
+        :routes="sheetPagesRoutes"
       />
     </div>
   </div>

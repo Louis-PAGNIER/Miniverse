@@ -6,17 +6,31 @@ import Tab from "@/components/ui/Tab.vue";
 import SearchBar from "@/components/ui/SearchBar.vue";
 import {Mod, ModrinthSearchResult} from "@/models/mod";
 import {apiSearchMods} from "@/api/mods";
+import {RouteLocationNormalizedLoadedGeneric, Router, useRoute, useRouter} from "vue-router";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 
-const activeTab = ref("installedMods");
-const search = ref("");
+const VALID_TABS = ["installedMods", "searchMods"];
 
+const route: RouteLocationNormalizedLoadedGeneric = useRoute();
+const router: Router = useRouter();
+
+const search = ref("");
 const allModrinthMods: Ref<ModrinthSearchResult[]> = ref([]);
 
-async function updateSearchedModrinthMods() {
-  allModrinthMods.value = (await apiSearchMods(search.value)).hits;
-}
+const activeTab = computed({
+  get() {
+    const tab = route.query.tab as string;
+    search.value = route.query['mod-search'] as string ?? '';
+    return VALID_TABS.includes(tab) ? tab : "installedMods";
+  },
+  set(tab) {
+    router.replace({
+      path: route.path,
+      query: {...route.query, 'mod-search': search.value, 'tab': tab}
+    })
+  }
+});
 
 const filteredInstalledMods = computed(() => {
   const term = search.value.trim().toLowerCase();
@@ -25,6 +39,18 @@ const filteredInstalledMods = computed(() => {
       .filter(m => m.title.toLowerCase().includes(term))
       .sort((a, b) => a.title.localeCompare(b.title));
 });
+
+async function updateSearchedModrinthMods() {
+  allModrinthMods.value = (await apiSearchMods(search.value)).hits;
+  await router.replace({
+    path: route.path,
+    query: {...route.query, 'mod-search': search.value}
+  })
+}
+
+function navigateToMod(modId: string) {
+  router.push(`/miniverse/${miniverse.id}/mods/mod?id=${modId}`)
+}
 
 onMounted(async () => {
   await updateSearchedModrinthMods();
@@ -44,7 +70,7 @@ onMounted(async () => {
       <template #installedMods>
         <SearchBar class="search-bar" v-model="search"></SearchBar>
         <ul>
-          <li v-for="mod in filteredInstalledMods" :key="mod.id">
+          <li v-for="mod in filteredInstalledMods" :key="mod.id" @click="navigateToMod(mod.project_id)">
             <img class="mod-icon" :src="mod.icon_url">
             <div class="text-info">
               <span class="mod-title">{{ mod.title }}</span>
@@ -57,7 +83,7 @@ onMounted(async () => {
       <template #searchMods>
         <SearchBar class="search-bar" v-model="search" @change="updateSearchedModrinthMods" :debounce="1000"></SearchBar>
         <ul>
-          <li v-for="mod in allModrinthMods" :key="mod.project_id">
+          <li v-for="mod in allModrinthMods" :key="mod.project_id" @click="navigateToMod(mod.project_id)">
             <img class="mod-icon" :src="mod.icon_url">
             <div class="text-info">
               <span class="mod-title">{{ mod.title }}</span>

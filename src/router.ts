@@ -4,6 +4,7 @@ import PlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage.vue";
 import VersionSheetPage from "@/pages/sheet-pages/VersionSheetPage.vue";
 import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
+import ModSheetPage from "@/pages/sheet-pages/ModSheetPage.vue";
 
 export const mainRoutes = [
   {
@@ -22,5 +23,6 @@ export const sheetPagesRoutes = {
   players: { name: "Players", component: PlayersSheetPage },
   version: { name: "Version", component: VersionSheetPage },
   mods: { name: "Mods", component: ModsSheetPage },
+  mod: { name: "Mod", component: ModSheetPage },
   console: { name: "Console", component: ConsoleSheetPage },
 };
