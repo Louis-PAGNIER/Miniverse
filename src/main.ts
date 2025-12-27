@@ -8,6 +8,9 @@ import App from "@/App.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import Tres from '@tresjs/core';
 import {mainRoutes} from "@/router";
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faBars, faTrash, faPlay, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -17,7 +20,15 @@ const router = createRouter({
 const app = createApp(App)
 const pinia = createPinia()
 
+library.add(
+  faBars,
+  faTrash,
+  faPlay,
+  faRotateLeft
+)
+
 app.use(router)
 app.use(Tres)
 app.use(pinia)
-app.mount('#app')
+app.component("FontAwesomeIcon", FontAwesomeIcon)
+  .mount('#app')
