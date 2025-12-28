@@ -57,10 +57,11 @@ onUnmounted(() => {
         <button
             v-for="(action, i) in secondary"
             :key="i"
+            :class="{ danger: action.danger }"
             @click="() => { showOptions = false; action.onClick() }"
         >
-          <font-awesome-icon :class="{ danger: action.danger }" v-if="action.icon" :icon='action.icon' />
-          <span class="label" :class="{ danger: action.danger }">
+          <font-awesome-icon v-if="action.icon" :icon='action.icon' />
+          <span class="label">
             {{ action.label }}
           </span>
         </button>
@@ -99,14 +100,6 @@ onUnmounted(() => {
     }
   }
 
-  .danger {
-    color: var(--color-danger-secondary);
-
-    &:hover {
-      background: var(--color-danger-secondary);
-    }
-  }
-
   .primary {
     flex: 1;
     display: flex;
@@ -115,12 +108,17 @@ onUnmounted(() => {
     align-items: center;
     border-radius: 10px 0 0 10px;
 
-    .icon {
-      width: 30px;
-    }
-
     .label {
       margin-left: 5px;
+    }
+
+    &.danger {
+      background: var(--color-danger-secondary);
+      color: var(--color-secondary);
+
+      &:hover {
+        background: var(--color-danger);
+      }
     }
   }
 
@@ -170,12 +168,13 @@ onUnmounted(() => {
           background: var(--color-background-tertiary);
         }
 
-        .icon {
-          width: 15px;
-        }
-
-        .label.danger {
+        &.danger {
           color: var(--color-danger-secondary);
+
+          &:hover {
+            background: var(--color-danger-secondary);
+            color: var(--color-secondary);
+          }
         }
       }
     }
