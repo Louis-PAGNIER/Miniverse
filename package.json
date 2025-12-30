@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --mode development"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
