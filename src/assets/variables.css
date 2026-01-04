@@ -7,20 +7,23 @@
     --color-background-secondary: #3c3c3c;
     --color-background-tertiary: #484848;
 
-    --color-success: #2f8035;
+    --color-success: #45914a;
     --color-warning: #c37503;
     --color-danger: #a82d2d;
     --color-info: #1c65ae;
+    --color-neutral: #7e7e7e;
 
-    --color-success-secondary: #45914a;
+    --color-success-secondary: #40a846;
     --color-warning-secondary: #cc8823;
     --color-danger-secondary: #ae3939;
     --color-info-secondary: #2b79ca;
+    --color-neutral-secondary: #8f8f8f;
 
-    --color-success-tertiary: #6bbf6b;
+    --color-success-tertiary: #47b351;
     --color-warning-tertiary: #e0a153;
-    --color-danger-tertiary: #ea9595;
+    --color-danger-tertiary: #bd4d4d;
     --color-info-tertiary: #7faedc;
+    --color-neutral-tertiary: #b5b5b5;
 
 
     --color-border: #5c5c5c;

@@ -8,7 +8,7 @@ import {apiGetMinecraftVersions} from "@/api/minecraft";
 import {MinecraftVersion} from "@/models/minecraftVersion";
 import Checkbox from "@/components/ui/Checkbox.vue";
 import Input from "@/components/ui/Input.vue";
-import Button from "@/components/ui/Button.vue";
+import OverlayButton from "@/components/ui/OverlayButton.vue";
 import {apiCreateMiniverse} from "@/api/miniverse";
 
 const popupRef = ref<InstanceType<typeof BasePopup> | null>(null);
@@ -131,8 +131,8 @@ watch(show, (newShow) => {
 
     </form>
     <template #footer>
-      <Button @click="popupRef?.close">Cancel</Button>
-      <Button severity="primary" @click="createMiniverse">Create</Button>
+      <OverlayButton @click="popupRef?.close">Cancel</OverlayButton>
+      <OverlayButton severity="primary" @click="createMiniverse">Create</OverlayButton>
     </template>
   </BasePopup>
 </template>

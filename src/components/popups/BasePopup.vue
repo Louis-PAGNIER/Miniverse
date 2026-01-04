@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import Button from "@/components/ui/Button.vue";
+import OverlayButton from "@/components/ui/OverlayButton.vue";
 
 const props = withDefaults(defineProps<{
   title?: string;
@@ -59,8 +59,8 @@ onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside))
 
         <footer v-if="showFooter" class="popup-actions">
           <slot name="footer">
-            <Button @click="close">Cancel</Button>
-            <Button @click="confirm">OK</Button>
+            <OverlayButton @click="close">Cancel</OverlayButton>
+            <OverlayButton @click="confirm">OK</OverlayButton>
           </slot>
         </footer>
       </div>

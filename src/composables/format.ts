@@ -25,9 +25,12 @@ export function formatBigNumber(n: number, decimals: number = 2): string {
 }
 
 export function timeAgo(
-  timestamp: number | string | Date,
+  timestamp?: number | string | Date,
   now: Date = new Date()
 ): string {
+  if (!timestamp)
+    return '';
+
   const date = new Date(timestamp);
   const diffMs = now.getTime() - date.getTime();
 
@@ -49,4 +52,31 @@ export function timeAgo(
   if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
 
   return "just now";
+}
+
+export function computeVersionRange(versions: string[]): string {
+  if (versions.length === 0) return ""
+
+  if (versions.length === 1) {
+    return versions[0]
+  }
+
+  const parse = (v: string) => v.split(".").map(Number)
+
+  const compare = (a: string, b: string) => {
+    const pa = parse(a)
+    const pb = parse(b)
+    const len = Math.max(pa.length, pb.length)
+
+    for (let i = 0; i < len; i++) {
+      const da = pa[i] ?? 0
+      const db = pb[i] ?? 0
+      if (da !== db) return da - db
+    }
+    return 0
+  }
+
+  const sorted = [...versions].sort(compare)
+
+  return `${sorted[0]}-${sorted[sorted.length - 1]}`
 }

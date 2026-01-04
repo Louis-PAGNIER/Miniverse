@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BasePopup from "./BasePopup.vue";
-import Button from "@/components/ui/Button.vue";
+import OverlayButton from "@/components/ui/OverlayButton.vue";
 import {ref} from "vue";
 
 const popupRef = ref<InstanceType<typeof BasePopup> | null>(null);
@@ -35,8 +35,8 @@ const emit = defineEmits<{
   >
     <p><slot></slot></p>
     <template #footer>
-      <Button @click="popupRef?.close">Cancel</Button>
-      <Button :severity="severity" @click="popupRef?.confirm">{{ primaryButtonText }}</Button>
+      <OverlayButton @click="popupRef?.close">Cancel</OverlayButton>
+      <OverlayButton :severity="severity" @click="popupRef?.confirm">{{ primaryButtonText }}</OverlayButton>
     </template>
   </BasePopup>
 </template>

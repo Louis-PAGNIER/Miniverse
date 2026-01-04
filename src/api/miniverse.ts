@@ -48,3 +48,17 @@ export async function apiUpdateMiniverseMCVersion(miniverseId: string, mcVersion
 export async function apiDeleteMiniverse(miniverseId: string): Promise<void> {
     await axios.delete(`${API_BASE}/miniverses/${miniverseId}/`);
 }
+
+export async function apiInstallMod(miniverseId: string, modVersionId: string): Promise<void> {
+    await axios.post(`${API_BASE}/miniverses/${miniverseId}/install/mod/${modVersionId}`);
+}
+
+export async function apiAutomaticModInstall(miniverseId: string, modId: string): Promise<void> {
+    await axios.post(`${API_BASE}/miniverses/${miniverseId}/install/mod`, {
+        mod_id: modId,
+    });
+}
+
+export async function apiUninstallMod(modId: string): Promise<void> {
+    await axios.delete(`${API_BASE}/miniverses/mods/${modId}`);
+}

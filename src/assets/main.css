@@ -39,10 +39,10 @@ img {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-weight: normal;
 }
 
 .svg-icon {
@@ -97,4 +97,66 @@ a:hover {
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+/* -------------- Color Styling -------------- */
+
+.success {
+    background: var(--color-success);
+
+    &:hover {
+        background: var(--color-success-secondary);
+    }
+
+    &:active {
+        background: var(--color-success-tertiary);
+    }
+}
+
+.danger {
+    background: var(--color-danger);
+
+    &:hover {
+        background: var(--color-danger-secondary);
+    }
+
+    &:active {
+        background: var(--color-danger-tertiary);
+    }
+}
+
+.warning {
+    background: var(--color-warning);
+
+    &:hover {
+        background: var(--color-warning-secondary);
+    }
+
+    &:active {
+        background: var(--color-warning-tertiary);
+    }
+}
+
+.info {
+    background: var(--color-info);
+
+    &:hover {
+        background: var(--color-info-secondary);
+    }
+
+    &:active {
+        background: var(--color-info-tertiary);
+    }
+}
+
+.neutral {
+    background: var(--color-neutral);
+
+    &:hover {
+        background: var(--color-neutral-secondary);
+    }
+
+    &:active {
+        background: var(--color-neutral-tertiary);
+    }
 }

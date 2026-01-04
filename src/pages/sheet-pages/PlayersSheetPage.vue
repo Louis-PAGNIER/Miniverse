@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ComputedRef, inject} from "vue";
+import {computed, ComputedRef, inject, ref, watch} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import FlatPlayerHead from "@/components/FlatPlayerHead.vue";
