@@ -24,6 +24,28 @@ export function formatBigNumber(n: number, decimals: number = 2): string {
   return n.toString();
 }
 
+export function formatFileSize(n: number, decimals: number = 2): string {
+  if (!Number.isFinite(n)) return "0B";
+
+  const abs = Math.abs(n);
+
+  const units = [
+    { value: 1e12, suffix: "To" },
+    { value: 1e9, suffix: "Go" },
+    { value: 1e6, suffix: "Mo" },
+    { value: 1e3, suffix: "Ko" },
+  ];
+
+  for (const unit of units) {
+    if (abs >= unit.value) {
+      const formatted = (n / unit.value).toFixed(decimals);
+      return `${removeTrailingZeros(formatted)} ${unit.suffix}`;
+    }
+  }
+
+  return n.toString();
+}
+
 export function timeAgo(
   timestamp?: number | string | Date,
   now: Date = new Date()

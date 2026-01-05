@@ -5,12 +5,25 @@ import VersionSheetPage from "@/pages/sheet-pages/VersionSheetPage.vue";
 import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
 import ModSheetPage from "@/pages/sheet-pages/ModSheetPage.vue";
+import Login from "@/pages/Login.vue";
+import Users from "@/pages/Users.vue";
+import FilesSheetPage from "@/pages/sheet-pages/FilesSheetPage.vue";
 
 export const mainRoutes = [
   {
     path: '/',
     name: 'Home',
     component: Canvas
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: Users
   },
   {
     path: '/miniverse/:catchAll(.*)',
@@ -25,4 +38,5 @@ export const sheetPagesRoutes = {
   mods: { name: "Mods", component: ModsSheetPage },
   mod: { name: "Mod", component: ModSheetPage },
   console: { name: "Console", component: ConsoleSheetPage },
+  files: { name: "Files", component: FilesSheetPage },
 };

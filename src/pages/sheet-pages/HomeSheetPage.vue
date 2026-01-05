@@ -39,6 +39,7 @@ const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.p
     <MiniverseSheetTile icon="player-head.png" label="Players" @click="$router.push(`/miniverse/${miniverse.id}/players`)">{{ numberOfPlayers }}/20</MiniverseSheetTile>
     <MiniverseSheetTile icon="console.png" label="$sh" @click="$router.push(`/miniverse/${miniverse.id}/console`)">Console</MiniverseSheetTile>
     <MiniverseSheetTile :icon="loaderIcon" label="Loader">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
+    <MiniverseSheetTile icon="bookshelf.png" label="World data" @click="$router.push(`/miniverse/${miniverse.id}/files`)">Files</MiniverseSheetTile>
     <MiniverseSheetTile v-if="supportMods" icon="mods.png" label="Mods" @click="$router.push(`/miniverse/${miniverse.id}/mods`)">{{ miniverse.mods.length }}</MiniverseSheetTile>
   </div>
 </template>

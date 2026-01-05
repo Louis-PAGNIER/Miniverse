@@ -33,6 +33,7 @@ const value = ref(props.modelValue || "");
 .custom-input {
   position: relative;
   width: 250px;
+  height: 40px;
   margin: 5px 0;
   user-select: none;
 }
@@ -46,7 +47,7 @@ const value = ref(props.modelValue || "");
   background: var(--color-background-secondary);
   border-radius: 8px;
   padding: 0 12px;
-  height: 40px;
+  height: 100%;
   color: var(--color-primary);
   outline: none;
   transition: border-color 0.2s;
