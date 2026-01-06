@@ -2,6 +2,7 @@ import axios from "axios";
 import {API_BASE} from "@/api/api";
 import {Miniverse} from "@/models/miniverse";
 import {MiniverseType} from "@/models/enums/miniverseType";
+import {FileInfo} from "@/models/fileInfo";
 
 export async function apiGetMiniverses(): Promise<Miniverse[]> {
     const response = await axios.get(`${API_BASE}/miniverses/`);
@@ -61,4 +62,8 @@ export async function apiAutomaticModInstall(miniverseId: string, modId: string)
 
 export async function apiUninstallMod(modId: string): Promise<void> {
     await axios.delete(`${API_BASE}/miniverses/mods/${modId}`);
+}
+
+export async function apiListFiles(miniverseId: string, path: string): Promise<FileInfo[]> {
+    return (await axios.get(`${API_BASE}/miniverses/${miniverseId}/files?path=` + path)).data;
 }

@@ -208,7 +208,7 @@ const versionsTableColumns: Column<ModrinthProjectVersion>[] = [
       </template>
 
       <template #versions>
-        <Table :columns="versionsTableColumns" :rows="modAvailableVersions">
+        <Table :columns="versionsTableColumns" :rows="modAvailableVersions" :row-key="row => row.id">
           <template #cell-name="{ value }">
             <div class="name-column">
               <span class="version-number">{{ value.version_number }}</span>

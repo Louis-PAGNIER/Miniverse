@@ -30,10 +30,11 @@ export function formatFileSize(n: number, decimals: number = 2): string {
   const abs = Math.abs(n);
 
   const units = [
-    { value: 1e12, suffix: "To" },
-    { value: 1e9, suffix: "Go" },
-    { value: 1e6, suffix: "Mo" },
-    { value: 1e3, suffix: "Ko" },
+    { value: 1e12, suffix: "TB" },
+    { value: 1e9, suffix: "GB" },
+    { value: 1e6, suffix: "MB" },
+    { value: 1e3, suffix: "KB" },
+    { value: 1, suffix: "B" },
   ];
 
   for (const unit of units) {

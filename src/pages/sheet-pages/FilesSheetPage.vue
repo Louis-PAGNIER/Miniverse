@@ -11,7 +11,7 @@ const miniverseStore = useMiniverseStore();
 <template>
   <div class="files-sheet-page">
     <h2>Files</h2>
-    <FileBrowser></FileBrowser>
+    <FileBrowser :miniverse="miniverse"></FileBrowser>
   </div>
 </template>
 

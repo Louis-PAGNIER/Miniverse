@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps<{
   modelValue?: string;
@@ -12,7 +12,10 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
 
-const value = ref(props.modelValue || "");
+const value = computed({
+  get: () => props.modelValue ?? "",
+  set: (val: string) => emit("update:modelValue", val)
+});
 </script>
 
 <template>

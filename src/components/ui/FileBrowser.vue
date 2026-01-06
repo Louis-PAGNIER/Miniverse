@@ -1,61 +1,160 @@
 <script setup lang="ts">
-
 import Button from "@/components/ui/OverlayButton.vue";
-import {faArrowUp, faCopy, faDownload, faFile, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Input from "@/components/ui/Input.vue";
-import {ref} from "vue";
+import {onMounted, Ref, ref, watch} from "vue";
 import Table, {Column} from "@/components/ui/Table.vue";
-import {formatFileSize} from "@/composables/format";
+import {formatFileSize, timeAgo} from "@/composables/format";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {faFolder} from "@fortawesome/free-regular-svg-icons";
+import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawesome/free-regular-svg-icons";
+import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
+import {FileInfo} from "@/models/fileInfo";
+import {apiListFiles} from "@/api/miniverse";
+import {Miniverse} from "@/models/miniverse";
+import {useRoute, useRouter} from "vue-router";
 
-const browsePath = ref("/var/www/http");
+const props = defineProps<{
+  miniverse: Miniverse
+}>();
 
-interface FileInfo {
-  is_folder: boolean;
-  name: string;
-  created: number;
-  updated: number;
-  size?: number;
+const route = useRoute();
+const router = useRouter();
+
+const browsingPath: Ref<string> = ref("");
+const files: Ref<FileInfo[]> = ref([]);
+const selectedPaths: Ref<Array<string | number>> = ref([]);
+
+function getIconFromFileInfo(info: FileInfo) {
+  if (info.is_folder)
+    return faFolder;
+
+  const parts = info.name.split(".");
+  if (parts.length < 2)
+    return faFile;
+
+  const extension = parts[parts.length - 1];
+
+  switch (extension) {
+    case 'zip':
+    case 'tar':
+    case 'gz':
+    case 'rar':
+      return faFileZipper;
+    case 'jar':
+    case 'java':
+      return faJava;
+    case 'py':
+    case 'pyc':
+      return faPython;
+    case 'txt':
+      return faFileLines;
+    case 'json':
+      return faFileCode;
+  }
+
+  return faFile;
+}
+
+function normalizePath(path?: string): string {
+  if (!path || path.trim() === "") return "/";
+  return path.startsWith("/") ? path : "/" + path;
+}
+
+async function refreshFiles() {
+  files.value = await apiListFiles(props.miniverse.id, browsingPath.value);
+}
+
+async function navigateFileBrowserTo(path: string) {
+  const normalized = normalizePath(path);
+
+  await router.push({
+    path: route.path,
+    query: {
+      ...route.query,
+      path: normalized !== "/" ? normalized : undefined, // URL propre
+    },
+  });
+}
+
+async function navigateFileBrowserToParent() {
+  if (browsingPath.value === "/") return;
+
+  const parent =
+      browsingPath.value.substring(0, browsingPath.value.lastIndexOf("/")) || "/";
+
+  await navigateFileBrowserTo(parent);
+}
+
+async function onRowDoubleClick(file: FileInfo) {
+  await navigateFileBrowserTo(file.path);
+}
+
+async function onPathBarValidate() {
+  await navigateFileBrowserTo(browsingPath.value);
+  await refreshFiles();
 }
 
 const browserColumns: Column<FileInfo>[] = [
-  { id: "is_folder", name: "Type", value: (v: FileInfo) => v.is_folder },
-  { id: "name", name: "Name", value: (v: FileInfo) => v.name },
-  { id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--' },
-  { id: "created", name: "Creation", class: 'optional1', value: (v: FileInfo) => v.created },
-  { id: "updated", name: "Modification", class: 'optional1', value: (v: FileInfo) => v.updated },
+  {
+    id: "type",
+    name: "",
+    value: (v: FileInfo) => getIconFromFileInfo(v),
+    width: '15px',
+    sortable: true,
+    sortValue: (v: FileInfo) => ((v.is_folder ? '0_' : ('1_' + v.name.split('.').pop())) + v.name) || '2_'
+  },
+  { id: "name", name: "Name", value: (v: FileInfo) => v.name, sortable: true },
+  { id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--', sortable: true },
+  { id: "created", name: "Creation", class: 'optional1', value: (v: FileInfo) => v.created, sortable: true },
+  { id: "updated", name: "Modification", class: 'optional1', value: (v: FileInfo) => v.updated, sortable: true },
 ]
 
-const files = [
-  {is_folder: true, name: 'mods', created: 0, updated: 0},
-  {is_folder: true, name: 'world', created: 0, updated: 0},
-  {is_folder: true, name: 'data', created: 0, updated: 0},
-  {is_folder: false, name: 'toto.txt', created: 0, updated: 0, size: 5000000},
-  {is_folder: false, name: 'world.json', created: 0, updated: 0, size: 80000000},
-];
+watch(
+    () => route.query.path,
+    async (newPath) => {
+      const normalized = normalizePath(newPath as string | undefined);
+
+      if (browsingPath.value !== normalized) {
+        browsingPath.value = normalized;
+        await refreshFiles();
+      }
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
   <div class="wrapper">
-    <div class="sidebar">
-
-    </div>
     <div class="main">
       <div class="header">
         <Button :icon="faTrash" severity="danger"></Button>
         <Button :icon="faDownload"></Button>
         <Button :icon="faCopy"></Button>
         <Button :icon="faPaste"></Button>
-        <Button :icon="faArrowUp"></Button>
-        <Input class="input-path" v-model="browsePath" placeholder="/"></Input>
+        <Button :icon="faArrowUp" @click="navigateFileBrowserToParent"></Button>
+        <Input class="input-path" v-model="browsingPath" placeholder="/" @keyup.enter="onPathBarValidate"></Input>
       </div>
 
       <div class="content">
-        <Table :columns="browserColumns" :rows="files">
-          <template #cell-is_folder="{ value }">
-            <font-awesome-icon :icon="faFolder" v-if="value"></font-awesome-icon>
-            <font-awesome-icon :icon="faFile" v-else></font-awesome-icon>
+        <Table
+            v-model:selectedKeys="selectedPaths"
+            :columns="browserColumns"
+            :rows="files"
+            :row-key="row => row.path"
+            :default-sort="{columnId: 'type', order: 'asc'}"
+            padding="4px"
+            selectable
+            @row-dblclick="onRowDoubleClick">
+          <template #cell-type="{ value }">
+            <font-awesome-icon :icon="value"></font-awesome-icon>
+          </template>
+
+          <template #cell-created="{ value }">
+            {{ timeAgo(value) }}
+          </template>
+
+          <template #cell-updated="{ value }">
+            {{ timeAgo(value) }}
           </template>
         </Table>
       </div>
@@ -73,18 +172,9 @@ const files = [
   display: flex;
   border-radius: 14px;
 
-  .sidebar {
-    width: 300px;
-    margin: 12px 0 12px 12px;
-    background: var(--color-background-primary);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    overflow-y: auto;
-  }
-
   .main {
     width: 100%;
-    margin: 12px 12px 12px 0;
+    margin: 12px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -115,6 +205,7 @@ const files = [
     .content {
       height: 100%;
       overflow-y: auto;
+      overflow-x: hidden;
     }
   }
 }
