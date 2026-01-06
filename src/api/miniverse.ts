@@ -5,65 +5,91 @@ import {MiniverseType} from "@/models/enums/miniverseType";
 import {FileInfo} from "@/models/fileInfo";
 
 export async function apiGetMiniverses(): Promise<Miniverse[]> {
-    const response = await axios.get(`${API_BASE}/miniverses/`);
-    return response.data;
+  const response = await axios.get(`${API_BASE}/miniverses/`);
+  return response.data;
 }
 
 export async function apiCreateMiniverse(
-    name: string,
-    description: string,
-    type: MiniverseType,
-    MCVersion: string,
-    subdomain: string,
-    liteProxy: boolean,
+  name: string,
+  description: string,
+  type: MiniverseType,
+  MCVersion: string,
+  subdomain: string,
+  liteProxy: boolean,
 ): Promise<Miniverse> {
-    const response = await axios.post(`${API_BASE}/miniverses/`, {
-        name: name,
-        type: type,
-        mc_version: MCVersion,
-        description: description,
-        subdomain: subdomain,
-        is_on_lite_proxy: liteProxy,
-    });
-    return response.data;
+  const response = await axios.post(`${API_BASE}/miniverses/`, {
+    name: name,
+    type: type,
+    mc_version: MCVersion,
+    description: description,
+    subdomain: subdomain,
+    is_on_lite_proxy: liteProxy,
+  });
+  return response.data;
 }
 
 export async function apiStartMiniverse(miniverseId: string): Promise<void> {
-    await axios.post(`${API_BASE}/miniverses/${miniverseId}/start/`);
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/start/`);
 }
 
 export async function apiStopMiniverse(miniverseId: string): Promise<void> {
-    await axios.post(`${API_BASE}/miniverses/${miniverseId}/stop/`);
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/stop/`);
 }
 
 export async function apiRestartMiniverse(miniverseId: string): Promise<void> {
-    await axios.post(`${API_BASE}/miniverses/${miniverseId}/restart/`);
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/restart/`);
 }
 
 export async function apiUpdateMiniverseMCVersion(miniverseId: string, mcVersion: string): Promise<void> {
-    await axios.post(`${API_BASE}/miniverses/${miniverseId}/update_mc_version`, {
-        mc_version: mcVersion,
-    });
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/update_mc_version`, {
+    mc_version: mcVersion,
+  });
 }
 
 export async function apiDeleteMiniverse(miniverseId: string): Promise<void> {
-    await axios.delete(`${API_BASE}/miniverses/${miniverseId}/`);
+  await axios.delete(`${API_BASE}/miniverses/${miniverseId}/`);
 }
 
 export async function apiInstallMod(miniverseId: string, modVersionId: string): Promise<void> {
-    await axios.post(`${API_BASE}/miniverses/${miniverseId}/install/mod/${modVersionId}`);
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/install/mod/${modVersionId}`);
 }
 
 export async function apiAutomaticModInstall(miniverseId: string, modId: string): Promise<void> {
-    await axios.post(`${API_BASE}/miniverses/${miniverseId}/install/mod`, {
-        mod_id: modId,
-    });
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/install/mod`, {
+    mod_id: modId,
+  });
 }
 
 export async function apiUninstallMod(modId: string): Promise<void> {
-    await axios.delete(`${API_BASE}/miniverses/mods/${modId}`);
+  await axios.delete(`${API_BASE}/miniverses/mods/${modId}`);
 }
 
 export async function apiListFiles(miniverseId: string, path: string): Promise<FileInfo[]> {
-    return (await axios.get(`${API_BASE}/miniverses/${miniverseId}/files?path=` + path)).data;
+  return (await axios.get(`${API_BASE}/miniverses/${miniverseId}/files?path=` + path)).data;
+}
+
+export async function apiDownloadFile(miniverseId: string, paths: string[]): Promise<void> {
+  if (paths.length == 0) return;
+
+  const response = await axios.post(
+    `${API_BASE}/miniverses/${miniverseId}/files/download`, {
+      paths: paths
+    }, {
+      responseType: "blob",
+    });
+
+  let filename = "download.zip";
+  if (paths.length == 1)
+    filename = paths[0].split("/").pop() ?? "download.zip";
+
+  const url = window.URL.createObjectURL(response.data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 }

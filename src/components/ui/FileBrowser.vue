@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawesome/free-regular-svg-icons";
 import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
 import {FileInfo} from "@/models/fileInfo";
-import {apiListFiles} from "@/api/miniverse";
+import {apiDownloadFile, apiListFiles} from "@/api/miniverse";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 
@@ -22,7 +22,7 @@ const router = useRouter();
 
 const browsingPath: Ref<string> = ref("");
 const files: Ref<FileInfo[]> = ref([]);
-const selectedPaths: Ref<Array<string | number>> = ref([]);
+const selectedPaths: Ref<Array<string>> = ref([]);
 
 function getIconFromFileInfo(info: FileInfo) {
   if (info.is_folder)
@@ -85,6 +85,12 @@ async function navigateFileBrowserToParent() {
   await navigateFileBrowserTo(parent);
 }
 
+async function downloadSelection() {
+  if (selectedPaths.value.length > 0) {
+    await apiDownloadFile(props.miniverse.id, selectedPaths.value);
+  }
+}
+
 async function onRowDoubleClick(file: FileInfo) {
   await navigateFileBrowserTo(file.path);
 }
@@ -128,7 +134,7 @@ watch(
     <div class="main">
       <div class="header">
         <Button :icon="faTrash" severity="danger"></Button>
-        <Button :icon="faDownload"></Button>
+        <Button :icon="faDownload" @click="downloadSelection"></Button>
         <Button :icon="faCopy"></Button>
         <Button :icon="faPaste"></Button>
         <Button :icon="faArrowUp" @click="navigateFileBrowserToParent"></Button>
