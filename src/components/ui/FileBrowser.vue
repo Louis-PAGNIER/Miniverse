@@ -109,10 +109,21 @@ const browserColumns: Column<FileInfo>[] = [
     sortable: true,
     sortValue: (v: FileInfo) => ((v.is_folder ? '0_' : ('1_' + v.name.split('.').pop())) + v.name) || '2_'
   },
+
   { id: "name", name: "Name", value: (v: FileInfo) => v.name, sortable: true },
-  { id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--', sortable: true },
-  { id: "created", name: "Creation", class: 'optional1', value: (v: FileInfo) => v.created, sortable: true },
-  { id: "updated", name: "Modification", class: 'optional1', value: (v: FileInfo) => v.updated, sortable: true },
+
+  { id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--',
+    sortable: true, sortValue: (v: FileInfo) => v.size ?? 0 },
+
+  { id: "created", name: "Creation", class: 'optional1',
+    sortable: true,
+    value: (v: FileInfo) => timeAgo(v.created),
+    sortValue: (v: FileInfo) => v.created },
+
+  { id: "updated", name: "Modification", class: 'optional1',
+    sortable: true,
+    value: (v: FileInfo) => timeAgo(v.updated),
+    sortValue: (v: FileInfo) => v.updated },
 ]
 
 watch(
@@ -153,14 +164,6 @@ watch(
             @row-dblclick="onRowDoubleClick">
           <template #cell-type="{ value }">
             <font-awesome-icon :icon="value"></font-awesome-icon>
-          </template>
-
-          <template #cell-created="{ value }">
-            {{ timeAgo(value) }}
-          </template>
-
-          <template #cell-updated="{ value }">
-            {{ timeAgo(value) }}
           </template>
         </Table>
       </div>
