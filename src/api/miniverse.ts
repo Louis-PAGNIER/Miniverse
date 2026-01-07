@@ -68,6 +68,18 @@ export async function apiListFiles(miniverseId: string, path: string): Promise<F
   return (await axios.get(`${API_BASE}/miniverses/${miniverseId}/files?path=` + path)).data;
 }
 
+export async function apiDeleteFiles(miniverseId: string, paths: string[]): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/delete`, {
+    paths: paths
+  })
+}
+
+export async function apiCopyFiles(miniverseId: string, paths: string[], destination: string): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/copy?destination=` + destination, {
+    paths: paths
+  })
+}
+
 export async function apiDownloadFile(miniverseId: string, paths: string[]): Promise<void> {
   if (paths.length == 0) return;
 

@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawesome/free-regular-svg-icons";
 import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
 import {FileInfo} from "@/models/fileInfo";
-import {apiDownloadFile, apiListFiles} from "@/api/miniverse";
+import {apiCopyFiles, apiDeleteFiles, apiDownloadFile, apiListFiles} from "@/api/miniverse";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 
@@ -23,6 +23,7 @@ const router = useRouter();
 const browsingPath: Ref<string> = ref("");
 const files: Ref<FileInfo[]> = ref([]);
 const selectedPaths: Ref<Array<string>> = ref([]);
+const copiedPaths: Ref<Array<string>> = ref([]);
 
 function getIconFromFileInfo(info: FileInfo) {
   if (info.is_folder)
@@ -91,6 +92,26 @@ async function downloadSelection() {
   }
 }
 
+async function deleteSelection() {
+  if (selectedPaths.value.length > 0) {
+    await apiDeleteFiles(props.miniverse.id, selectedPaths.value);
+    await refreshFiles();
+  }
+}
+
+function copySelection() {
+  if (selectedPaths.value.length > 0) {
+    copiedPaths.value = selectedPaths.value.slice();
+  }
+}
+
+async function pasteFiles() {
+  if (copiedPaths.value.length > 0) {
+    await apiCopyFiles(props.miniverse.id, copiedPaths.value, browsingPath.value);
+    await refreshFiles();
+  }
+}
+
 async function onRowDoubleClick(file: FileInfo) {
   await navigateFileBrowserTo(file.path);
 }
@@ -144,10 +165,10 @@ watch(
   <div class="wrapper">
     <div class="main">
       <div class="header">
-        <Button :icon="faTrash" severity="danger"></Button>
+        <Button :icon="faTrash" severity="danger" @click="deleteSelection"></Button>
         <Button :icon="faDownload" @click="downloadSelection"></Button>
-        <Button :icon="faCopy"></Button>
-        <Button :icon="faPaste"></Button>
+        <Button :icon="faCopy" @click="copySelection"></Button>
+        <Button :icon="faPaste" @click="pasteFiles"></Button>
         <Button :icon="faArrowUp" @click="navigateFileBrowserToParent"></Button>
         <Input class="input-path" v-model="browsingPath" placeholder="/" @keyup.enter="onPathBarValidate"></Input>
       </div>
