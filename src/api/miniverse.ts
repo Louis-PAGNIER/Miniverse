@@ -75,7 +75,7 @@ export async function apiDeleteFiles(miniverseId: string, paths: string[]): Prom
 }
 
 export async function apiCopyFiles(miniverseId: string, paths: string[], destination: string): Promise<void> {
-  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/copy?destination=` + destination, {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/copy?destination=${encodeURIComponent(destination)}`, {
     paths: paths
   })
 }
@@ -104,4 +104,22 @@ export async function apiDownloadFile(miniverseId: string, paths: string[]): Pro
 
   document.body.removeChild(a);
   window.URL.revokeObjectURL(url);
+}
+
+export async function apiUploadFiles(miniverseId: string, destination: string, files: File[]): Promise<void> {
+  const formData = new FormData();
+
+  for (const file of files) {
+    formData.append("files", file);
+  }
+
+  await axios.post(
+    `${API_BASE}/miniverses/${miniverseId}/files/upload?destination=${encodeURIComponent(destination)}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 }

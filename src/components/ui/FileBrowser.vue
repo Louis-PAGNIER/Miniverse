@@ -2,14 +2,14 @@
 import Button from "@/components/ui/OverlayButton.vue";
 import {faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Input from "@/components/ui/Input.vue";
-import {onMounted, Ref, ref, watch} from "vue";
+import {onMounted, onUnmounted, Ref, ref, watch} from "vue";
 import Table, {Column} from "@/components/ui/Table.vue";
 import {formatFileSize, timeAgo} from "@/composables/format";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawesome/free-regular-svg-icons";
 import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
 import {FileInfo} from "@/models/fileInfo";
-import {apiCopyFiles, apiDeleteFiles, apiDownloadFile, apiListFiles} from "@/api/miniverse";
+import {apiCopyFiles, apiDeleteFiles, apiDownloadFile, apiListFiles, apiUploadFiles} from "@/api/miniverse";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 
@@ -24,6 +24,7 @@ const browsingPath: Ref<string> = ref("");
 const files: Ref<FileInfo[]> = ref([]);
 const selectedPaths: Ref<Array<string>> = ref([]);
 const copiedPaths: Ref<Array<string>> = ref([]);
+const dropZoneVisibility: Ref<boolean> = ref(false);
 
 function getIconFromFileInfo(info: FileInfo) {
   if (info.is_folder)
@@ -121,6 +122,19 @@ async function onPathBarValidate() {
   await refreshFiles();
 }
 
+async function onDrop(event: DragEvent) {
+  dropZoneVisibility.value = false;
+  event.preventDefault();
+
+  if (!event.dataTransfer) return;
+
+  const files = Array.from(event.dataTransfer.files);
+  console.log(files);
+
+  await apiUploadFiles(props.miniverse.id, browsingPath.value, files);
+  await refreshFiles();
+}
+
 const browserColumns: Column<FileInfo>[] = [
   {
     id: "type",
@@ -159,10 +173,25 @@ watch(
     },
     { immediate: true }
 );
+
+function preventBrowserDragAndDrop(e: DragEvent) {
+  e.preventDefault();
+}
+
+onMounted(() => {
+  window.addEventListener("dragover", preventBrowserDragAndDrop, false);
+  window.addEventListener("drop", preventBrowserDragAndDrop, false);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("dragover", preventBrowserDragAndDrop, false);
+  window.removeEventListener("drop", preventBrowserDragAndDrop, false);
+});
 </script>
 
 <template>
-  <div class="wrapper">
+  <div class="wrapper"
+       @drop="(e) => {e.preventDefault()}">
     <div class="main">
       <div class="header">
         <Button :icon="faTrash" severity="danger" @click="deleteSelection"></Button>
@@ -173,7 +202,16 @@ watch(
         <Input class="input-path" v-model="browsingPath" placeholder="/" @keyup.enter="onPathBarValidate"></Input>
       </div>
 
-      <div class="content">
+      <div class="dropzone"
+           @dragleave="dropZoneVisibility = false"
+           @drop="onDrop"
+           :style="{visibility: dropZoneVisibility ? 'visible' : 'hidden'}">
+        Drop files to upload
+      </div>
+
+      <div class="content"
+           @dragenter="dropZoneVisibility = true"
+      >
         <Table
             v-model:selectedKeys="selectedPaths"
             :columns="browserColumns"
@@ -230,6 +268,22 @@ watch(
         height: 31px;
         margin: 0;
       }
+    }
+
+    .dropzone {
+      position: absolute;
+      visibility: visible;
+      background: var(--color-background-primary);
+      outline: 8px dashed var(--color-secondary);
+      opacity: 0.9;
+      border-radius: 10px;
+      height: 100%;
+      width: 100%;
+      z-index: 2;
+      display: flex;
+      font-size: 2em;
+      justify-content: center;
+      align-items: center;
     }
 
     .content {
