@@ -147,7 +147,7 @@ const versionsTableColumns: Column<ModrinthProjectVersion>[] = [
         <div class="panels">
           <div class="left-panel panel" v-html="markdown.render(modDetails.body)"></div>
           <div class="right-panel">
-            <BigButton v-if="!isModInstalled" severity="success" @click="installMod">
+            <BigButton v-if="!isModInstalled" severity="success" @click="() => installMod()">
               <FontAwesomeIcon :icon="faDownload" style="height: 0.85em"></FontAwesomeIcon>
               Install
             </BigButton>
