@@ -33,8 +33,9 @@ defineSlots<{
 const emit = defineEmits<{
   (e: 'update:selectedKeys', value: Array<string | number>): void
   (e: 'update:sort', sort: { columnId: string; order: 'asc' | 'desc' } | null): void
-  (e: 'row-click', row: T): void,
-  (e: 'row-dblclick', row: T): void,
+  (e: 'row-click', row: T, event: MouseEvent): void,
+  (e: 'row-dblclick', row: T, event: MouseEvent): void,
+  (e: 'row-context-menu', row: T, event: MouseEvent): void,
 }>()
 
 type SortState = { columnId: string; order: 'asc' | 'desc' } | null;
@@ -163,9 +164,10 @@ const handleSelection = (row: T, index: number, event: MouseEvent) => {
         :class="{ selected: isSelected(row) }"
         @click="(e) => {
           handleSelection(row, i, e)
-          emit('row-click', row)
+          emit('row-click', row, e)
         }"
-        @dblclick="emit('row-dblclick', row)"
+        @dblclick="(e) => emit('row-dblclick', row, e)"
+        @contextmenu="(e) => emit('row-context-menu', row, e)"
     >
       <td v-for="col in columns" :key="col.id" :class="col.class" :style="{ width: col.width }">
         <slot

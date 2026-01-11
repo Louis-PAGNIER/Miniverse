@@ -54,3 +54,16 @@ export async function apiUploadFiles(miniverseId: string, destination: string, f
 export async function apiExtractArchive(miniverseId: string, archivePath: string): Promise<void> {
   await axios.post(`${API_BASE}/files/${miniverseId}/extract?path=${encodeURIComponent(archivePath)}`);
 }
+
+export async function apiCompressFiles(miniverseId: string, paths: string[]): Promise<void> {
+  await axios.post(`${API_BASE}/files/${miniverseId}/compress`, {
+    paths: paths
+  });
+}
+
+export async function apiRenameItem(miniverseId: string, path: string, newName: string): Promise<void> {
+  await axios.post(`${API_BASE}/files/${miniverseId}/rename`, {
+    path: path,
+    new_name: newName
+  });
+}

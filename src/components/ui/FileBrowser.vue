@@ -2,7 +2,7 @@
 import Button from "@/components/ui/OverlayButton.vue";
 import {faArchive, faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Input from "@/components/ui/Input.vue";
-import {onMounted, onUnmounted, Ref, ref, watch} from "vue";
+import {computed, onMounted, onUnmounted, Ref, ref, watch} from "vue";
 import Table, {Column} from "@/components/ui/Table.vue";
 import {formatFileSize, timeAgo} from "@/composables/format";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -10,15 +10,18 @@ import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawes
 import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
 import {FileInfo} from "@/models/fileInfo";
 import {
+  apiCompressFiles,
   apiCopyFiles,
   apiDeleteFiles,
   apiDownloadMiniverseFiles,
   apiExtractArchive,
-  apiListFiles,
+  apiListFiles, apiRenameItem,
   apiUploadFiles
 } from "@/api/files";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
+import ContextMenu, {ContextMenuItem} from "@/components/ui/ContextMenu.vue";
+import InputPopup from "@/components/popups/InputPopup.vue";
 
 const props = defineProps<{
   miniverse: Miniverse
@@ -32,6 +35,9 @@ const files: Ref<FileInfo[]> = ref([]);
 const selectedPaths: Ref<Array<string>> = ref([]);
 const copiedPaths: Ref<Array<string>> = ref([]);
 const dropZoneVisibility: Ref<boolean> = ref(false);
+const showRenamePopup: Ref<boolean> = ref(false);
+
+const contextMenuRef = ref<InstanceType<typeof ContextMenu>>()
 
 function getIconFromFileInfo(info: FileInfo) {
   if (info.is_folder)
@@ -128,8 +134,26 @@ async function extractSelection() {
   }
 }
 
-async function onRowDoubleClick(file: FileInfo) {
+async function compressSelection() {
+  console.log("Compress")
+  await apiCompressFiles(props.miniverse.id, selectedPaths.value);
+  await refreshFiles();
+}
+
+async function renameSelectedElement(newName: string) {
+  if (selectedPaths.value.length !== 1) return;
+  const path = selectedPaths.value[0];
+
+  await apiRenameItem(props.miniverse.id, path, newName);
+  await refreshFiles();
+}
+
+async function onRowDoubleClick(file: FileInfo, event: MouseEvent) {
   await navigateFileBrowserTo(file.path);
+}
+
+async function onRowContextMenu(file: FileInfo, event: MouseEvent) {
+  contextMenuRef.value?.open(event);
 }
 
 async function onPathBarValidate() {
@@ -174,6 +198,51 @@ const browserColumns: Column<FileInfo>[] = [
     sortable: true,
     value: (v: FileInfo) => timeAgo(v.updated),
     sortValue: (v: FileInfo) => v.updated },
+]
+
+const canPaste = computed(() => copiedPaths.value.length > 0);
+const canUncompress = computed(() => selectedPaths.value.every(p => p.toLowerCase().endsWith(".zip")));
+const canRename = computed(() => selectedPaths.value.length === 1);
+
+const nameOfFirstFile = computed(() => {
+  if (selectedPaths.value.length === 0) return "";
+  const path = selectedPaths.value[0];
+  const name = path.split("/");
+  return name.length > 0 ? name[name.length - 1] : "";
+})
+
+const contextMenuItems: ContextMenuItem[] = [
+  {
+    label: 'Rename',
+    action: () => { showRenamePopup.value = true },
+    visible: () => canRename.value
+  },
+  {
+    label: 'Copy',
+    action: copySelection
+  },
+  {
+    label: 'Paste',
+    action: pasteFiles,
+    disabled: () => !canPaste.value
+  },
+  {
+    label: 'Compress',
+    action: compressSelection
+  },
+  {
+    label: 'Uncompress',
+    action: extractSelection,
+    visible: () => canUncompress.value
+  },
+  {
+    label: 'Download',
+    action: downloadSelection
+  },
+  {
+    label: 'Delete',
+    action: deleteSelection
+  }
 ]
 
 watch(
@@ -236,13 +305,23 @@ onUnmounted(() => {
             :default-sort="{columnId: 'type', order: 'asc'}"
             padding="4px"
             selectable
-            @row-dblclick="onRowDoubleClick">
+            @row-dblclick="onRowDoubleClick"
+            @row-context-menu="onRowContextMenu">
           <template #cell-type="{ value }">
             <font-awesome-icon :icon="value"></font-awesome-icon>
           </template>
         </Table>
+
+        <ContextMenu ref="contextMenuRef" :items="contextMenuItems"/>
       </div>
     </div>
+
+    <InputPopup v-model="showRenamePopup"
+                title="Rename file"
+                :default-value="nameOfFirstFile"
+                placeholder="File name..."
+                @ok="value => renameSelectedElement(value)">
+    </InputPopup>
   </div>
 </template>
 

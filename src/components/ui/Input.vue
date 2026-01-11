@@ -8,6 +8,8 @@ const props = defineProps<{
   error?: boolean;
 }>();
 
+const inputRef = ref<InstanceType<typeof HTMLInputElement> | null>(null);
+
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
@@ -16,11 +18,20 @@ const value = computed({
   get: () => props.modelValue ?? "",
   set: (val: string) => emit("update:modelValue", val)
 });
+
+function focus() {
+  inputRef.value?.focus();
+}
+
+defineExpose({
+  focus
+});
 </script>
 
 <template>
   <div class="custom-input" :class="{ 'disabled': disabled }">
     <input
+        ref="inputRef"
         type="text"
         v-model="value"
         @input="emit('update:modelValue', value)"
