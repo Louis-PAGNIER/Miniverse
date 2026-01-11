@@ -2,7 +2,6 @@ import axios from "axios";
 import {API_BASE} from "@/api/api";
 import {Miniverse} from "@/models/miniverse";
 import {MiniverseType} from "@/models/enums/miniverseType";
-import {FileInfo} from "@/models/fileInfo";
 
 export async function apiGetMiniverses(): Promise<Miniverse[]> {
   const response = await axios.get(`${API_BASE}/miniverses/`);
@@ -62,68 +61,4 @@ export async function apiAutomaticModInstall(miniverseId: string, modId: string)
 
 export async function apiUninstallMod(modId: string): Promise<void> {
   await axios.delete(`${API_BASE}/miniverses/mods/${modId}`);
-}
-
-export async function apiListFiles(miniverseId: string, path: string): Promise<FileInfo[]> {
-  return (await axios.get(`${API_BASE}/miniverses/${miniverseId}/files?path=` + path)).data;
-}
-
-export async function apiDeleteFiles(miniverseId: string, paths: string[]): Promise<void> {
-  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/delete`, {
-    paths: paths
-  })
-}
-
-export async function apiCopyFiles(miniverseId: string, paths: string[], destination: string): Promise<void> {
-  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/copy?destination=${encodeURIComponent(destination)}`, {
-    paths: paths
-  })
-}
-
-export async function apiDownloadFile(miniverseId: string, paths: string[]): Promise<void> {
-  if (paths.length == 0) return;
-
-  const response = await axios.post(
-    `${API_BASE}/miniverses/${miniverseId}/files/download`, {
-      paths: paths
-    }, {
-      responseType: "blob",
-    });
-
-  let filename = "download.zip";
-  if (paths.length == 1)
-    filename = paths[0].split("/").pop() ?? "download.zip";
-
-  const url = window.URL.createObjectURL(response.data);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-
-  document.body.appendChild(a);
-  a.click();
-
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-}
-
-export async function apiUploadFiles(miniverseId: string, destination: string, files: File[]): Promise<void> {
-  const formData = new FormData();
-
-  for (const file of files) {
-    formData.append("files", file);
-  }
-
-  await axios.post(
-    `${API_BASE}/miniverses/${miniverseId}/files/upload?destination=${encodeURIComponent(destination)}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-}
-
-export async function apiExtractArchive(miniverseId: string, archivePath: string): Promise<void> {
-  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/extract?path=${encodeURIComponent(archivePath)}`);
 }

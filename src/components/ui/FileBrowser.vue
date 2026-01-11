@@ -12,11 +12,11 @@ import {FileInfo} from "@/models/fileInfo";
 import {
   apiCopyFiles,
   apiDeleteFiles,
-  apiDownloadFile,
+  apiDownloadMiniverseFiles,
   apiExtractArchive,
   apiListFiles,
   apiUploadFiles
-} from "@/api/miniverse";
+} from "@/api/files";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 
@@ -96,7 +96,7 @@ async function navigateFileBrowserToParent() {
 
 async function downloadSelection() {
   if (selectedPaths.value.length > 0) {
-    await apiDownloadFile(props.miniverse.id, selectedPaths.value);
+    await apiDownloadMiniverseFiles(props.miniverse.id, selectedPaths.value);
   }
 }
 
