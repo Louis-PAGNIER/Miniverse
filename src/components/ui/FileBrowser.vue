@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Button from "@/components/ui/OverlayButton.vue";
-import {faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faArchive, faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Input from "@/components/ui/Input.vue";
 import {onMounted, onUnmounted, Ref, ref, watch} from "vue";
 import Table, {Column} from "@/components/ui/Table.vue";
@@ -9,7 +9,14 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawesome/free-regular-svg-icons";
 import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
 import {FileInfo} from "@/models/fileInfo";
-import {apiCopyFiles, apiDeleteFiles, apiDownloadFile, apiListFiles, apiUploadFiles} from "@/api/miniverse";
+import {
+  apiCopyFiles,
+  apiDeleteFiles,
+  apiDownloadFile,
+  apiExtractArchive,
+  apiListFiles,
+  apiUploadFiles
+} from "@/api/miniverse";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 
@@ -113,6 +120,14 @@ async function pasteFiles() {
   }
 }
 
+async function extractSelection() {
+  const selection = selectedPaths.value.slice();
+  for (const path of selection) {
+    await apiExtractArchive(props.miniverse.id, path);
+    await refreshFiles();
+  }
+}
+
 async function onRowDoubleClick(file: FileInfo) {
   await navigateFileBrowserTo(file.path);
 }
@@ -196,6 +211,7 @@ onUnmounted(() => {
       <div class="header">
         <Button :icon="faTrash" severity="danger" @click="deleteSelection"></Button>
         <Button :icon="faDownload" @click="downloadSelection"></Button>
+        <Button :icon="faArchive" @click="extractSelection"></Button>
         <Button :icon="faCopy" @click="copySelection"></Button>
         <Button :icon="faPaste" @click="pasteFiles"></Button>
         <Button :icon="faArrowUp" @click="navigateFileBrowserToParent"></Button>

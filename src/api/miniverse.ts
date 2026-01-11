@@ -123,3 +123,7 @@ export async function apiUploadFiles(miniverseId: string, destination: string, f
     }
   );
 }
+
+export async function apiExtractArchive(miniverseId: string, archivePath: string): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/files/extract?path=${encodeURIComponent(archivePath)}`);
+}
