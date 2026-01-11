@@ -20,13 +20,23 @@ import {
     faCheck, faArrowUpRightFromSquare
 } from '@fortawesome/free-solid-svg-icons'
 
+import { vueKeycloak } from '@josempgon/vue-keycloak'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+app.use(vueKeycloak, {
+    config: {
+        url: 'http://localhost:8080/',
+        realm: 'miniverse',
+        clientId: 'miniverse-client',
+    }
+})
+
 const router = createRouter({
     history: createWebHistory(),
     routes: mainRoutes
 })
-
-const app = createApp(App)
-const pinia = createPinia()
 
 library.add(
   faBars,
