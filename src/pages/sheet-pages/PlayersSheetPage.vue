@@ -1,9 +1,19 @@
 <script setup lang="ts">
-import {computed, ComputedRef, inject, ref, watch} from "vue";
+import {computed, ComputedRef, inject} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import FlatPlayerHead from "@/components/FlatPlayerHead.vue";
 import {Player} from "@/models/player";
+import Table, {Column} from "@/components/ui/Table.vue";
+import IconButton from "@/components/ui/IconButton.vue";
+import {
+  faArrowRightFromBracket,
+  faGavel,
+  faPersonArrowDownToLine,
+  faPersonArrowUpFromLine,
+} from "@fortawesome/free-solid-svg-icons";
+import Chip from "@/components/ui/Chip.vue";
+import {apiBanPlayer, apiKickPlayer, apiSetPlayerOperator} from "@/api/miniverse";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 const miniverseStore = useMiniverseStore();
@@ -12,6 +22,25 @@ const players: ComputedRef<Player[]> = computed(() => {
   const animators = miniverseStore.miniversePlayersLists.get(miniverse.id) || [];
   return animators.map((p) => p.player);
 });
+
+const playersTableColumns: Column<Player>[] = [
+  { id: "head", name: "", },
+  { id: "username", name: "Username", value: (p: Player) => p.name, sortable: true },
+  { id: "role", name: "Role", sortable: true, sortValue: (p: Player) => p.is_operator },
+  { id: "actions", name: "Actions" },
+]
+
+async function setPlayerOperator(player: Player, value: boolean) {
+  await apiSetPlayerOperator(miniverse.id, player.id, value);
+}
+
+async function kickPlayer(player: Player, reason: string = 'You have been kicked by an administrator') {
+  await apiKickPlayer(miniverse.id, player.id, reason);
+}
+
+async function banPlayer(player: Player, reason: string = 'You have been banned by an administrator') {
+  await apiBanPlayer(miniverse.id, player.id, reason);
+}
 </script>
 
 <template>
@@ -20,62 +49,21 @@ const players: ComputedRef<Player[]> = computed(() => {
     <div v-if="players.length === 0">
       No players found.
     </div>
-    <ul v-else>
-      <li v-for="player in players" :key="player.id">
-        <FlatPlayerHead :id="player.id" />
-        <div class="text-info">
-          <span class="player-name">{{ player.name }}</span>
-          <span class="player-role">Operator</span>
-        </div>
-      </li>
-    </ul>
+    <Table v-else :columns="playersTableColumns" :rows="players" :row-key="player => player.id" height="5em" padding="0.5em">
+      <template #cell-head="{ value }">
+        <FlatPlayerHead :id="value.id" />
+      </template>
+      <template #cell-role="{ value }">
+        <Chip v-if="value.is_operator">Operator</Chip>
+        <Chip v-else>Player</Chip>
+      </template>
+      <template #cell-actions="{ value }">
+        <IconButton v-if="value.is_operator" :icon="faPersonArrowDownToLine" severity="danger" @click="() => setPlayerOperator(value, false)"></IconButton>
+        <IconButton v-else :icon="faPersonArrowUpFromLine" @click="() => setPlayerOperator(value, true)"></IconButton>
+        <span class="separator"></span>
+        <IconButton :icon="faGavel" severity="danger" @click="() => banPlayer(value)"></IconButton>
+        <IconButton :icon="faArrowRightFromBracket" severity="danger" @click="() => kickPlayer(value)"></IconButton>
+      </template>
+    </Table>
   </div>
 </template>
-
-<style scoped>
-ul {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-li {
-  list-style: none;
-  margin-bottom: 10px;
-  width: 100%;
-  height: 4.5em;
-  background: var(--color-background-secondary);
-  padding: var(--padding-secondary);
-  border-radius: 10px;
-  transition: background 0.2s;
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-
-  &:hover {
-    background: var(--color-background-tertiary);
-  }
-
-  .text-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 5px 0;
-
-    .player-name {
-      font-size: 1.5em;
-      line-height: 0.75em;
-      font-weight: 500;
-    }
-
-    .player-role {
-      font-size: 1em;
-      color: var(--color-secondary);
-      line-height: 1em;
-    }
-  }
-}
-</style>

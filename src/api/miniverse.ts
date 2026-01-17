@@ -62,3 +62,15 @@ export async function apiAutomaticModInstall(miniverseId: string, modId: string)
 export async function apiUninstallMod(modId: string): Promise<void> {
   await axios.delete(`${API_BASE}/miniverses/mods/${modId}`);
 }
+
+export async function apiSetPlayerOperator(miniverseId: string, playerId: string, value: boolean): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/operator?player_id=${playerId}&value=${value}`);
+}
+
+export async function apiKickPlayer(miniverseId: string, playerId: string, reason: string): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/kick?player_id=${playerId}&reason=${encodeURIComponent(reason)}`);
+}
+
+export async function apiBanPlayer(miniverseId: string, playerId: string, reason: string): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/ban?player_id=${playerId}&reason=${encodeURIComponent(reason)}`);
+}

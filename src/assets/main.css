@@ -83,6 +83,13 @@ a:hover {
     text-decoration: underline;
 }
 
+.separator {
+    border: 1px solid var(--color-secondary);
+    height: 1em;
+    border-right: none;
+    margin: 0 8px;
+}
+
 /* -------------- Transitions -------------- */
 
 .fade-enter-active,

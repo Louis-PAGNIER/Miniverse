@@ -7,21 +7,25 @@ export interface Column<T, V = unknown> {
   class?: string
   width?: string
 
-  value: (row: T) => V
+  value?: (row: T) => V
   sortable?: boolean
   sortValue?: (row: T) => any
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   columns: Column<T>[]
   rows: T[]
   padding?: string
+  height?: string
   selectable?: boolean
 
   rowKey: (row: T) => string | number
   selectedKeys?: Array<string | number>
   defaultSort?: { columnId: string; order: 'asc' | 'desc' }
-}>();
+}>(), {
+  padding: '15px',
+  height: 'auto'
+});
 
 defineSlots<{
   [K in string]?: (props: {
@@ -52,8 +56,8 @@ const sortedRows = computed(() => {
     const col = props.columns.find(c => c.id === sortState.value!.columnId);
     if (!col) return 0;
 
-    const aValue = col.sortValue ? col.sortValue(a) : col.value(a);
-    const bValue = col.sortValue ? col.sortValue(b) : col.value(b);
+    const aValue = col.sortValue ? col.sortValue(a) : (col.value ? col.value(a) : a);
+    const bValue = col.sortValue ? col.sortValue(b) : (col.value ? col.value(b) : b);
 
     if (aValue == null && bValue != null) return -1;
     if (aValue != null && bValue == null) return 1;
@@ -136,7 +140,7 @@ const handleSelection = (row: T, index: number, event: MouseEvent) => {
 </script>
 
 <template>
-  <table :style="{ '--cell-padding': padding ?? '15px' }">
+  <table :style="{ '--cell-padding': padding, '--cell-height': height }">
     <thead>
     <tr>
       <th
@@ -172,10 +176,10 @@ const handleSelection = (row: T, index: number, event: MouseEvent) => {
       <td v-for="col in columns" :key="col.id" :class="col.class" :style="{ width: col.width }">
         <slot
             :name="`cell-${col.id}`"
-            :value="col.value(row)"
+            :value="col.value ? col.value(row) : row"
             :row="row"
         >
-          {{ col.value(row) }}
+          {{ col.value ? col.value(row) : row }}
         </slot>
       </td>
     </tr>
@@ -235,6 +239,7 @@ th.active .sort-indicator {
 
 td {
   border-top: 1px #4e4e4e solid;
+  height: var(--cell-height, auto);
 }
 
 th,

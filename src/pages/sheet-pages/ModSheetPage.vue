@@ -120,11 +120,11 @@ const versionsTableColumns: Column<ModrinthProjectVersion>[] = [
           <div class="stat">
             <FontAwesomeIcon :icon="faDownload"></FontAwesomeIcon> {{ formatBigNumber(modDetails.downloads) }}
           </div>
-          <span class="separator">|</span>
+          <span class="separator"></span>
           <div class="stat">
             <FontAwesomeIcon :icon="faHeart"></FontAwesomeIcon> {{ formatBigNumber(modDetails.followers) }}
           </div>
-          <span class="separator">|</span>
+          <span class="separator"></span>
           <div class="stat chip-list">
             <FontAwesomeIcon :icon="faTags"></FontAwesomeIcon>
             <Chip v-for="category of modDetails.categories">
@@ -311,11 +311,6 @@ const versionsTableColumns: Column<ModrinthProjectVersion>[] = [
       margin-top: auto;
       text-transform: capitalize;
       align-items: center;
-
-      .separator {
-        transform: translateY(-2px) scaleY(1.3);
-        color: var(--color-secondary);
-      }
     }
   }
 }

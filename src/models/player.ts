@@ -5,6 +5,7 @@ import {markRaw, reactive} from "vue";
 export interface Player {
   id: string;
   name: string;
+  is_operator: boolean;
 }
 
 export class PlayerAnimator {

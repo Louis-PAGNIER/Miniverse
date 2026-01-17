@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {IconDefinition} from "@fortawesome/free-brands-svg-icons";
 
 const props = withDefaults(defineProps<{
-  icon: string;
+  icon: IconDefinition | string;
   disabled?: boolean;
   severity?: string;
 }>(), {
@@ -30,6 +31,7 @@ button {
   height: 2.5em;
   color: var(--color-primary);
   transition: 0.2s;
+  margin: 3px;
 
   &:disabled {
     cursor: not-allowed;
@@ -38,7 +40,7 @@ button {
   }
 
   &:hover {
-    color: black;
+    color: var(--color-background-primary);
   }
 }
 </style>
