@@ -2,12 +2,13 @@ import {onMounted, onUnmounted, reactive, ref} from 'vue'
 import {defineStore} from 'pinia'
 import {apiGetMiniverses} from "@/api/miniverse"
 import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
-import {Player, PlayerAnimator} from "@/models/player";
-import {apiGetPlayers} from "@/api/player";
+import {MSMPPlayerBan, Player, PlayerAnimator} from "@/models/player";
+import {apiGetBans, apiGetPlayers} from "@/api/player";
 import {WS_BASE} from "@/api/api";
 
 type MiniverseAnimatorsMap = Map<string, MiniverseAnimator>
 type MiniversePlayersMap = Map<string, PlayerAnimator[]>
+type MiniverseBannedPlayersMap = Map<string, MSMPPlayerBan[]>
 
 export const useMiniverseStore = defineStore('miniverse', () => {
   const wsSocket = ref<WebSocket | null>(null);
@@ -18,6 +19,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
   const miniverseAnimators = reactive<MiniverseAnimatorsMap>(new Map());
 
   const miniversePlayersLists = reactive<MiniversePlayersMap>(new Map());
+  const miniverseBannedPlayersLists = reactive<MiniverseBannedPlayersMap>(new Map());
 
   const fetchMiniverses = async () => {
     const newMiniverses = await apiGetMiniverses();
@@ -31,8 +33,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
       if (incoming) {
         Object.assign(existing, incoming); // update in-place
         newById.delete(existing.id); // Mark as processed
-        if (!incoming.started)
-        {
+        if (!incoming.started) {
           miniversePlayersLists.set(existing.id, []); // Clear players if miniverse is stopped
         }
         i++
@@ -89,6 +90,13 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     updatePlayers(newMiniversePlayersLists);
   }
 
+  const fetchPlayerBans = async () => {
+    const newBans = await apiGetBans();
+    for (const [miniverseId, banList] of newBans.entries()) {
+      miniverseBannedPlayersLists.set(miniverseId, banList);
+    }
+  }
+
   const connectWebSocket = () => {
     // TODO: Repair connection/close logic
     // There is a bug with the websocket being opened/closed multiple times due to app lifecycle
@@ -109,15 +117,13 @@ export const useMiniverseStore = defineStore('miniverse', () => {
         const data = JSON.parse(event.data);
         console.log('Websocket message', data)
         const miniverseId: string | undefined = data['miniverse_id'];
-        if (data.type === 'players')
-        {
+        if (data.type === 'players') {
           const map = new Map<string, Player[]>();
           map.set(miniverseId!, data['data']);
           updatePlayers(map);
-          console.log(miniversePlayersLists);
-        }
-        else if (['created', 'deleted', 'updated'].includes(data.type))
-        {
+        } else if (data.type === 'player-ban') {
+          miniverseBannedPlayersLists.set(miniverseId!, data['data']);
+        } else if (['created', 'deleted', 'updated'].includes(data.type)) {
           await fetchMiniverses();
         }
       } catch (e) {
@@ -145,5 +151,15 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     }*/
   };
 
-  return { miniverses, miniverseAnimators, miniversePlayersLists, fetchMiniverses, fetchPlayers, connectWebSocket, closeWebSocket };
+  return {
+    miniverses,
+    miniverseAnimators,
+    miniversePlayersLists,
+    miniverseBannedPlayersLists,
+    fetchMiniverses,
+    fetchPlayers,
+    fetchPlayerBans,
+    connectWebSocket,
+    closeWebSocket
+  };
 })

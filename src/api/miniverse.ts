@@ -74,3 +74,7 @@ export async function apiKickPlayer(miniverseId: string, playerId: string, reaso
 export async function apiBanPlayer(miniverseId: string, playerId: string, reason: string): Promise<void> {
   await axios.post(`${API_BASE}/miniverses/${miniverseId}/ban?player_id=${playerId}&reason=${encodeURIComponent(reason)}`);
 }
+
+export async function apiUnbanPlayer(miniverseId: string, playerId: string): Promise<void> {
+  await axios.post(`${API_BASE}/miniverses/${miniverseId}/unban?player_id=${playerId}`);
+}

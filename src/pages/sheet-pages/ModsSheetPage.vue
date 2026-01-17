@@ -22,7 +22,7 @@ const activeTab = computed({
   get() {
     const tab = route.query.tab as string;
     search.value = route.query['mod-search'] as string ?? '';
-    return VALID_TABS.includes(tab) ? tab : "installedMods";
+    return VALID_TABS.includes(tab) ? tab : VALID_TABS[0];
   },
   set(tab) {
     router.replace({

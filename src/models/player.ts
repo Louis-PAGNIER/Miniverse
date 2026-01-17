@@ -2,6 +2,18 @@ import {NumberAnimator, Vector3Animator} from "@/composables/animations";
 import {Vector3} from "three";
 import {markRaw, reactive} from "vue";
 
+export interface MSMPPlayer {
+  id: string;
+  name: string;
+}
+
+export interface MSMPPlayerBan {
+  reason: string;
+  expires: string;
+  source: string;
+  player: MSMPPlayer
+}
+
 export interface Player {
   id: string;
   name: string;

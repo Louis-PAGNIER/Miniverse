@@ -6,8 +6,11 @@ const auth = useAuthStore();
 const miniverseStore = useMiniverseStore();
 
 auth.initialize().then(() => {
-  miniverseStore.fetchMiniverses().then(() => {
-    miniverseStore.fetchPlayers();
+  miniverseStore.fetchMiniverses().then(async () => {
+    await Promise.all([
+      miniverseStore.fetchPlayers(),
+      miniverseStore.fetchPlayerBans()
+    ]);
   });
   miniverseStore.connectWebSocket();
 });
@@ -25,6 +28,7 @@ body {
   height: 100%;
   width: 100%;
 }
+
 #app {
   height: 100%;
   width: 100%;
