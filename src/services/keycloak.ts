@@ -18,13 +18,14 @@ export const initKeycloak = async () => {
         keycloak.onTokenExpired = () => {
             keycloak.updateToken().then((refreshed: boolean) => {
                 if (refreshed) {
-                    console.debug(`Token rafraîchi avec succès`);
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
+                    console.debug(`Token rafraîchi avec succès`)
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`
+                    localStorage.setItem("access_token", keycloak.token)
                 }
             }).catch(() => {
-                console.log('Échec du rafraîchissement du token');
-            });
-        };
+                console.log('Échec du rafraîchissement du token')
+            })
+        }
 
         const authenticated = await keycloak.init({
             onLoad: 'login-required',
@@ -32,13 +33,15 @@ export const initKeycloak = async () => {
             flow: 'standard'
         });
 
-        axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
+        axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`
+        localStorage.setItem("access_token", keycloak.token)
 
-        return authenticated;
+
+        return authenticated
     } catch (error) {
-        console.error('Erreur lors de l\'initialisation de Keycloak', error);
-        return false;
+        console.error('Erreur lors de l\'initialisation de Keycloak', error)
+        return false
     }
 };
 
-export default keycloak;
+export default keycloak
