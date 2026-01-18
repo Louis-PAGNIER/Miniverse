@@ -19,8 +19,7 @@ export const initKeycloak = async () => {
             keycloak.updateToken().then((refreshed: boolean) => {
                 if (refreshed) {
                     console.debug(`Token rafraîchi avec succès`)
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`
-                    localStorage.setItem("access_token", keycloak.token)
+                    document.cookie = `token=Bearer ${keycloak.token}`
                 }
             }).catch(() => {
                 console.log('Échec du rafraîchissement du token')
@@ -32,10 +31,7 @@ export const initKeycloak = async () => {
             pkceMethod: 'S256',
             flow: 'standard'
         });
-
-        axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`
-        localStorage.setItem("access_token", keycloak.token)
-
+        document.cookie = `token=Bearer ${keycloak.token}`
 
         return authenticated
     } catch (error) {

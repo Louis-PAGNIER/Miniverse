@@ -97,7 +97,6 @@ export const useMiniverseStore = defineStore('miniverse', () => {
             //wsSocket.value.close();
         }
         wsStatus.value = 'connecting';
-        localStorage.setItem("access_token", keycloak.token)
         wsSocket.value = new WebSocket(wsUrl);
 
         wsSocket.value.onopen = () => {
