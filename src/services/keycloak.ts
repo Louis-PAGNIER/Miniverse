@@ -16,10 +16,10 @@ const keycloak = new Keycloak({
 export const initKeycloak = async () => {
     try {
         keycloak.onTokenExpired = () => {
-            keycloak.updateToken().then((refreshed: boolean) => {
+            keycloak.updateToken().then(async (refreshed: boolean) => {
                 if (refreshed) {
                     console.debug(`Token rafraîchi avec succès`)
-                    document.cookie = `token=Bearer ${keycloak.token}`
+                    await cookieStore.set('token', `Bearer ${keycloak.token}`)
                 }
             }).catch(() => {
                 console.log('Échec du rafraîchissement du token')
@@ -31,7 +31,8 @@ export const initKeycloak = async () => {
             pkceMethod: 'S256',
             flow: 'standard'
         });
-        document.cookie = `token=Bearer ${keycloak.token}`
+        await cookieStore.set('token', `Bearer ${keycloak.token}`)
+        console.log(`Token: ${keycloak.token}`)
 
         return authenticated
     } catch (error) {
