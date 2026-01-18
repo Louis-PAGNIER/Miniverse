@@ -16,12 +16,13 @@ const keycloak = new Keycloak({
 export const initKeycloak = async () => {
     try {
         keycloak.onTokenExpired = () => {
-            console.log('tokenExpired'); // TODO This work
-            keycloak.updateToken(70).then((refreshed: string) => {
-                console.debug('Token rafraîchi avec succès'); // TODO Does not work
-                axios.defaults.headers.common['Authorization'] = `Bearer ${refreshed}`;
+            keycloak.updateToken().then((refreshed: boolean) => {
+                if (refreshed) {
+                    console.debug(`Token rafraîchi avec succès`);
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
+                }
             }).catch(() => {
-                console.error('Échec du rafraîchissement du token');
+                console.log('Échec du rafraîchissement du token');
             });
         };
 
