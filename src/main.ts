@@ -1,46 +1,53 @@
 import './assets/main.css'
 
-import { createApp } from 'vue'
-import { createPinia } from "pinia";
+import {createApp} from 'vue'
+import {createPinia} from "pinia";
 
 import App from "@/App.vue";
 
-import { createRouter, createWebHistory } from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 import Tres from '@tresjs/core';
 import {mainRoutes} from "@/router";
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {
+    faArrowRightArrowLeft,
+    faArrowUpRightFromSquare,
     faBars,
-    faTrash,
+    faCheck,
     faPlay,
     faRotateLeft,
     faStop,
-    faArrowRightArrowLeft,
-    faCheck, faArrowUpRightFromSquare
+    faTrash
 } from '@fortawesome/free-solid-svg-icons'
+import {initKeycloak} from "@/services/keycloak";
+
+const app = createApp(App)
+const pinia = createPinia()
 
 const router = createRouter({
     history: createWebHistory(),
     routes: mainRoutes
 })
 
-const app = createApp(App)
-const pinia = createPinia()
-
 library.add(
-  faBars,
-  faStop,
-  faTrash,
-  faPlay,
-  faRotateLeft,
-  faArrowRightArrowLeft,
-  faCheck,
-  faArrowUpRightFromSquare
+    faBars,
+    faStop,
+    faTrash,
+    faPlay,
+    faRotateLeft,
+    faArrowRightArrowLeft,
+    faCheck,
+    faArrowUpRightFromSquare
 )
 
 app.use(router)
 app.use(Tres)
 app.use(pinia)
-app.component("FontAwesomeIcon", FontAwesomeIcon)
-  .mount('#app')
+
+initKeycloak().then(() => {
+    app
+        .component("FontAwesomeIcon", FontAwesomeIcon)
+        .mount('#app')
+});
+

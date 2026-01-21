@@ -1,4 +1,4 @@
-import {onMounted, onUnmounted, reactive, ref} from 'vue'
+import {reactive, ref} from 'vue'
 import {defineStore} from 'pinia'
 import {apiGetMiniverses} from "@/api/miniverse"
 import {Miniverse, MiniverseAnimator} from "@/models/miniverse";

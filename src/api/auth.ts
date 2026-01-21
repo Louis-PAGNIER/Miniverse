@@ -1,33 +1,9 @@
 import axios from "axios";
-import {API_BASE} from "@/api/api";
-
-export async function apiLogin(username: string, password: string): Promise<any[]> {
-  const params = new URLSearchParams();
-  params.append("username", username);
-  params.append("password", password);
-
-  const response = await axios.post(`${API_BASE}/login`, params, {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    withCredentials: true
-  });
-  const token = response.data.access_token;
-  const decodedToken = atob(token.split(".")[1]);
-  const user = JSON.parse(decodedToken)['extras']['user'];
-
-  localStorage.setItem("access_token", token);
-  localStorage.setItem("user", JSON.stringify(user));
-
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-  return [token, user];
-}
 
 export function apiLogout() {
-  localStorage.removeItem("access_token");
-  delete axios.defaults.headers.common["Authorization"];
-}
+    localStorage.removeItem("access_token");
+    delete axios.defaults.headers.common["Authorization"];
+} // TODO : implement this with keycloak
 
 /*
 export function initAuth() {
