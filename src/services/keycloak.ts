@@ -1,7 +1,6 @@
 // Configuration
 // @ts-ignore
 import Keycloak from "keycloak-js";
-import axios from "axios";
 
 const keycloak = new Keycloak({
     url: 'http://localhost:8080/', // TODO : env vars ?
