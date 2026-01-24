@@ -3,7 +3,7 @@
 import Keycloak from "keycloak-js";
 
 const keycloak = new Keycloak({
-    url: 'http://localhost:8080/', // TODO : env vars ?
+    url: '/keycloak', // TODO : env vars ?
     realm: 'miniverse',            // TODO : env vars ?
     clientId: 'miniverse-client',  // TODO : env vars ?
     enableLogging: true
@@ -31,7 +31,6 @@ export const initKeycloak = async () => {
             flow: 'standard'
         });
         await cookieStore.set('token', `Bearer ${keycloak.token}`)
-        console.log(`Token: ${keycloak.token}`)
 
         return authenticated
     } catch (error) {
