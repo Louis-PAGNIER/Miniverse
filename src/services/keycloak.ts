@@ -3,9 +3,9 @@
 import Keycloak from "keycloak-js";
 
 const keycloak = new Keycloak({
-    url: '/keycloak', // TODO : env vars ?
-    realm: 'miniverse',            // TODO : env vars ?
-    clientId: 'miniverse-client',  // TODO : env vars ?
+    url: '/keycloak',
+    realm: 'miniverse',
+    clientId: 'miniverse-client',
     enableLogging: true
 });
 
