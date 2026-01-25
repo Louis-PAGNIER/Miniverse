@@ -38,7 +38,7 @@ onMounted(async () => {
 
   function updateMiniverseFocus() {
     const path = props.route.fullPath;
-    const match = path.match(/^\/miniverse\/([^\/]+)/);
+    const match = path.match(/^\/miniverse\/([^\/#?&]+)/);
     if (match) {
       const id = match[1];
       const miniverseAnimator = miniverseStore.miniverseAnimators.get(id);
