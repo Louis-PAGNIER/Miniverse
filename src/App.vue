@@ -1,23 +1,20 @@
 <script setup lang="ts">
 import {useAuthStore} from "@/stores/authStore";
 import {useMiniverseStore} from "@/stores/miniverseStore";
+import ToastContainer from "@/components/ToastContainer.vue";
 
 const auth = useAuthStore();
 const miniverseStore = useMiniverseStore();
 
 auth.initialize().then(() => {
-  miniverseStore.fetchMiniverses().then(async () => {
-    await Promise.all([
-      miniverseStore.fetchPlayers(),
-      miniverseStore.fetchPlayerBans()
-    ]);
-  });
+  miniverseStore.fetchAll();
   miniverseStore.connectWebSocket();
 });
 </script>
 
 <template>
   <router-view></router-view>
+  <ToastContainer />
 </template>
 
 <style>

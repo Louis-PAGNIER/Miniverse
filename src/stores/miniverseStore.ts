@@ -5,6 +5,7 @@ import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
 import {MSMPPlayerBan, Player, PlayerAnimator} from "@/models/player";
 import {apiGetBans, apiGetPlayers} from "@/api/player";
 import {WS_BASE} from "@/api/api";
+import {useToastStore} from "@/stores/toastStore";
 
 type MiniverseAnimatorsMap = Map<string, MiniverseAnimator>
 type MiniversePlayersMap = Map<string, PlayerAnimator[]>
@@ -20,6 +21,10 @@ export const useMiniverseStore = defineStore('miniverse', () => {
 
   const miniversePlayersLists = reactive<MiniversePlayersMap>(new Map());
   const miniverseBannedPlayersLists = reactive<MiniverseBannedPlayersMap>(new Map());
+
+  // @ts-ignore
+  const reconnectDelay = import.meta.env.DEV ? 1000 : 5000;
+  const connectionLostToastId = ref<string | null>(null);
 
   const fetchMiniverses = async () => {
     const newMiniverses = await apiGetMiniverses();
@@ -97,25 +102,38 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     }
   }
 
+  const fetchAll = async () => {
+    fetchMiniverses().then(async () => {
+      await Promise.all([
+        fetchPlayers(),
+        fetchPlayerBans()
+      ]);
+    });
+  }
+
   const connectWebSocket = () => {
-    // TODO: Repair connection/close logic
-    // There is a bug with the websocket being opened/closed multiple times due to app lifecycle
-    if (wsSocket.value) {
-      return;
-      //wsSocket.value.close();
-    }
+    if (wsSocket.value) return;
+
     wsStatus.value = 'connecting';
     wsSocket.value = new WebSocket(wsUrl);
 
-    wsSocket.value.onopen = () => {
+    wsSocket.value.onopen = async () => {
       wsStatus.value = 'open';
-      console.log("WebSocket connected");
+      console.debug("WebSocket connected");
+
+      if (connectionLostToastId.value != null) {
+        const toastStore = useToastStore();
+        toastStore.removeToast(connectionLostToastId.value);
+        connectionLostToastId.value = null;
+        await fetchAll();
+        toastStore.addToast('Connection restored', 'The server connection has been restored.', 'success');
+      }
     };
 
     wsSocket.value.onmessage = async (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('Websocket message', data)
+        console.debug('Websocket message', data)
         const miniverseId: string | undefined = data['miniverse_id'];
         if (data.type === 'players') {
           const map = new Map<string, Player[]>();
@@ -134,7 +152,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
 
     wsSocket.value.onclose = () => {
       wsStatus.value = 'closed';
-      console.log("WebSocket disconnected");
+      closeWebSocket();
     };
 
     wsSocket.value.onerror = (e) => {
@@ -144,11 +162,20 @@ export const useMiniverseStore = defineStore('miniverse', () => {
   }
 
   const closeWebSocket = () => {
-    console.log("Je suis méchant")
-    /*if (wsSocket.value) {
+    console.debug("WebSocket disconnected")
+    if (connectionLostToastId.value === null) {
+      connectionLostToastId.value = useToastStore().addToast('Connection lost', 'Trying to reconnect...', 'danger', null);
+    }
+
+    if (wsSocket.value) {
       wsSocket.value.close();
       wsSocket.value = null;
-    }*/
+    }
+
+    setTimeout(async () => {
+      connectWebSocket();
+    }, reconnectDelay);
+
   };
 
   return {
@@ -159,6 +186,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     fetchMiniverses,
     fetchPlayers,
     fetchPlayerBans,
+    fetchAll,
     connectWebSocket,
     closeWebSocket
   };

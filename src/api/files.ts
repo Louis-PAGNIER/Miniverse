@@ -1,32 +1,31 @@
-import axios from "axios";
-import {API_BASE} from "@/api/api";
+import {apiClient} from "@/api/api";
 import {FileInfo} from "@/models/fileInfo";
 
 export async function apiListFiles(miniverseId: string, path: string): Promise<FileInfo[]> {
-  return (await axios.get(`${API_BASE}/files/${miniverseId}?path=` + path)).data;
+  return (await apiClient.get(`/files/${miniverseId}?path=` + path)).data;
 }
 
 export async function apiDeleteFiles(miniverseId: string, paths: string[]): Promise<void> {
-  await axios.post(`${API_BASE}/files/${miniverseId}/delete`, {
+  await apiClient.post(`/files/${miniverseId}/delete`, {
     paths: paths
   })
 }
 
 export async function apiCopyFiles(miniverseId: string, paths: string[], destination: string): Promise<void> {
-  await axios.post(`${API_BASE}/files/${miniverseId}/copy?destination=${encodeURIComponent(destination)}`, {
+  await apiClient.post(`/files/${miniverseId}/copy?destination=${encodeURIComponent(destination)}`, {
     paths: paths
   })
 }
 
 export async function apiDownloadFile(token: string): Promise<void> {
-  window.location.href = `${API_BASE}/files/download/${token}`;
+  window.location.href = `/files/download/${token}`;
 }
 
 export async function apiDownloadMiniverseFiles(miniverseId: string, paths: string[]): Promise<void> {
   if (paths.length == 0) return;
 
-  const response = await axios.post(
-    `${API_BASE}/files/${miniverseId}/download-token`, {
+  const response = await apiClient.post(
+    `/files/${miniverseId}/download-token`, {
       paths: paths
     });
   const token = response.data;
@@ -40,8 +39,8 @@ export async function apiUploadFiles(miniverseId: string, destination: string, f
     formData.append("files", file);
   }
 
-  await axios.post(
-    `${API_BASE}/files/${miniverseId}/upload?destination=${encodeURIComponent(destination)}`,
+  await apiClient.post(
+    `/files/${miniverseId}/upload?destination=${encodeURIComponent(destination)}`,
     formData,
     {
       headers: {
@@ -52,17 +51,17 @@ export async function apiUploadFiles(miniverseId: string, destination: string, f
 }
 
 export async function apiExtractArchive(miniverseId: string, archivePath: string): Promise<void> {
-  await axios.post(`${API_BASE}/files/${miniverseId}/extract?path=${encodeURIComponent(archivePath)}`);
+  await apiClient.post(`/files/${miniverseId}/extract?path=${encodeURIComponent(archivePath)}`);
 }
 
 export async function apiCompressFiles(miniverseId: string, paths: string[]): Promise<void> {
-  await axios.post(`${API_BASE}/files/${miniverseId}/compress`, {
+  await apiClient.post(`/files/${miniverseId}/compress`, {
     paths: paths
   });
 }
 
 export async function apiRenameItem(miniverseId: string, path: string, newName: string): Promise<void> {
-  await axios.post(`${API_BASE}/files/${miniverseId}/rename`, {
+  await apiClient.post(`/files/${miniverseId}/rename`, {
     path: path,
     new_name: newName
   });

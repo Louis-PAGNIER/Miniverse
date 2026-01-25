@@ -1,8 +1,8 @@
-import axios from "axios";
+import {apiClient} from "@/api/api";
 
 export function apiLogout() {
     localStorage.removeItem("access_token");
-    delete axios.defaults.headers.common["Authorization"];
+    delete apiClient.defaults.headers.common["Authorization"];
 } // TODO : implement this with keycloak
 
 /*
