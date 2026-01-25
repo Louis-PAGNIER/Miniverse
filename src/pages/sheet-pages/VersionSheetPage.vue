@@ -11,10 +11,12 @@ import ActionButton from "@/components/ui/ActionButton.vue";
 import MessagePopup from "@/components/popups/MessagePopup.vue";
 import {apiUpdateMiniverseMCVersion} from "@/api/miniverse";
 import {useAuthStore} from "@/stores/authStore";
+import {useToastStore} from "@/stores/toastStore";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 
 const authStore = useAuthStore();
+const toastStore = useToastStore();
 
 const selectedVersion = ref<string>(miniverse.mc_version);
 const versions = ref<MinecraftVersion[]>([]);
@@ -40,6 +42,7 @@ async function updateServer() {
   showPopup.value = false;
   isUpdating.value = true;
   await apiUpdateMiniverseMCVersion(miniverse.id, selectedVersion.value);
+  toastStore.addToast('Miniverse updated', `Minecraft version updated to ${selectedVersion.value} for miniverse ${miniverse.name}.`)
   isUpdating.value = false;
 }
 </script>

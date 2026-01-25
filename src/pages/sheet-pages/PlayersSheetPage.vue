@@ -18,6 +18,7 @@ import {RouteLocationNormalizedLoadedGeneric, Router, useRoute, useRouter} from 
 import Tabs from "@/components/ui/Tabs.vue";
 import Tab from "@/components/ui/Tab.vue";
 import {faFaceKissWinkHeart} from "@fortawesome/free-regular-svg-icons";
+import {useToastStore} from "@/stores/toastStore";
 
 const miniverse = inject<Miniverse>('miniverse')!;
 const miniverseStore = useMiniverseStore();
@@ -34,6 +35,8 @@ const players: ComputedRef<Player[]> = computed(() => {
 const bannedPlayers: ComputedRef<MSMPPlayerBan[]> = computed(() => {
   return miniverseStore.miniverseBannedPlayersLists.get(miniverse.id) || [];
 });
+
+const toastStore = useToastStore();
 
 const activeTab = computed({
   get() {
@@ -64,18 +67,26 @@ const bannedPlayersTableColumns: Column<MSMPPlayerBan>[] = [
 
 async function setPlayerOperator(player: Player, value: boolean) {
   await apiSetPlayerOperator(miniverse.id, player.id, value);
+  if (value) {
+    toastStore.addToast('Operator added', `${player.name} is now operator.`, 'success');
+  } else {
+    toastStore.addToast('Operator removed', `${player.name} is no longer operator.`, 'success');
+  }
 }
 
 async function kickPlayer(player: Player, reason: string = 'You have been kicked by an administrator') {
   await apiKickPlayer(miniverse.id, player.id, reason);
+  toastStore.addToast('Player kicked', `${player.name} has been kicked successfully.`, 'success');
 }
 
 async function banPlayer(player: Player, reason: string = 'You have been banned by an administrator') {
   await apiBanPlayer(miniverse.id, player.id, reason);
+  toastStore.addToast('Player banned', `${player.name} has been banned successfully.`, 'success');
 }
 
 async function unbanPlayer(player: Player) {
   await apiUnbanPlayer(miniverse.id, player.id);
+  toastStore.addToast('Player pardoned', `${player.name} is no longer banned.`, 'success');
 }
 </script>
 

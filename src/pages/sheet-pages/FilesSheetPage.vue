@@ -5,7 +5,6 @@ import {useMiniverseStore} from "@/stores/miniverseStore";
 import FileBrowser from "@/components/ui/FileBrowser.vue";
 
 const miniverse = inject<Miniverse>('miniverse')!;
-const miniverseStore = useMiniverseStore();
 </script>
 
 <template>

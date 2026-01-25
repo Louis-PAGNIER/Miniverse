@@ -34,6 +34,8 @@ import Tab from "@/components/ui/Tab.vue";
 import Table, {Column} from "@/components/ui/Table.vue";
 import IconButton from "@/components/ui/IconButton.vue";
 import {openNewTab} from "@/composables/browser";
+import player from "@/components/3D/Player.vue";
+import {useToastStore} from "@/stores/toastStore";
 
 const markdown = new MarkdownIt({html: true})
   .use(MarkdownItAbbr)
@@ -62,6 +64,8 @@ const modDetails: Ref<ModrinthProject | null> = ref(null);
 const modAvailableVersions: Ref<ModrinthProjectVersion[]> = ref([]);
 const installedVersionDetails: Ref<ModrinthProjectVersion | null> = ref(null);
 
+const toastStore = useToastStore();
+
 const installedMod = computed(() => {
   return miniverse.mods.find(m => m.project_id === modId.value)
 })
@@ -75,12 +79,14 @@ async function installMod(versionId: string | null = null) {
     await apiAutomaticModInstall(miniverse.id, modId.value);
   else
     await apiInstallMod(miniverse.id, versionId)
+  toastStore.addToast('Mod installed', `Mod ${modDetails.value?.title} installed successfully.`, 'success');
 }
 
 async function uninstallMod() {
   if (installedMod.value) {
     await apiUninstallMod(installedMod.value.id);
   }
+  toastStore.addToast('Mod uninstalled', `Mod ${modDetails.value?.title} removed successfully.`, 'success');
 }
 
 watch(installedMod, async (newValue, oldValue) => {
