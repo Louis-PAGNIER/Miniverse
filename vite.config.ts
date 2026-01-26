@@ -38,7 +38,7 @@ export default defineConfig(async ({ mode }) => {
           ws: true,
         },
         '/keycloak': {
-          target: 'http://localhost',
+          target: 'https://localhost',
           changeOrigin: true,
           secure:false,
         },
