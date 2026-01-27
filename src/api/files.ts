@@ -1,4 +1,4 @@
-import {apiClient} from "@/api/api";
+import {API_BASE, apiClient} from "@/api/api";
 import {FileInfo} from "@/models/fileInfo";
 
 export async function apiListFiles(miniverseId: string, path: string): Promise<FileInfo[]> {
@@ -18,7 +18,7 @@ export async function apiCopyFiles(miniverseId: string, paths: string[], destina
 }
 
 export async function apiDownloadFile(token: string): Promise<void> {
-  window.location.href = `/files/download/${token}`;
+  window.location.assign(`${API_BASE}/files/download/${token}`)
 }
 
 export async function apiDownloadMiniverseFiles(miniverseId: string, paths: string[]): Promise<void> {
