@@ -17,19 +17,10 @@ export async function apiCopyFiles(miniverseId: string, paths: string[], destina
   })
 }
 
-export async function apiDownloadFile(token: string): Promise<void> {
-  window.location.assign(`${API_BASE}/files/download/${token}`)
-}
-
 export async function apiDownloadMiniverseFiles(miniverseId: string, paths: string[]): Promise<void> {
   if (paths.length == 0) return;
 
-  const response = await apiClient.post(
-    `/files/${miniverseId}/download-token`, {
-      paths: paths
-    });
-  const token = response.data;
-  await apiDownloadFile(token);
+  window.location.assign(`${API_BASE}/files/${miniverseId}/download/?paths=${encodeURIComponent(paths.toString())}`);
 }
 
 export async function apiUploadFiles(miniverseId: string, destination: string, files: File[]): Promise<void> {
