@@ -5,7 +5,7 @@ import Pages from 'vite-plugin-pages'
 import {templateCompilerOptions} from '@tresjs/core'
 import mkcert from 'vite-plugin-mkcert'
 
-export default defineConfig(async ({ mode }) => {
+export default defineConfig(async ({mode}) => {
   const isDev = mode === 'development'
 
   const plugins = [
@@ -16,7 +16,7 @@ export default defineConfig(async ({ mode }) => {
   ]
 
   if (isDev) {
-    const { default: vueDevTools } = await import('vite-plugin-vue-devtools')
+    const {default: vueDevTools} = await import('vite-plugin-vue-devtools')
     // @ts-ignore
     plugins.push(vueDevTools())
     // @ts-ignore
@@ -28,19 +28,20 @@ export default defineConfig(async ({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'https://localhost',
           changeOrigin: true,
           secure: false,
         },
         '/ws': {
-          target: 'ws://localhost:8000',
+          target: 'https://localhost',
           changeOrigin: true,
+          secure: false,
           ws: true,
         },
         '/keycloak': {
           target: 'https://localhost',
           changeOrigin: true,
-          secure:false,
+          secure: false,
         },
       },
     },
