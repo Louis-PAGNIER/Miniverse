@@ -20,7 +20,7 @@ export async function apiCopyFiles(miniverseId: string, paths: string[], destina
 export async function apiDownloadMiniverseFiles(miniverseId: string, paths: string[]): Promise<void> {
   if (paths.length == 0) return;
 
-  window.location.assign(`${API_BASE}/files/${miniverseId}/download/?paths=${encodeURIComponent(paths.toString())}`);
+  window.location.assign(`${API_BASE}/files/${miniverseId}/download?paths=${encodeURIComponent(paths.toString())}`);
 }
 
 export async function apiUploadFiles(miniverseId: string, destination: string, files: File[]): Promise<void> {
