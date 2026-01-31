@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {AnsiUp} from 'ansi_up';
-import {inject, onUnmounted, ref, watch, nextTick} from "vue";
+import {inject, onUnmounted, ref, watch, nextTick, ComputedRef} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {WS_BASE} from "@/api/api";
 
 const ansiUp = new AnsiUp();
 ansiUp.use_classes = true;
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 
 const lines = ref<string[]>([]);
 const consoleScreenRef = ref<HTMLElement | null>(null);
@@ -95,7 +95,7 @@ onUnmounted(() => {
     <h2>Console</h2>
     <div class="console-wrapper">
       <div class="screen-wrapper">
-        <div class="console-screen" ref="consoleScreenRef" @scroll="handleScroll">
+        <div class="console-screen scrollbar" ref="consoleScreenRef" @scroll="handleScroll">
           <div v-for="(line, index) in lines" :key="index" v-html="line"></div>
         </div>
       </div>
@@ -119,7 +119,7 @@ onUnmounted(() => {
 .screen-wrapper {
   border-radius: 10px;
   border: var(--color-border) 1px solid;
-  padding: 10px;
+  padding: 3px;
   box-sizing: border-box;
   background: var(--color-background-secondary);
   min-height: 0;

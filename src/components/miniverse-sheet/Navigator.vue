@@ -32,25 +32,6 @@ function navigateTo(segments: string[]) {
   });
 }
 
-function resolveRouteNode(path: string): RouteNode | null {
-  const parts = path.split("/").filter(Boolean);
-  console.log("parts", parts)
-  console.log(props.routes)
-  let node: RouteNode | null = null;
-  let current = props.routes;
-
-  for (const part of parts) {
-    node = current[part];
-    if (!node) break;
-  }
-
-  console.log(node)
-
-  return node || props.routes.home; // fallback
-}
-
-const currentNode = computed(() => resolveRouteNode(currentPath.value));
-
 const breadcrumbs = computed(() => {
   const parts = currentPath.value.split("/").filter(Boolean);
   const crumbs: { name: string; segments: string[] }[] = [];
@@ -81,10 +62,6 @@ const breadcrumbs = computed(() => {
         {{ crumb.name }}
         <span v-if="i < breadcrumbs.length - 1"> ⟩ </span>
       </span>
-    </div>
-
-    <div class="page-content">
-      <component :is="currentNode?.component" />
     </div>
   </div>
 </template>

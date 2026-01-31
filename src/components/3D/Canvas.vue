@@ -1,8 +1,7 @@
 <script setup lang="ts">
-
 import {TresCanvas} from "@tresjs/core";
 import MiniversesListDisplay from "@/components/3D/MiniversesListDisplay.vue";
-import {computed, ref, ShallowRef, shallowRef} from "vue";
+import {computed, provide, ref, ShallowRef, shallowRef} from "vue";
 import MiniverseSheet from "@/components/miniverse-sheet/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 import {useRoute, useRouter} from "vue-router";
@@ -26,6 +25,8 @@ const handleOverlayClick = (event: MouseEvent) => {
 const openNewMiniverseDialog = () => {
   showAddMiniversePopup.value = true;
 };
+
+provide('miniverse', focusedMiniverse);
 </script>
 
 <template>
@@ -58,7 +59,9 @@ const openNewMiniverseDialog = () => {
     <transition name="fade">
       <div id="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleOverlayClick($event)">
         <div id="main-overlay">
-          <MiniverseSheet :miniverse="focusedMiniverse"></MiniverseSheet>
+          <MiniverseSheet>
+            <router-view />
+          </MiniverseSheet>
         </div>
       </div>
     </transition>

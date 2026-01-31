@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {inject} from "vue";
+import {ComputedRef, inject} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import FileBrowser from "@/components/ui/FileBrowser.vue";
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 </script>
 
 <template>

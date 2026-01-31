@@ -294,7 +294,7 @@ onUnmounted(() => {
         Drop files to upload
       </div>
 
-      <div class="content"
+      <div class="content scrollbar"
            @dragenter="dropZoneVisibility = true"
       >
         <Table

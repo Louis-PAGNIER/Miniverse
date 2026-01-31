@@ -1,6 +1,6 @@
 import Canvas from "@/components/3D/Canvas.vue";
 import HomeSheetPage from "@/pages/sheet-pages/HomeSheetPage.vue";
-import PlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage.vue";
+import PlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/PlayersSheetPage.vue";
 import VersionSheetPage from "@/pages/sheet-pages/VersionSheetPage.vue";
 import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
@@ -12,12 +12,85 @@ import AccountSettingsPage from "@/pages/settings-pages/AccountSettingsPage.vue"
 import UsersSettingsPage from "@/pages/settings-pages/UsersSettingsPage.vue";
 import StatisticsSettingsPage from "@/pages/settings-pages/StatisticsSettingsPage.vue";
 import InformationSettingsPage from "@/pages/settings-pages/InformationSettingsPage.vue";
+import ConnectedPlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/ConnectedPlayersSheetPage.vue";
+import BannedPlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/BannedPlayersSheetPage.vue";
 
 export const mainRoutes = [
   {
     path: '/',
     name: 'Home',
     component: Canvas
+  },
+  {
+    path: '/miniverse/:miniverse_id',
+    component: Canvas,
+    children: [
+      {
+        path: '',
+        name: 'HomeSheetPage',
+        component: HomeSheetPage
+      },
+      {
+        path: 'version',
+        name: 'VersionSheetPage',
+        component: VersionSheetPage
+      },
+      {
+        path: 'players',
+        name: 'PlayersSheetPage',
+        component: PlayersSheetPage,
+        children: [
+          {
+            path: '',
+            redirect: { name: 'ConnectedPlayersSheetPage' }
+          },
+          {
+            path: 'connected',
+            name: 'ConnectedPlayersSheetPage',
+            component: ConnectedPlayersSheetPage
+          },
+          {
+            path: 'banned',
+            name: 'BannedPlayersSheetPage',
+            component: BannedPlayersSheetPage
+          }
+        ]
+      },
+      {
+        path: 'mods',
+        name: 'ModsSheetPage',
+        component: ModsSheetPage,
+        children: [
+          {
+            path: '',
+            redirect: { name: 'InstalledModsSheetPage' }
+          },
+          {
+            path: 'installed',
+            name: 'InstalledModsSheetPage', // TODO: Link component
+          },
+          {
+            path: 'search',
+            name: 'SearchModsSheetPage', // TODO: Link component
+          },
+          {
+            path: ':modId',
+            name: 'ModSheetPage',
+            component: ModSheetPage
+          }
+        ]
+      },
+      {
+        path: 'console',
+        name: 'ConsoleSheetPage',
+        component: ConsoleSheetPage
+      },
+      {
+        path: 'files',
+        name: 'Files',
+        component: FilesSheetPage
+      }
+    ]
   },
   {
     path: '/settings',
@@ -50,10 +123,6 @@ export const mainRoutes = [
       },
     ]
   },
-  {
-    path: '/miniverse/:catchAll(.*)',
-    component: Canvas,
-  }
 ]
 
 export const sheetPagesRoutes = {

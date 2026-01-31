@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {capitalize, computed, inject, onMounted, ref, Ref, watch} from "vue";
+import {capitalize, computed, ComputedRef, inject, onMounted, ref, Ref, watch} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {RouteLocationNormalizedLoadedGeneric, Router, useRoute, useRouter} from "vue-router";
 import {apiGetModDetails, apiGetModVersionDetails, apiGetModVersions} from "@/api/mods";
@@ -47,7 +47,7 @@ const markdown = new MarkdownIt({html: true})
   .use(MarkdownItTasklists)
   .use(MarkdownItTOC);
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 
 const route: RouteLocationNormalizedLoadedGeneric = useRoute();
 const router: Router = useRouter();
@@ -56,7 +56,7 @@ const activeTab = ref('presentation');
 
 const modId = computed(() => {
   const mId = route.query['id'] as string;
-  if (!mId) router.replace(`/miniverse/${miniverse.id}`)
+  if (!mId) router.replace(`/miniverse/${miniverse.value.id}`)
   return mId;
 });
 
@@ -67,7 +67,7 @@ const installedVersionDetails: Ref<ModrinthProjectVersion | null> = ref(null);
 const toastStore = useToastStore();
 
 const installedMod = computed(() => {
-  return miniverse.mods.find(m => m.project_id === modId.value)
+  return miniverse.value.mods.find(m => m.project_id === modId.value)
 })
 
 const isModInstalled = computed(() => {
@@ -76,9 +76,9 @@ const isModInstalled = computed(() => {
 
 async function installMod(versionId: string | null = null) {
   if (versionId == null)
-    await apiAutomaticModInstall(miniverse.id, modId.value);
+    await apiAutomaticModInstall(miniverse.value.id, modId.value);
   else
-    await apiInstallMod(miniverse.id, versionId)
+    await apiInstallMod(miniverse.value.id, versionId)
   toastStore.addToast('Mod installed', `Mod ${modDetails.value?.title} installed successfully.`, 'success');
 }
 

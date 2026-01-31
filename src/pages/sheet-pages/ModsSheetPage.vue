@@ -8,7 +8,7 @@ import {Mod, ModrinthSearchResult} from "@/models/mod";
 import {apiSearchMods} from "@/api/mods";
 import {RouteLocationNormalizedLoadedGeneric, Router, useRoute, useRouter} from "vue-router";
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 
 const VALID_TABS = ["installedMods", "searchMods"];
 
@@ -35,7 +35,7 @@ const activeTab = computed({
 const filteredInstalledMods = computed(() => {
   const term = search.value.trim().toLowerCase();
 
-  return [...miniverse.mods]
+  return [...miniverse.value.mods]
       .filter(m => m.title.toLowerCase().includes(term))
       .sort((a, b) => a.title.localeCompare(b.title));
 });
@@ -49,7 +49,7 @@ async function updateSearchedModrinthMods() {
 }
 
 function navigateToMod(modId: string) {
-  router.push(`/miniverse/${miniverse.id}/mods/mod?id=${modId}`)
+  router.push(`/miniverse/${miniverse.value.id}/mods/mod?id=${modId}`)
 }
 
 onMounted(async () => {

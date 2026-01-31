@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { Miniverse } from "@/models/miniverse";
-import { provide } from "vue";
+import {inject} from "vue";
 
 import Navigator from "@/components/miniverse-sheet/Navigator.vue";
 import {sheetPagesRoutes} from "@/router";
 
-const props = defineProps<{ miniverse: Miniverse }>();
-
-provide('miniverse', props.miniverse);
-
+const miniverse = inject<Miniverse>('miniverse')!;
 </script>
 
 <template>
@@ -19,6 +16,7 @@ provide('miniverse', props.miniverse);
         :basePath="`/miniverse/${miniverse.id}`"
         :routes="sheetPagesRoutes"
       />
+      <slot></slot>
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, inject, onMounted, ref} from "vue";
+import {computed, ComputedRef, inject, onMounted, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import Select from "@/components/ui/Select.vue";
 import Checkbox from "@/components/ui/Checkbox.vue";
@@ -13,20 +13,20 @@ import {apiUpdateMiniverseMCVersion} from "@/api/miniverse";
 import {useAuthStore} from "@/stores/authStore";
 import {useToastStore} from "@/stores/toastStore";
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 
 const authStore = useAuthStore();
 const toastStore = useToastStore();
 
-const selectedVersion = ref<string>(miniverse.mc_version);
+const selectedVersion = ref<string>(miniverse.value.mc_version);
 const versions = ref<MinecraftVersion[]>([]);
 
-const showSnapshots = ref(!isReleaseVersion(miniverse.mc_version));
+const showSnapshots = ref(!isReleaseVersion(miniverse.value.mc_version));
 const showPopup = ref(false);
 const isUpdating = ref(false);
 
 onMounted(async () => {
-  versions.value = await apiGetMinecraftVersions(miniverse.mc_version);
+  versions.value = await apiGetMinecraftVersions(miniverse.value.mc_version);
 });
 
 const options = computed(() => {
@@ -41,8 +41,8 @@ function showUpdateServerPopup() {
 async function updateServer() {
   showPopup.value = false;
   isUpdating.value = true;
-  await apiUpdateMiniverseMCVersion(miniverse.id, selectedVersion.value);
-  toastStore.addToast('Miniverse updated', `Minecraft version updated to ${selectedVersion.value} for miniverse ${miniverse.name}.`)
+  await apiUpdateMiniverseMCVersion(miniverse.value.id, selectedVersion.value);
+  toastStore.addToast('Miniverse updated', `Minecraft version updated to ${selectedVersion.value} for miniverse ${miniverse.value.name}.`)
   isUpdating.value = false;
 }
 </script>

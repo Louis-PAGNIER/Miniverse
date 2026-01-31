@@ -1,34 +1,30 @@
 <script setup lang="ts">
-import {computed, inject} from "vue";
+import {computed, ComputedRef, inject} from "vue";
 import { Miniverse } from "@/models/miniverse";
 import { useMiniverseStore } from "@/stores/miniverseStore";
 import MiniverseSheetTile from "@/components/miniverse-sheet/MiniverseSheetTile.vue";
 import MiniverseStartButton from "@/components/MiniverseStartButton.vue";
 import {MiniverseType} from "@/models/enums/miniverseType";
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 const miniverseStore = useMiniverseStore();
 
 const numberOfPlayers = computed(() =>
-    miniverseStore.miniversePlayersLists.get(miniverse.id)?.length || 0
+    miniverseStore.miniversePlayersLists.get(miniverse.value.id)?.length || 0
 );
 
 const supportMods = computed(() => {
-  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.type);
+  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.value.type);
 })
 
 function titleCase(str: string): string {
+  console.log("miniverse", miniverse)
   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
 }
 
-function formatMemory(memory: number): string {
-  if (memory === 0) return "0M";
-  if (memory < 1_000_000) return (memory / 1_000_000).toFixed(2) + "M";
-  return (memory / 1_000_000_000).toFixed(2) + "G";
-}
+const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
 
-const loaderIcon = computed(() => miniverse.type.toLowerCase() + ".png");
-const statusIcon = computed(() => (miniverse.started ? "running.png" : "stoped.png"));
+
 </script>
 
 <template>

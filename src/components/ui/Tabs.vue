@@ -1,58 +1,30 @@
 <script setup lang="ts">
-import { useSlots, computed } from "vue";
+import { RouteLocationRaw } from 'vue-router';
 
-const props = defineProps<{
-  modelValue: string;
+defineProps<{
+  tabs: {
+    label: string;
+    to: RouteLocationRaw;
+  }[]
 }>();
-
-const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
-}>();
-
-const slots = useSlots();
-
-const tabList = computed(() => {
-  const tabSlot = slots.tabs?.();
-  if (!tabSlot) return [];
-  return tabSlot
-      .map(vnode => vnode.props && { name: vnode.props.name, label: vnode.props.label })
-      .filter(Boolean) as { name: string; label: string }[];
-});
-
-function selectTab(name: string) {
-  emit("update:modelValue", name);
-}
 </script>
 
 <template>
-  <div class="tabs-container">
-    <div class="tabs-header">
-      <button
-          v-for="tab in tabList"
-          :key="tab.name"
-          :class="['tab-btn', { active: tab.name === modelValue }]"
-          @click="selectTab(tab.name)"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <transition name="fade-slide" mode="out-in">
-      <div :key="modelValue">
-        <slot :name="modelValue" />
-      </div>
-    </transition>
-  </div>
+  <nav class="nav-tabs">
+    <router-link
+        v-for="tab in tabs"
+        :key="tab.label"
+        :to="tab.to"
+        class="tab-item"
+        active-class="is-active"
+    >
+      {{ tab.label }}
+    </router-link>
+  </nav>
 </template>
 
 <style scoped>
-.tabs-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.tabs-header {
+.nav-tabs {
   display: flex;
   gap: 16px;
   margin-bottom: 10px;
@@ -61,7 +33,7 @@ function selectTab(name: string) {
   justify-content: center;
 }
 
-.tab-btn {
+.tab-item {
   padding: 10px 14px;
   border: 1px solid var(--color-border);
   max-width: 300px;
@@ -72,28 +44,15 @@ function selectTab(name: string) {
   cursor: pointer;
   transition: all 0.2s;
   font-size: 1em;
-}
+  text-align: center;
+  text-decoration: none;
 
-.tab-btn.active {
-  background: var(--color-background-secondary);
-}
+  &:hover {
+    border-color: var(--color-secondary);
+  }
 
-.tab-btn:hover {
-  border-color: var(--color-secondary);
-}
-
-/* --- Transition entre onglets --- */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.25s ease;
-}
-
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(6px);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
+  &.router-link-exact-active {
+    background: var(--color-background-secondary);
+  }
 }
 </style>
