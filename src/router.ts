@@ -5,9 +5,13 @@ import VersionSheetPage from "@/pages/sheet-pages/VersionSheetPage.vue";
 import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
 import ModSheetPage from "@/pages/sheet-pages/ModSheetPage.vue";
-import Login from "@/pages/Login.vue";
-import Users from "@/pages/Users.vue";
 import FilesSheetPage from "@/pages/sheet-pages/FilesSheetPage.vue";
+import Settings from "@/pages/Settings.vue";
+import MainSettingsPage from "@/pages/settings-pages/MainSettingsPage.vue";
+import AccountSettingsPage from "@/pages/settings-pages/AccountSettingsPage.vue";
+import UsersSettingsPage from "@/pages/settings-pages/UsersSettingsPage.vue";
+import StatisticsSettingsPage from "@/pages/settings-pages/StatisticsSettingsPage.vue";
+import InformationSettingsPage from "@/pages/settings-pages/InformationSettingsPage.vue";
 
 export const mainRoutes = [
   {
@@ -16,14 +20,35 @@ export const mainRoutes = [
     component: Canvas
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/users',
-    name: 'Users',
-    component: Users
+    path: '/settings',
+    component: Settings,
+    children: [
+      {
+        path: '',
+        name: 'SettingsMain',
+        component: MainSettingsPage
+      },
+      {
+        path: 'account',
+        name: 'SettingsAccount',
+        component: AccountSettingsPage
+      },
+      {
+        path: 'users',
+        name: 'SettingsUsers',
+        component: UsersSettingsPage
+      },
+      {
+        path: 'statistics',
+        name: 'SettingsStatistics',
+        component: StatisticsSettingsPage
+      },
+      {
+        path: 'information',
+        name: 'SettingsInformation',
+        component: InformationSettingsPage
+      },
+    ]
   },
   {
     path: '/miniverse/:catchAll(.*)',

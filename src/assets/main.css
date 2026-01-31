@@ -38,13 +38,6 @@ img {
     user-select: none;
 }
 
-#app {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-weight: normal;
-}
-
 .svg-icon {
     width: 1.5em;
     height: 1.5em;

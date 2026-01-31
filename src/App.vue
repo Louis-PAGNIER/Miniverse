@@ -31,5 +31,8 @@ body {
   width: 100%;
   background-color: #000;
   position: static !important;
+  margin: 0 auto;
+  padding: 1rem;
+  font-weight: normal;
 }
 </style>

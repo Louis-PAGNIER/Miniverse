@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {inject} from "vue";
 import {Miniverse} from "@/models/miniverse";
-import {useMiniverseStore} from "@/stores/miniverseStore";
 import FileBrowser from "@/components/ui/FileBrowser.vue";
 
 const miniverse = inject<Miniverse>('miniverse')!;

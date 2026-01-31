@@ -6,6 +6,9 @@ import {computed, ref, ShallowRef, shallowRef} from "vue";
 import MiniverseSheet from "@/components/miniverse-sheet/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 import {useRoute, useRouter} from "vue-router";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {faGear, faPlus} from "@fortawesome/free-solid-svg-icons";
+import {faUser} from "@fortawesome/free-regular-svg-icons";
 
 const router = useRouter();
 const route = useRoute();
@@ -32,17 +35,30 @@ const openNewMiniverseDialog = () => {
   <div id="overlays-wrapper">
     <div class="header">
       <span class="logo">Miniverse</span>
+
       <div class="spacer"></div>
+
       <button class="overlay-button" @click="openNewMiniverseDialog">
-        <img class="svg-icon" src="../../assets/icons/plus.svg" />
+        <font-awesome-icon :icon="faPlus"></font-awesome-icon>
       </button>
-<!--      <router-link class="button" to="settings"><img class="svg-icon" src="@/assets/icons/settings.svg"></router-link>-->
-      <button class="overlay-button"><img class="svg-icon" src="../../assets/icons/account.svg"></button>
+
+      <router-link class="button" to="/settings/account">
+        <button class="overlay-button">
+          <font-awesome-icon :icon="faUser"></font-awesome-icon>
+        </button>
+      </router-link>
+
+      <router-link class="button" to="/settings">
+        <button class="overlay-button">
+          <font-awesome-icon :icon="faGear"></font-awesome-icon>
+        </button>
+      </router-link>
     </div>
+
     <transition name="fade">
       <div id="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleOverlayClick($event)">
         <div id="main-overlay">
-          <MiniverseSheet  :miniverse="focusedMiniverse"></MiniverseSheet>
+          <MiniverseSheet :miniverse="focusedMiniverse"></MiniverseSheet>
         </div>
       </div>
     </transition>
@@ -107,10 +123,10 @@ const openNewMiniverseDialog = () => {
   justify-content: center;
   background: var(--color-background-primary);
   border: var(--color-border) 1px solid;;
-  color: var(--color-primary);
+  color: var(--color-secondary);
   font-size: 1em;
-  padding: 1em;
   margin: 0.5em;
+  width: 3.5em;
   height: 3.5em;
   outline: none;
   border-radius: 5px;
@@ -123,6 +139,10 @@ const openNewMiniverseDialog = () => {
 
   &:active {
     opacity: 1;
+  }
+
+  svg {
+    scale: 1.2;
   }
 }
 </style>
