@@ -85,7 +85,7 @@ onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside))
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 16437346;
+  z-index: 99437346;
 }
 
 .popup {
