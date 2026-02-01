@@ -22,3 +22,11 @@ const props = defineProps<{
   align-items: center;
 }
 </style>
+
+<style>
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+</style>

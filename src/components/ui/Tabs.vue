@@ -17,6 +17,7 @@ defineProps<{
         :to="tab.to"
         class="tab-item"
         active-class="is-active"
+        replace
     >
       {{ tab.label }}
     </router-link>

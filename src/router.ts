@@ -2,9 +2,9 @@ import Canvas from "@/components/3D/Canvas.vue";
 import HomeSheetPage from "@/pages/sheet-pages/HomeSheetPage.vue";
 import PlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/PlayersSheetPage.vue";
 import VersionSheetPage from "@/pages/sheet-pages/VersionSheetPage.vue";
-import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage.vue";
+import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
-import ModSheetPage from "@/pages/sheet-pages/ModSheetPage.vue";
+import ModSheetPage from "@/pages/sheet-pages/ModSheetPage/ModSheetPage.vue";
 import FilesSheetPage from "@/pages/sheet-pages/FilesSheetPage.vue";
 import Settings from "@/pages/Settings.vue";
 import MainSettingsPage from "@/pages/settings-pages/MainSettingsPage.vue";
@@ -14,6 +14,11 @@ import StatisticsSettingsPage from "@/pages/settings-pages/StatisticsSettingsPag
 import InformationSettingsPage from "@/pages/settings-pages/InformationSettingsPage.vue";
 import ConnectedPlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/ConnectedPlayersSheetPage.vue";
 import BannedPlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/BannedPlayersSheetPage.vue";
+import InstalledModsSheetPage from "@/pages/sheet-pages/ModsSheetPage/InstalledModsSheetPage.vue";
+import SearchModsSheetPage from "@/pages/sheet-pages/ModsSheetPage/SearchModsSheetPage.vue";
+import PresentationModSheetPage from "@/pages/sheet-pages/ModSheetPage/PresentationModSheetPage.vue";
+import VersionsModSheetPage from "@/pages/sheet-pages/ModSheetPage/VersionsModSheetPage.vue";
+import GalleryModSheetPage from "@/pages/sheet-pages/ModSheetPage/GalleryModSheetPage.vue";
 
 export const mainRoutes = [
   {
@@ -67,17 +72,40 @@ export const mainRoutes = [
           },
           {
             path: 'installed',
-            name: 'InstalledModsSheetPage', // TODO: Link component
+            name: 'InstalledModsSheetPage',
+            component: InstalledModsSheetPage
           },
           {
             path: 'search',
-            name: 'SearchModsSheetPage', // TODO: Link component
+            name: 'SearchModsSheetPage',
+            component: SearchModsSheetPage
+          }
+        ]
+      },
+      {
+        path: 'mod/:modId',
+        name: 'ModSheetPage',
+        component: ModSheetPage,
+        children: [
+          {
+            path: '',
+            redirect: { name: 'PresentationModSheetPage' }
           },
           {
-            path: ':modId',
-            name: 'ModSheetPage',
-            component: ModSheetPage
-          }
+            path: 'presentation',
+            name: 'PresentationModSheetPage',
+            component: PresentationModSheetPage
+          },
+          {
+            path: 'versions',
+            name: 'VersionsModSheetPage',
+            component: VersionsModSheetPage
+          },
+          {
+            path: 'gallery',
+            name: 'GalleryModSheetPage',
+            component: GalleryModSheetPage
+          },
         ]
       },
       {

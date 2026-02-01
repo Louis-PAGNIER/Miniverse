@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {useRoute, useRouter} from "vue-router";
 import {
   faChartSimple,
   faGears,
@@ -8,9 +7,6 @@ import {
   faUser,
   faUsers
 } from "@fortawesome/free-solid-svg-icons";
-
-const router = useRouter();
-const route = useRoute();
 </script>
 
 <template>
