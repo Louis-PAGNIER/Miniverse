@@ -1,5 +1,6 @@
 import {API_BASE, apiClient} from "@/api/api";
 import {FileInfo} from "@/models/fileInfo";
+import * as tus from 'tus-js-client'
 
 export async function apiListFiles(miniverseId: string, path: string): Promise<FileInfo[]> {
   return (await apiClient.get(`/files/${miniverseId}?path=` + path)).data;
@@ -24,21 +25,56 @@ export async function apiDownloadMiniverseFiles(miniverseId: string, paths: stri
 }
 
 export async function apiUploadFiles(miniverseId: string, destination: string, files: File[]): Promise<void> {
-  const formData = new FormData();
+  // Create a new tus upload
+  const file = files[0];
+  const upload = new tus.Upload(file, {
+    // Endpoint is the upload creation URL from your tus server
+    endpoint: '/api/files/tus',
+    // Retry delays will enable tus-js-client to automatically retry on errors
+    retryDelays: [0, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 3000, 5000, 10000, 20000],
+    // Attach additional metadata about the file for the server
+    metadata: {
+      filename: file.name,
+      filetype: file.type,
+      miniverseId: miniverseId,
+      destination: destination,
+    },
+    // It forces the browser to send your 'sessionid' or 'csrftoken' cookies
+    // along with the upload request to the server.
+    onBeforeRequest: function (req) {
+      const xhr = req.getUnderlyingObject();
+      xhr.withCredentials = true;
+    },
 
-  for (const file of files) {
-    formData.append("files", file);
-  }
+    // Callback for errors which cannot be fixed using retries
+    onError: function (error) {
+      console.log('Failed because: ' + error)
+    },
+    // Callback for reporting upload progress
+    onProgress: function (bytesUploaded: number, bytesTotal: number) {
+      const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+      console.log("Uploading :", bytesUploaded, bytesTotal, percentage + '%')
+    },
+    // Callback for once the upload is completed
+    onSuccess: function () {
+      if ("name" in upload.file) {
+        console.log('Upload %s to %s', upload.file.name, upload.url)
+      } else {
+        console.log('Upload to %s', upload.url)
+      }
+    },
+  });
 
-  await apiClient.post(
-    `/files/${miniverseId}/upload?destination=${encodeURIComponent(destination)}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  // Check if there are any previous uploads to continue.
+  upload.findPreviousUploads().then(function (previousUploads: any[]) {
+    // Found previous uploads so we select the first one.
+    if (previousUploads.length) {
+      upload.resumeFromPreviousUpload(previousUploads[0])
     }
-  );
+
+    // Start the upload
+    upload.start()
+  })
 }
 
 export async function apiExtractArchive(miniverseId: string, archivePath: string): Promise<void> {
