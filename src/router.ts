@@ -122,7 +122,7 @@ export const mainRoutes = [
   },
   {
     path: '/settings',
-    component: Settings,
+    component: Canvas,
     children: [
       {
         path: '',

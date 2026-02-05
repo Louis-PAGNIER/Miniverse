@@ -4,6 +4,14 @@ import {MiniverseAnimator} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import {Vector3} from "three";
 
+export type ViewMode = 'home' | 'focus' | 'settings';
+
+const CAMERA_CONFIG = {
+  home: { pos: new Vector3(0, 0, 40), duration: 1000, interpolation: InterpolationType.EASE_IN_OUT },
+  focus: { pos: new Vector3(0, 20, 100), duration: 1000, interpolation: InterpolationType.EASE_IN_OUT },
+  settings: { pos: new Vector3(36, 0, 40), duration: 1000, interpolation: InterpolationType.EASE_IN_OUT },
+};
+
 const GRID_WIDTH_FACTOR_DEFAULT: number = 22;
 const GRID_WIDTH_FACTOR_FOCUS: number = 50;
 const GRID_HORIZONTAL_SPACING: number = 10;
@@ -12,6 +20,7 @@ const GRID_VERTICAL_SPACING: number = 13;
 export class MiniverseAnimatorManager {
   camera: Vector3Animator;
   focusedMiniverse: Ref<MiniverseAnimator | null>;
+  viewMode: ViewMode = 'home';
   gridRows: number;
   miniverseStore = useMiniverseStore();
 
@@ -101,7 +110,7 @@ export class MiniverseAnimatorManager {
   };
 
   checkCameraBounds = () => {
-    if (!this.focusedMiniverse.value) {
+    if (this.viewMode === 'home') {
       const y = this.camera.endValue.y;
       const minY = -GRID_VERTICAL_SPACING * (this.gridRows - 1);
       const maxY = 0;
@@ -112,12 +121,10 @@ export class MiniverseAnimatorManager {
   };
 
   distributeMiniverses = (animated: boolean = true) => {
+    let config = CAMERA_CONFIG[this.viewMode];
+    this.camera.setGoal(config.pos, animated ? config.duration : 0, config.interpolation);
+
     const miniverseAnimators: Map<string, MiniverseAnimator> = this.miniverseStore.miniverseAnimators;
-    if (this.focusedMiniverse.value) {
-      this.camera.setGoal(new Vector3(0, 20, 100), 1000, InterpolationType.EASE_IN_OUT);
-    } else {
-      this.camera.setGoal(new Vector3(0, 0, 40), 1000, InterpolationType.EASE_IN_OUT);
-    }
     const sortedMiniverseAnimators: MiniverseAnimator[] = Array.from(miniverseAnimators.values()).sort((a, b) => {
       if (a.miniverse.started && !b.miniverse.started) return -1;
       if (!a.miniverse.started && b.miniverse.started) return 1;
@@ -125,6 +132,12 @@ export class MiniverseAnimatorManager {
     });
     this.setDistribution(sortedMiniverseAnimators, animated);
   };
+
+  setViewMode(mode: ViewMode, animated: boolean = true) {
+    if (this.viewMode === mode) return;
+    this.viewMode = mode;
+    this.distributeMiniverses(animated);
+  }
 
   focusMiniverse = (miniverse: MiniverseAnimator | null, animated: boolean = true) => {
     if (this.focusedMiniverse.value === miniverse)
@@ -135,8 +148,7 @@ export class MiniverseAnimatorManager {
     } else {
       miniverse.scaleAnimator.setGoal(1.2, 100, InterpolationType.LINEAR);
     }
-    this.focusedMiniverse.value = miniverse ? miniverse : null;
-    this.distributeMiniverses(animated);
+    this.focusedMiniverse.value = miniverse;
   };
 
   handleResize = () => {
@@ -144,19 +156,23 @@ export class MiniverseAnimatorManager {
   };
 
   handleScroll = (e: WheelEvent) => {
-    if (!this.focusedMiniverse.value) {
+    if (this.viewMode === 'home') {
       this.camera.setGoal(new Vector3(this.camera.value.x, this.camera.value.y - e.deltaY * 0.01, this.camera.value.z));
       this.checkCameraBounds();
     }
   };
 
   handleMouseEnter = (m: MiniverseAnimator) => {
-    m.scaleAnimator.setGoal(1.2, 100, InterpolationType.LINEAR);
-    document.body.style.cursor = "pointer";
+    if (this.viewMode === 'home') {
+      m.scaleAnimator.setGoal(1.2, 100, InterpolationType.LINEAR);
+      document.body.style.cursor = "pointer";
+    }
   };
 
   handleMouseLeave = (m: MiniverseAnimator) => {
-    m.scaleAnimator.setGoal(1.0, 100, InterpolationType.LINEAR);
-    document.body.style.cursor = "default";
+    if (this.viewMode === 'home') {
+      m.scaleAnimator.setGoal(1.0, 100, InterpolationType.LINEAR);
+      document.body.style.cursor = "default";
+    }
   };
 }

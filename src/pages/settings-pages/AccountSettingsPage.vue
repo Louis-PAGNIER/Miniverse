@@ -3,7 +3,6 @@
 </script>
 
 <template>
-Hello account
 </template>
 
 <style scoped>

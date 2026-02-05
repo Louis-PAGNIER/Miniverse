@@ -11,9 +11,7 @@ import {
 
 <template>
   <div class="wrapper">
-    <h1 class="title">Miniverse Settings</h1>
     <div class="main">
-
       <div class="left-panel">
         <router-link to="/settings/" class="nav-item">
           <font-awesome-icon :icon="faGears"></font-awesome-icon>
@@ -53,8 +51,11 @@ import {
 .wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  position: relative;
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 10vh;
+  bottom: 20px;
 
   .title {
     font-size: 3em;
@@ -107,6 +108,7 @@ import {
     .right-panel {
       width: 100%;
       padding: 1em;
+      position: relative;
     }
   }
 }

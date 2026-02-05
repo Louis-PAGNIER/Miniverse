@@ -28,3 +28,19 @@
     opacity: 0;
     transform: translateY(-10px);
 }
+
+/* Fade Right */
+.fade-right-enter-active,
+.fade-right-leave-active {
+    transition: all 1s ease-in-out;
+}
+
+.fade-right-enter-from {
+    opacity: 0;
+    transform: translateX(2500px);
+}
+
+.fade-right-leave-to {
+    opacity: 0;
+    transform: translateX(2500px);
+}

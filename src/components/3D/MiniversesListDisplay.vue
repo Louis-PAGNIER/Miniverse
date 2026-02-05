@@ -97,7 +97,8 @@ onBeforeRender(({ delta }) => {
 /* -------------------- Exposes -------------------- */
 defineExpose({
   focusedMiniverse,
-  focusMiniverse: miniverseAnimatorManager.focusMiniverse
+  focusMiniverse: miniverseAnimatorManager.focusMiniverse,
+  manager: miniverseAnimatorManager
 })
 
 const setMiniversesRef = (el: any | null, id: string) => {
