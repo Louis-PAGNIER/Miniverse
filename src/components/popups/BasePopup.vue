@@ -19,13 +19,13 @@ const emit = defineEmits<{
 }>();
 
 function close() {
-  show.value = false;
   emit("cancel");
+  show.value = false;
 }
 
 function confirm() {
-  show.value = false;
   emit("ok");
+  show.value = false;
 }
 
 const popupRef = ref<HTMLElement | null>(null);
