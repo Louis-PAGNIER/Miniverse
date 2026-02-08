@@ -11,9 +11,21 @@ export async function apiListUsers(): Promise<User[]> {
 }
 
 export async function apiDeleteUser(userId: string): Promise<void> {
-  return (await apiClient.delete(`/users/${userId}`));
+  return await apiClient.delete(`/users/${userId}`);
 }
 
 export async function apiSetRole(userId: string, role: Role): Promise<void> {
-  return (await apiClient.put(`/users/${userId}/role`, {role}));
+  return await apiClient.put(`/users/${userId}/role`, {role});
+}
+
+export async function apiListInactiveUsers(): Promise<User[]> {
+  return (await apiClient.get(`/users/inactive`)).data;
+}
+
+export async function apiAcceptUserRequest(userId: string): Promise<void> {
+  return await apiClient.post(`/users/inactive/accept/${userId}`);
+}
+
+export async function apiRejectUserRequest(userId: string): Promise<void> {
+  return await apiClient.delete(`/users/inactive/reject/${userId}`);
 }

@@ -3,38 +3,45 @@ import Table, {Column} from "@/components/ui/Table.vue";
 import {User} from "@/models/user";
 import {downgradeRole, Role, upgradeRole} from "@/models/enums/role";
 import IconButton from "@/components/ui/IconButton.vue";
-import {faPersonArrowDownToLine, faPersonArrowUpFromLine, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {apiDeleteUser, apiListUsers, apiSetRole, apiSetUserRole} from "@/api/user";
-import {onMounted, ref} from "vue";
+import {
+  faCheck,
+  faPersonArrowDownToLine,
+  faPersonArrowUpFromLine,
+  faTrash, faXmark
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  apiAcceptUserRequest,
+  apiDeleteUser,
+  apiListInactiveUsers,
+  apiListUsers,
+  apiRejectUserRequest,
+  apiSetRole
+} from "@/api/user";
+import {computed, onMounted, ref} from "vue";
 import Chip from "@/components/ui/Chip.vue";
 import {useAuthStore} from "@/stores/authStore";
+import MessagePopup from "@/components/popups/MessagePopup.vue";
 
 const usersList = ref<User[]>([]);
+const inactiveUsersList = ref<User[]>([]);
+
+const userToDelete = ref<User | null>(null);
+
+const isDeleteDialogOpen = computed({
+  get: () => userToDelete.value !== null,
+  set: (value) => {
+    if (!value) userToDelete.value = null;
+  }
+});
 
 const authStore = useAuthStore();
 
-const rows: User[] = [
-  {id: 'e13a2298-ef09-4e03-bd77-586168d5d358', username: 'Louis le vrai', role: Role.ADMIN},
-  {id: '1', username: 'Mathis', role: Role.ADMIN},
-  {id: '2', username: 'Louis', role: Role.MODERATOR},
-  {id: '3', username: 'Louis1', role: Role.USER},
-  {id: '4', username: 'Louis2', role: Role.ADMIN},
-  {id: '5', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '6', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '7', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '8', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '9', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '10', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '11', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '12', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '13', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '14', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '15', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '16', username: 'Louis - Copie', role: Role.ADMIN},
-  {id: '17', username: 'Louis - Copie', role: Role.ADMIN},
-]
+const inactiveUsersColumns: Column<User>[] = [
+  {id: "username", name: "Username", value: (p: User) => p.username, sortable: true},
+  {id: "actions", name: "Actions"},
+];
 
-const columns: Column<User>[] = [
+const allUsersColumns: Column<User>[] = [
   {id: "username", name: "Username", value: (p: User) => p.username, sortable: true},
   {id: "role", name: "Role", value: (p: User) => p.role, sortable: true},
   {id: "actions", name: "Actions"},
@@ -44,7 +51,10 @@ async function refreshUsers() {
   usersList.value = await apiListUsers()
 }
 
-/* TODO: Add a confirmation popup */
+function confirmDeleteUser(user: User) {
+  userToDelete.value = user;
+}
+
 async function deleteUser(userId: string) {
   await apiDeleteUser(userId);
   await refreshUsers();
@@ -55,16 +65,40 @@ async function setUserRole(userId: string, role: Role) {
   await refreshUsers();
 }
 
+async function refreshInactiveUsers() {
+  inactiveUsersList.value = await apiListInactiveUsers();
+}
+
+async function acceptUserRequest(userId: string) {
+  await apiAcceptUserRequest(userId);
+  await Promise.all([refreshUsers(), refreshInactiveUsers()]);
+}
+
+async function rejectUserRequest(userId: string) {
+  await apiRejectUserRequest(userId);
+  await refreshInactiveUsers();
+}
+
 onMounted(async () => {
-  await refreshUsers()
-  usersList.value = rows;
+  await Promise.all([refreshUsers(), refreshInactiveUsers()]);
 });
 
 </script>
 
 <template>
-  <h2>Users</h2>
-  <Table :columns="columns" :rows="usersList" :row-key="user => user.id">
+  <template v-if="inactiveUsersList.length > 0">
+    <h2>Pending user requests</h2>
+    <Table :columns="inactiveUsersColumns" :rows="inactiveUsersList" :row-key="user => user.id">
+      <template #cell-actions="{ value }">
+        <IconButton :icon="faCheck" severity="success" @click="acceptUserRequest(value.id)"></IconButton>
+        <IconButton :icon="faXmark" severity="danger" @click="rejectUserRequest(value.id)"></IconButton>
+      </template>
+    </Table>
+  </template>
+
+
+  <h2>All users</h2>
+  <Table :columns="allUsersColumns" :rows="usersList" :row-key="user => user.id">
     <template #cell-role="{ value }">
       <Chip>{{ value }}</Chip>
     </template>
@@ -72,13 +106,21 @@ onMounted(async () => {
       <div v-if="value.id != authStore.me!.id">
         <IconButton :icon="faPersonArrowDownToLine" severity="danger" @click="setUserRole(value.id, downgradeRole(value.role))" :disabled="value.role == Role.USER"></IconButton>
         <IconButton :icon="faPersonArrowUpFromLine" severity="success" @click="setUserRole(value.id, upgradeRole(value.role))" :disabled="value.role == Role.ADMIN"></IconButton>
-        <IconButton :icon="faTrash" severity="danger"></IconButton>
+        <IconButton :icon="faTrash" severity="danger" @click="confirmDeleteUser(value)"></IconButton>
       </div>
       <span v-else>
         <Chip background="var(--color-background-secondary)">You</Chip>
       </span>
     </template>
   </Table>
+  <MessagePopup
+      v-model="isDeleteDialogOpen"
+      title="Delete user"
+      severity="danger"
+      primary-button-text="Delete"
+      @ok="deleteUser(userToDelete!.id)">
+    Do you want to delete {{ userToDelete!.username }} account ?
+  </MessagePopup>
 </template>
 
 <style scoped>

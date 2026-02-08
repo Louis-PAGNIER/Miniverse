@@ -10,9 +10,12 @@ import {faGear, faPlus} from "@fortawesome/free-solid-svg-icons";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import Settings from "@/pages/Settings.vue";
 import Logo from "@/components/Logo.vue";
+import {useAuthStore} from "@/stores/authStore";
 
 const router = useRouter();
 const route = useRoute();
+
+const authStore = useAuthStore();
 
 const systemRef: ShallowRef = shallowRef(null);
 const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse?.miniverse);
@@ -82,7 +85,7 @@ provide('miniverse', focusedMiniverse);
 
       <div class="spacer"></div>
 
-      <button class="overlay-button" @click="openNewMiniverseDialog">
+      <button v-if="authStore.isModerator" class="overlay-button" @click="openNewMiniverseDialog">
         <font-awesome-icon :icon="faPlus"></font-awesome-icon>
       </button>
 
