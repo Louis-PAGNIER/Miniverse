@@ -7,10 +7,12 @@ import {TresCanvas} from "@tresjs/core";
 import Logo from "@/components/Logo.vue";
 import {useAuthStore} from "@/stores/authStore";
 import {useRouter} from "vue-router";
-import {onMounted, watch} from "vue";
+import {onMounted, onUnmounted, watch} from "vue";
 
 const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
 const CAMERA_FOV: number = 30;
+
+let intervalId: number;
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -22,12 +24,15 @@ watch(() => authStore.isAuthenticated, (isAuth) => {
 }, {immediate: true});
 
 onMounted(() => {
-  window.setInterval(async () => {
+  intervalId = window.setInterval(async () => {
     console.log("Vérification de l'auth...");
     await authStore.initialize();
-  }, 3000); // Vérifie toutes les 3 secondes
+  }, 3000);
 });
 
+onUnmounted(() => {
+  window.clearInterval(intervalId)
+});
 </script>
 
 <template>
