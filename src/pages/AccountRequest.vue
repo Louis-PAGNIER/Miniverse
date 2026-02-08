@@ -4,6 +4,7 @@ import {Html, Stars} from "@tresjs/cientos";
 import {Color, Vector3} from "three";
 import Blob from "@/components/3D/Blob.vue";
 import {TresCanvas} from "@tresjs/core";
+import Logo from "@/components/Logo.vue";
 
 const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
 const CAMERA_FOV: number = 30;
@@ -20,6 +21,9 @@ const CAMERA_FOV: number = 30;
     <TresAmbientLight :intensity="0.7"/>
     <TresPointLight :position="[5, 5, 2]" :intensity="75"/>
 
+    <Html transform :distance-factor="4" :position="[0, 7, 0]" :scale="[1.5, 1.5, 1.5]">
+    <Logo class="logo" :longVersion="true"></Logo>
+    </Html>
     <Html transform :distance-factor="4" :position="[0, 0, 0]" :scale="[1.5, 1.5, 1.5]">
     <div class="miniverse-name-wrapper">
       <h1 class="miniverse-name">
@@ -36,7 +40,14 @@ const CAMERA_FOV: number = 30;
 
 <style scoped>
 
+.logo {
+  width: 100%;
+  cursor: pointer;
+  align-self: center;
+}
+
 .miniverse-name {
+  text-align: center;
   cursor: text;
 }
 
