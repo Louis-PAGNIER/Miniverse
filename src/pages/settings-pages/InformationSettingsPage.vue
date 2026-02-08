@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
+import Logo from "@/components/Logo.vue";
 </script>
 
 <template>
   <div class="logo-wrapper">
-    <img src="@/assets/miniverse-logo-long.png">
+    <Logo class="logo" :long-version="true"></Logo>
   </div>
 </template>
 
@@ -14,7 +14,7 @@
   text-align: center;
 }
 
-img {
-  width: 400px;
+.logo {
+  width: 800px;
 }
 </style>

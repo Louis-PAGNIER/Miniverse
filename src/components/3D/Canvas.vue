@@ -9,6 +9,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faGear, faPlus} from "@fortawesome/free-solid-svg-icons";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import Settings from "@/pages/Settings.vue";
+import Logo from "@/components/Logo.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -77,7 +78,7 @@ provide('miniverse', focusedMiniverse);
     </transition>
 
     <div class="header">
-      <img class="logo" src="@/assets/miniverse-logo-long.png" @click="router.push('/')" />
+      <Logo class="logo" :long-version="true" @click="router.push('/')"></Logo>
 
       <div class="spacer"></div>
 

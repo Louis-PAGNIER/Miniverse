@@ -39,7 +39,7 @@ import {
         </router-link>
       </div>
 
-      <div class="right-panel">
+      <div class="right-panel scrollbar">
         <router-view />
       </div>
 
@@ -109,6 +109,7 @@ import {
       width: 100%;
       padding: 1em;
       position: relative;
+      overflow-y: scroll;
     }
   }
 }

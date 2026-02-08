@@ -8,7 +8,6 @@ import {apiGetMe} from "@/api/user";
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false);
   const me = ref<User | null>(null);
-  // const token = ref<string | null>(null);
 
   const isAdmin = computed(() => {
     console.log(me.value);
@@ -22,27 +21,13 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   const login = async () => {
-    // console.log("Get Token");
-    // const accessToken = await getToken();
-    // localStorage.setItem("access_token", accessToken);
-    // axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    //
-    // console.log("access_token", accessToken);
-
-    const user = await apiGetMe();
-    localStorage.setItem("user", JSON.stringify(user));
-
-    console.log("user", JSON.stringify(user));
-
-    me.value = user;
-    // token.value = accessToken;
+    me.value = await apiGetMe();
     isAuthenticated.value = true;
   }
 
   const logout = () => {
     apiLogout();
     me.value = null;
-    // token.value = null;
     isAuthenticated.value = false;
   }
 
@@ -58,5 +43,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     initialize,
+    me
   }
 })

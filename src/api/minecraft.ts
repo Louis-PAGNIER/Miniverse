@@ -1,4 +1,4 @@
-import {API_BASE, apiClient} from "@/api/api";
+import {apiClient} from "@/api/api";
 import {MinecraftVersion} from "@/models/minecraftVersion";
 
 export async function apiGetMinecraftVersions(minVersion: string | null = null): Promise<MinecraftVersion[]> {
