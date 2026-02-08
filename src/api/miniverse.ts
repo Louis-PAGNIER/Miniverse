@@ -1,6 +1,8 @@
 import {apiClient} from "@/api/api";
 import {Miniverse} from "@/models/miniverse";
 import {MiniverseType} from "@/models/enums/miniverseType";
+import {Role} from "@/models/enums/role";
+import {User} from "@/models/user";
 
 export async function apiGetMiniverses(): Promise<Miniverse[]> {
   const response = await apiClient.get('/miniverses/');
@@ -76,4 +78,12 @@ export async function apiBanPlayer(miniverseId: string, playerId: string, reason
 
 export async function apiUnbanPlayer(miniverseId: string, playerId: string): Promise<void> {
   await apiClient.post(`/miniverses/${miniverseId}/unban?player_id=${playerId}`);
+}
+
+export async function apiSetUserRole(miniverseId: string, userIdOrName: string, role: Role): Promise<void> {
+  await apiClient.put(`/miniverses/${miniverseId}/roles/${userIdOrName}`, {role});
+}
+
+export async function apiListMiniverseUsersRole(miniverseId: string): Promise<User[]> {
+  return (await apiClient.get(`/miniverses/${miniverseId}/users`)).data;
 }

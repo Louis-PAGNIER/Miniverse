@@ -20,6 +20,7 @@ import VersionsModSheetPage from "@/pages/sheet-pages/ModSheetPage/VersionsModSh
 import GalleryModSheetPage from "@/pages/sheet-pages/ModSheetPage/GalleryModSheetPage.vue";
 import {createRouter, createWebHistory} from "vue-router";
 import AccountRequest from "@/pages/AccountRequest.vue";
+import PermissionsSheetPage from "@/pages/sheet-pages/PermissionsSheetPage.vue";
 
 export const mainRoutes = [
   {
@@ -123,6 +124,11 @@ export const mainRoutes = [
         path: 'files',
         name: 'Files',
         component: FilesSheetPage
+      },
+      {
+        path: 'permissions',
+        name: 'Permissions',
+        component: PermissionsSheetPage
       }
     ]
   },
@@ -160,13 +166,14 @@ export const mainRoutes = [
 ]
 
 export const sheetPagesRoutes = {
-  home: {name: "Home", component: HomeSheetPage},
-  players: {name: "Players", component: PlayersSheetPage},
-  version: {name: "Version", component: VersionSheetPage},
-  mods: {name: "Mods", component: ModsSheetPage},
-  mod: {name: "Mod", component: ModSheetPage},
-  console: {name: "Console", component: ConsoleSheetPage},
-  files: {name: "Files", component: FilesSheetPage},
+  home: {name: "Home"},
+  players: {name: "Players"},
+  version: {name: "Version"},
+  mods: {name: "Mods"},
+  mod: {name: "Mod"},
+  console: {name: "Console"},
+  files: {name: "Files"},
+  permissions: {name: "Permissions"},
 };
 
 export const router = createRouter({

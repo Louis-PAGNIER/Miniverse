@@ -4,7 +4,6 @@ import {useRoute, useRouter} from "vue-router";
 
 interface RouteNode {
   name: string;
-  component: any;
   children?: Record<string, RouteNode>;
 }
 

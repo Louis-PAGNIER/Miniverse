@@ -23,8 +23,6 @@ function titleCase(str: string): string {
 }
 
 const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
-
-
 </script>
 
 <template>
@@ -37,6 +35,7 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
     <MiniverseSheetTile :icon="loaderIcon" label="Loader">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
     <MiniverseSheetTile icon="bookshelf.png" label="World data" @click="$router.push(`/miniverse/${miniverse.id}/files`)">Files</MiniverseSheetTile>
     <MiniverseSheetTile v-if="supportMods" icon="mods.png" label="Mods" @click="$router.push(`/miniverse/${miniverse.id}/mods`)">{{ miniverse.mods.length }}</MiniverseSheetTile>
+    <MiniverseSheetTile icon="permissions.png" label="Manage" @click="$router.push(`/miniverse/${miniverse.id}/permissions`)">Permissions</MiniverseSheetTile>
   </div>
 </template>
 
