@@ -6,7 +6,7 @@ import MiniverseSheet from "@/components/miniverse-sheet/MiniverseSheet.vue";
 import AddMiniversePopup from "@/components/popups/AddMiniversePopup.vue";
 import {useRoute, useRouter} from "vue-router";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {faGear, faPlus} from "@fortawesome/free-solid-svg-icons";
+import {faArrowRightFromBracket, faGear, faPlus} from "@fortawesome/free-solid-svg-icons";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import Settings from "@/pages/Settings.vue";
 import Logo from "@/components/Logo.vue";
@@ -89,17 +89,21 @@ provide('miniverse', focusedMiniverse);
         <font-awesome-icon :icon="faPlus"></font-awesome-icon>
       </button>
 
-      <router-link class="button" to="/settings/account">
+      <router-link to="/settings/account">
         <button class="overlay-button">
           <font-awesome-icon :icon="faUser"></font-awesome-icon>
         </button>
       </router-link>
 
-      <router-link class="button" to="/settings">
+      <router-link to="/settings" v-if="authStore.isModerator">
         <button class="overlay-button">
           <font-awesome-icon :icon="faGear"></font-awesome-icon>
         </button>
       </router-link>
+
+      <button class="overlay-button" @click="authStore.logout">
+        <font-awesome-icon :icon="faArrowRightFromBracket"></font-awesome-icon>
+      </button>
     </div>
   </div>
 

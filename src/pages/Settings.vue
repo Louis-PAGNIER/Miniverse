@@ -7,13 +7,16 @@ import {
   faUser,
   faUsers
 } from "@fortawesome/free-solid-svg-icons";
+import {useAuthStore} from "@/stores/authStore";
+
+const authStore = useAuthStore();
 </script>
 
 <template>
   <div class="wrapper">
     <div class="main">
       <div class="left-panel">
-        <router-link to="/settings/" class="nav-item">
+        <router-link to="/settings/" class="nav-item" v-if="authStore.isModerator">
           <font-awesome-icon :icon="faGears"></font-awesome-icon>
           Main settings
         </router-link>
@@ -23,12 +26,12 @@ import {
           Account
         </router-link>
 
-        <router-link to="/settings/users" class="nav-item">
+        <router-link to="/settings/users" class="nav-item" v-if="authStore.isAdmin">
           <font-awesome-icon :icon="faUsers"></font-awesome-icon>
           Users
         </router-link>
 
-        <router-link to="/settings/statistics" class="nav-item">
+        <router-link to="/settings/statistics" class="nav-item" v-if="authStore.isAdmin">
           <font-awesome-icon :icon="faChartSimple"></font-awesome-icon>
           Statistics
         </router-link>
