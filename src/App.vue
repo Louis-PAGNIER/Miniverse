@@ -40,6 +40,10 @@ body {
   font-weight: normal;
 }
 
+</style>
+
+<style scoped>
+
 .container {
   position: fixed;
   top: 5.3em;
