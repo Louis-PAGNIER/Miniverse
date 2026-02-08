@@ -33,7 +33,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   const initialize = async () => {
     await login();
-    isAuthenticated.value = !!localStorage.getItem('access_token');
   }
 
   return {

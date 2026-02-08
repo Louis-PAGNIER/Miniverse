@@ -5,9 +5,28 @@ import {Color, Vector3} from "three";
 import Blob from "@/components/3D/Blob.vue";
 import {TresCanvas} from "@tresjs/core";
 import Logo from "@/components/Logo.vue";
+import {useAuthStore} from "@/stores/authStore";
+import {useRouter} from "vue-router";
+import {onMounted, watch} from "vue";
 
 const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
 const CAMERA_FOV: number = 30;
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+watch(() => authStore.isAuthenticated, (isAuth) => {
+  if (isAuth) {
+    router.replace("/");
+  }
+}, {immediate: true});
+
+onMounted(() => {
+  window.setInterval(async () => {
+    console.log("Vérification de l'auth...");
+    await authStore.initialize();
+  }, 3000); // Vérifie toutes les 3 secondes
+});
 
 </script>
 
