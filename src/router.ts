@@ -6,7 +6,6 @@ import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
 import ModSheetPage from "@/pages/sheet-pages/ModSheetPage/ModSheetPage.vue";
 import FilesSheetPage from "@/pages/sheet-pages/FilesSheetPage.vue";
-import Settings from "@/pages/Settings.vue";
 import MainSettingsPage from "@/pages/settings-pages/MainSettingsPage.vue";
 import AccountSettingsPage from "@/pages/settings-pages/AccountSettingsPage.vue";
 import UsersSettingsPage from "@/pages/settings-pages/UsersSettingsPage.vue";
@@ -19,12 +18,19 @@ import SearchModsSheetPage from "@/pages/sheet-pages/ModsSheetPage/SearchModsShe
 import PresentationModSheetPage from "@/pages/sheet-pages/ModSheetPage/PresentationModSheetPage.vue";
 import VersionsModSheetPage from "@/pages/sheet-pages/ModSheetPage/VersionsModSheetPage.vue";
 import GalleryModSheetPage from "@/pages/sheet-pages/ModSheetPage/GalleryModSheetPage.vue";
+import {createRouter, createWebHistory} from "vue-router";
+import AccountRequest from "@/pages/AccountRequest.vue";
 
 export const mainRoutes = [
   {
     path: '/',
     name: 'Home',
     component: Canvas
+  },
+  {
+    path: '/request',
+    name: 'Account request',
+    component: AccountRequest
   },
   {
     path: '/miniverse/:miniverse_id',
@@ -47,7 +53,7 @@ export const mainRoutes = [
         children: [
           {
             path: '',
-            redirect: { name: 'ConnectedPlayersSheetPage' }
+            redirect: {name: 'ConnectedPlayersSheetPage'}
           },
           {
             path: 'connected',
@@ -68,7 +74,7 @@ export const mainRoutes = [
         children: [
           {
             path: '',
-            redirect: { name: 'InstalledModsSheetPage' }
+            redirect: {name: 'InstalledModsSheetPage'}
           },
           {
             path: 'installed',
@@ -89,7 +95,7 @@ export const mainRoutes = [
         children: [
           {
             path: '',
-            redirect: { name: 'PresentationModSheetPage' }
+            redirect: {name: 'PresentationModSheetPage'}
           },
           {
             path: 'presentation',
@@ -154,11 +160,16 @@ export const mainRoutes = [
 ]
 
 export const sheetPagesRoutes = {
-  home: { name: "Home", component: HomeSheetPage },
-  players: { name: "Players", component: PlayersSheetPage },
-  version: { name: "Version", component: VersionSheetPage },
-  mods: { name: "Mods", component: ModsSheetPage },
-  mod: { name: "Mod", component: ModSheetPage },
-  console: { name: "Console", component: ConsoleSheetPage },
-  files: { name: "Files", component: FilesSheetPage },
+  home: {name: "Home", component: HomeSheetPage},
+  players: {name: "Players", component: PlayersSheetPage},
+  version: {name: "Version", component: VersionSheetPage},
+  mods: {name: "Mods", component: ModsSheetPage},
+  mod: {name: "Mod", component: ModSheetPage},
+  console: {name: "Console", component: ConsoleSheetPage},
+  files: {name: "Files", component: FilesSheetPage},
 };
+
+export const router = createRouter({
+  history: createWebHistory(),
+  routes: mainRoutes
+})

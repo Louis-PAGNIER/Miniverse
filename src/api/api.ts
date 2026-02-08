@@ -1,5 +1,6 @@
 import axios from "axios";
 import {useToastStore} from "@/stores/toastStore";
+import {router} from "@/router";
 
 export const API_BASE = "/api";
 export const WS_BASE = "/ws";
@@ -17,7 +18,11 @@ apiClient.interceptors.response.use(
       error.response?.data?.message ||
       "An request error occured";
 
-    toastStore.addToast('Error', message, 'danger');
+    if (error.status === 403 && error.response?.data?.detail === "Inactive user") {
+      router.replace("/request");
+    } else {
+      toastStore.addToast('Error', message, 'danger');
+    }
 
     return Promise.reject(error);
   }
