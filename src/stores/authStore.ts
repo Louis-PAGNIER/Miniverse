@@ -1,9 +1,9 @@
 import {computed, ref} from 'vue'
 import {defineStore} from 'pinia'
-import {apiLogout} from "@/api/auth";
 import {User} from "@/models/user";
 import {Role} from "@/models/enums/role";
 import {apiGetMe} from "@/api/user";
+import keycloak from "@/services/keycloak";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false);
@@ -25,8 +25,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = true;
   }
 
-  const logout = () => {
-    apiLogout();
+  const logout = async () => {
+    await keycloak.logout();
     me.value = null;
     isAuthenticated.value = false;
   }
