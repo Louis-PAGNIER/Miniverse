@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useToastStore } from "@/stores/toastStore";
+import {useToastStore} from "@/stores/toastStore";
 
 const store = useToastStore();
 </script>
 
 <template>
-  <div class="toast-container" aria-live="polite">
+  <div class="toast-container">
     <TransitionGroup name="toast-list">
       <div
           v-for="toast in store.toasts"
@@ -22,13 +22,10 @@ const store = useToastStore();
 
 <style scoped>
 .toast-container {
-  position: fixed;
-  top: 5.3em;
-  right: 1.4em;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  z-index: 100;
 }
 
 .toast-item {
@@ -55,6 +52,7 @@ const store = useToastStore();
   }
 
   .close-btn {
+    aspect-ratio: 1;
     position: absolute;
     background: rgba(255, 255, 255, 0.7);
     right: 1em;
@@ -70,7 +68,17 @@ const store = useToastStore();
   }
 }
 
-.toast-list-enter-from { opacity: 0; transform: translateY(20px); }
-.toast-list-leave-to { opacity: 0; transform: scale(0.9); }
-.toast-list-enter-active, .toast-list-leave-active { transition: all 0.3s ease; }
+.toast-list-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.toast-list-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.toast-list-enter-active, .toast-list-leave-active {
+  transition: all 0.3s ease;
+}
 </style>

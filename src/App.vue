@@ -2,6 +2,7 @@
 import {useAuthStore} from "@/stores/authStore";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import ToastContainer from "@/components/ToastContainer.vue";
+import UploadContainer from "@/components/UploadContainer.vue";
 
 const auth = useAuthStore();
 const miniverseStore = useMiniverseStore();
@@ -14,7 +15,10 @@ auth.initialize().then(() => {
 
 <template>
   <router-view></router-view>
-  <ToastContainer />
+  <div class="container">
+    <ToastContainer/>
+    <UploadContainer/>
+  </div>
 </template>
 
 <style>
@@ -35,4 +39,15 @@ body {
   padding: 1rem;
   font-weight: normal;
 }
+
+.container {
+  position: fixed;
+  top: 5.3em;
+  right: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  z-index: 1000000000;
+}
+
 </style>

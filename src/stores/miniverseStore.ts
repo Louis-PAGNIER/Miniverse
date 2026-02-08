@@ -26,6 +26,10 @@ export const useMiniverseStore = defineStore('miniverse', () => {
   const reconnectDelay = import.meta.env.DEV ? 1000 : 5000;
   const connectionLostToastId = ref<string | null>(null);
 
+  const getMiniverseById = (id: string): Miniverse | null => {
+    return miniverses.value.find((item) => item.id === id) ?? null;
+  }
+
   const fetchMiniverses = async () => {
     const newMiniverses = await apiGetMiniverses();
     const newById = new Map(newMiniverses.map(m => [m.id, m]));
@@ -183,6 +187,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     miniverseAnimators,
     miniversePlayersLists,
     miniverseBannedPlayersLists,
+    getMiniverseById,
     fetchMiniverses,
     fetchPlayers,
     fetchPlayerBans,

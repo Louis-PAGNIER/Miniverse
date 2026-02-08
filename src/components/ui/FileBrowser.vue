@@ -15,7 +15,8 @@ import {
   apiDeleteFiles,
   apiDownloadMiniverseFiles,
   apiExtractArchive,
-  apiListFiles, apiRenameItem,
+  apiListFiles,
+  apiRenameItem,
   apiUploadFiles
 } from "@/api/files";
 import {Miniverse} from "@/models/miniverse";
@@ -184,20 +185,26 @@ const browserColumns: Column<FileInfo>[] = [
     sortValue: (v: FileInfo) => ((v.is_folder ? '0_' : ('1_' + v.name.split('.').pop())) + v.name) || '2_'
   },
 
-  { id: "name", name: "Name", value: (v: FileInfo) => v.name, sortable: true },
+  {id: "name", name: "Name", value: (v: FileInfo) => v.name, sortable: true},
 
-  { id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--',
-    sortable: true, sortValue: (v: FileInfo) => v.size ?? 0 },
+  {
+    id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--',
+    sortable: true, sortValue: (v: FileInfo) => v.size ?? 0
+  },
 
-  { id: "created", name: "Creation", class: 'optional1',
+  {
+    id: "created", name: "Creation", class: 'optional1',
     sortable: true,
     value: (v: FileInfo) => timeAgo(v.created),
-    sortValue: (v: FileInfo) => v.created },
+    sortValue: (v: FileInfo) => v.created
+  },
 
-  { id: "updated", name: "Modification", class: 'optional1',
+  {
+    id: "updated", name: "Modification", class: 'optional1',
     sortable: true,
     value: (v: FileInfo) => timeAgo(v.updated),
-    sortValue: (v: FileInfo) => v.updated },
+    sortValue: (v: FileInfo) => v.updated
+  },
 ]
 
 const canPaste = computed(() => copiedPaths.value.length > 0);
@@ -214,7 +221,9 @@ const nameOfFirstFile = computed(() => {
 const contextMenuItems: ContextMenuItem[] = [
   {
     label: 'Rename',
-    action: () => { showRenamePopup.value = true },
+    action: () => {
+      showRenamePopup.value = true
+    },
     visible: () => canRename.value
   },
   {
@@ -255,7 +264,7 @@ watch(
         await refreshFiles();
       }
     },
-    { immediate: true }
+    {immediate: true}
 );
 
 function preventBrowserDragAndDrop(e: DragEvent) {
