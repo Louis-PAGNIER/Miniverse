@@ -14,12 +14,12 @@ const CAMERA_FOV: number = 30;
 
 let intervalId: number;
 
-const router = useRouter();
 const authStore = useAuthStore();
 
 watch(() => authStore.isAuthenticated, (isAuth) => {
   if (isAuth) {
-    router.replace("/");
+    // this reload page
+    window.location.replace("/")
   }
 }, {immediate: true});
 
