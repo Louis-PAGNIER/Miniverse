@@ -147,6 +147,7 @@ export const useMiniverseStore = defineStore('miniverse', () => {
           miniverseBannedPlayersLists.set(miniverseId!, data['data']);
         } else if (['created', 'deleted', 'updated'].includes(data.type)) {
           await fetchMiniverses();
+          await fetchPlayers();
         }
       } catch (e) {
         console.error('Error while parsing WS message', e);
