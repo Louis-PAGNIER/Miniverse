@@ -54,7 +54,7 @@ onBeforeRender(({ delta, elapsed }) => {
 </script>
 
 <template>
-  <TresPerspectiveCamera :position="DEFAULT_CAMERA_POSITION" :lookAt="[-4, 0, 0]" :fov="CAMERA_FOV"/>
+  <TresPerspectiveCamera :position="DEFAULT_CAMERA_POSITION" :lookAt="[-4.5, 0, 0]" :fov="CAMERA_FOV"/>
   <Stars :size="0.1" :radius="20"/>
 
   <TresGroup ref="mainBlob" :position="[-2, 0, 0]" :scale="[0.5, 0.5, 0.5]">
