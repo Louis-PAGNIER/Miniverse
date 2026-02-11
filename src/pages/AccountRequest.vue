@@ -1,16 +1,10 @@
 <script setup lang="ts">
 
-import {Html, Stars} from "@tresjs/cientos";
-import {Color, Vector3} from "three";
-import Blob from "@/components/3D/Blob.vue";
 import {TresCanvas} from "@tresjs/core";
-import Logo from "@/components/Logo.vue";
 import {useAuthStore} from "@/stores/authStore";
-import {useRouter} from "vue-router";
 import {onMounted, onUnmounted, watch} from "vue";
-
-const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
-const CAMERA_FOV: number = 30;
+import AccountRequestScene from "@/pages/AccountRequestScene.vue";
+import Logo from "@/components/Logo.vue";
 
 let intervalId: number;
 
@@ -33,52 +27,53 @@ onMounted(() => {
 onUnmounted(() => {
   window.clearInterval(intervalId)
 });
+
+
 </script>
 
 <template>
   <TresCanvas window-size clear-color="black" :antialias="false">
-    <TresPerspectiveCamera ref="cameraRef" :position="DEFAULT_CAMERA_POSITION" :fov="CAMERA_FOV"/>
-    <Stars :size="0.1" :radius="20"/>
-
-    <Blob :color1="new Color(0.6, 0.2, 1.0)" :color2="new Color(0.2, 1.0, 0.6)" :speed="1.0"></Blob>
-
-    <TresAmbientLight :intensity="0.7"/>
-    <TresPointLight :position="[5, 5, 2]" :intensity="75"/>
-
-    <Html transform :distance-factor="4" :position="[0, 7, 0]" :scale="[1.5, 1.5, 1.5]">
-    <Logo class="logo" :longVersion="true"></Logo>
-    </Html>
-    <Html transform :distance-factor="4" :position="[0, 0, 0]" :scale="[1.5, 1.5, 1.5]">
-    <div class="miniverse-name-wrapper">
-      <h1 class="miniverse-name">
-        Your account requires approval
-      </h1>
-      <h1 class="miniverse-name">
-        Please contact an administrator
-      </h1>
-    </div>
-    </Html>
-
+    <AccountRequestScene></AccountRequestScene>
   </TresCanvas>
+  <div class="overlay-wrapper">
+    <div class="overlay">
+      <Logo class="logo" :long-version="true"></Logo>
+      <div class="texts">
+        <h3>Your account requires approval</h3>
+        <h4>Please contact an administrator</h4>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.overlay-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  padding: 0;
+}
+
+.overlay {
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.texts {
+  margin-bottom: 16vh;
+  font-size: 24px;
+
+  h4 {
+    color: #a6a6a6;
+  }
+}
 
 .logo {
-  width: 100%;
-  cursor: pointer;
-  align-self: center;
-}
-
-.miniverse-name {
-  text-align: center;
-  cursor: text;
-}
-
-.miniverse-name-wrapper {
-  background: var(--color-background-primary);
-  opacity: 0.8;
-  padding: 8px 70px;
-  border-radius: 8px;
+  top: 0;
+  margin: 0 auto 0 auto;
+  width: 30%;
 }
 </style>
