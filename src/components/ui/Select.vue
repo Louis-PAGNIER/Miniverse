@@ -57,6 +57,7 @@ function selectOption(opt: string) {
 function handleClickOutside(event: MouseEvent) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
     isOpen.value = false;
+    event.stopPropagation();
   }
 }
 
