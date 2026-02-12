@@ -35,8 +35,9 @@ export async function apiUploadFiles(miniverseId: string, destination: string, f
     const upload = new tus.Upload(file, {
       // Endpoint is the upload creation URL from your tus server
       endpoint: '/api/files/tus',
+      chunkSize: 100 * 1024 * 1024, // 1M
       // Retry delays will enable tus-js-client to automatically retry on errors
-      retryDelays: [0, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 3000, 5000, 10000, 20000],
+      retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 60000],
       // Attach additional metadata about the file for the server
       metadata: {
         filename: file.name,

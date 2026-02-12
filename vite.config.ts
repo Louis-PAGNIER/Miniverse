@@ -28,18 +28,18 @@ export default defineConfig(async ({mode}) => {
     server: {
       proxy: {
         '/api': {
-          target: 'https://localhost:8443',
+          target: 'https://localhost',
           changeOrigin: false,
           secure: false,
         },
         '/ws': {
-          target: 'https://localhost:8443',
+          target: 'https://localhost',
           changeOrigin: false,
           secure: false,
           ws: true,
         },
         '/keycloak': {
-          target: 'https://localhost:8443',
+          target: 'https://localhost',
           changeOrigin: false,
           secure: false,
         },
