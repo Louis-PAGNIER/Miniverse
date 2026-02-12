@@ -171,8 +171,7 @@ async function onDrop(event: DragEvent) {
   const files = Array.from(event.dataTransfer.files);
   console.log(files);
 
-  await apiUploadFiles(props.miniverse.id, browsingPath.value, files);
-  await refreshFiles();
+  apiUploadFiles(props.miniverse.id, browsingPath.value, files, refreshFiles);
 }
 
 const browserColumns: Column<FileInfo>[] = [

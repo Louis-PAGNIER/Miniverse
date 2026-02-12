@@ -25,7 +25,7 @@ export async function apiDownloadMiniverseFiles(miniverseId: string, paths: stri
   window.location.assign(`${API_BASE}/files/${miniverseId}/download?paths=${encodeURIComponent(paths.toString())}`);
 }
 
-export async function apiUploadFiles(miniverseId: string, destination: string, files: File[]): Promise<void> {
+export function apiUploadFiles(miniverseId: string, destination: string, files: File[], callback: () => Promise<void>): void {
   const uploadStore = useUploadStore();
 
   // Create a new tus upload for each files
@@ -57,9 +57,10 @@ export async function apiUploadFiles(miniverseId: string, destination: string, f
         uploadStore.updateProgress(id!, bytesUploaded)
       },
       // Callback for once the upload is completed
-      onSuccess: function () {
+      onSuccess: async function () {
         uploadStore.completeUpload(id!)
         console.debug(`Upload succeed ${file.name} to ${upload.url}`)
+        await callback()
       },
 
       // Callback for errors which cannot be fixed using retries
