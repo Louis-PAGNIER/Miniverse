@@ -74,7 +74,7 @@ function selectOption(opt: string) {
              class="search-input"
       />
 
-      <div class="options-list" ref="optionsListRef">
+      <div class="options-list scrollbar" ref="optionsListRef">
         <div v-for="opt in filteredOptions"
              :key="opt"
              class="option"
