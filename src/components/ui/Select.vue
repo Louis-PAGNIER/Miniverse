@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed, nextTick, onMounted, onUnmounted, ref} from "vue";
+import {onClickOutside} from "@vueuse/core";
 
 const props = withDefaults(defineProps<{
   options: string[];
@@ -53,20 +54,12 @@ function selectOption(opt: string) {
   isOpen.value = false;
   search.value = "";
 }
-
-function handleClickOutside(event: MouseEvent) {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-    isOpen.value = false;
-    event.stopPropagation();
-  }
-}
-
-onMounted(() => document.addEventListener("click", handleClickOutside));
-onUnmounted(() => document.removeEventListener("click", handleClickOutside));
 </script>
 
 <template>
   <div class="custom-select" :class="{'disabled': disabled}" ref="dropdownRef">
+    <div v-if="isOpen" class="select-capture-overlay"  @click.stop="isOpen = false"></div>
+
     <div class="select-display" :class="{'disabled': disabled}" @click="toggleIsOpen">
       {{ selected || 'Select an option...' }}
       <span class="arrow" :class="{ open: isOpen }">▼</span>
@@ -109,6 +102,14 @@ onUnmounted(() => document.removeEventListener("click", handleClickOutside));
   &.disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  .select-capture-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
   }
 }
 

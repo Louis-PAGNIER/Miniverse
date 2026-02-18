@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import OverlayButton from "@/components/ui/OverlayButton.vue";
+import {onClickOutside} from "@vueuse/core";
 
 const props = withDefaults(defineProps<{
   title?: string;
@@ -29,20 +30,12 @@ function confirm() {
 }
 
 const popupRef = ref<HTMLElement | null>(null);
-function handleClickOutside(e: MouseEvent) {
-  if ("buttons" in e && e.buttons !== 1) return; // consider only left mouse button clicks
-  if (props.closeOnOutsideClick &&
-      popupRef.value &&
-      !popupRef.value.contains(e.target as Node)
-  ) {
-    close();
-  }
-}
 
 defineExpose({ close, confirm });
 
-onMounted(() => document.addEventListener("mousedown", handleClickOutside));
-onUnmounted(() => document.removeEventListener("mousedown", handleClickOutside));
+onClickOutside(popupRef, () => {
+  close();
+});
 </script>
 
 <template>
