@@ -21,6 +21,7 @@ const miniversePlayers: ComputedRef<PlayerAnimator[]> = computed(() => {
 });
 
 const playerRefs = ref(new Map<string, Group>())
+const blobRef = ref();
 
 const blobColors = computed(() => {
   if (props.miniverse.started) {
@@ -100,11 +101,16 @@ function setPlayersRef(el: any | null, id: string) {
   }
 }
 
+async function explode() {
+  await blobRef.value.explode();
+}
+
+defineExpose({ explode });
 </script>
 
 <template>
   <TresGroup>
-    <Blob :color1="blobColors[0]" :color2="blobColors[1]" :speed="blobSpeed"></Blob>
+    <Blob ref="blobRef" :color1="blobColors[0]" :color2="blobColors[1]" :speed="blobSpeed"></Blob>
     <template v-for="playerAnimator in miniversePlayers" :key="playerAnimator.player.id">
       <TresGroup :ref="el => setPlayersRef(el, playerAnimator.player.id)">
         <Player :id="playerAnimator.player.id" :animation="{ ...PlayerFloatAnimation, start: playerAnimator.animationStart }"/>

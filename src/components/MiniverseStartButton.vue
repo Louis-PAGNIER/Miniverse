@@ -10,6 +10,7 @@ import {
 } from "@/api/miniverse";
 import MessagePopup from "@/components/popups/MessagePopup.vue";
 import { Miniverse } from "@/models/miniverse";
+import {sleep} from "@/composables/time";
 
 const props = defineProps<{ miniverse: Miniverse }>();
 
@@ -65,7 +66,8 @@ const secondaryActions = computed<ActionItem[]>(() => [
 async function deleteMiniverse() {
   showDeletePopup.value = false;
   await apiDeleteMiniverse(props.miniverse.id);
-  router.push("/");
+  await sleep(1000);
+  await router.replace('/');
 }
 </script>
 

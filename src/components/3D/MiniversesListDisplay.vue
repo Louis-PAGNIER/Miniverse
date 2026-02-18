@@ -9,10 +9,14 @@ import {MiniverseAnimatorManager} from "@/composables/useMiniverseGrid";
 import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
 import {Group, Vector3} from "three";
 import {RouteLocation, Router} from "vue-router";
+import {sleep} from "@/composables/time";
 
 /* -------------------- Constants -------------------- */
 const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
 const CAMERA_FOV: number = 30;
+
+/* -------------------- Stores -------------------- */
+const miniverseStore = useMiniverseStore();
 
 /* -------------------- State -------------------- */
 const cameraRef = ref();
@@ -30,8 +34,34 @@ const miniverseAnimatorsArray = computed(() =>
     Array.from(miniverseStore.miniverseAnimators.values())
 );
 
-/* -------------------- Stores -------------------- */
-const miniverseStore = useMiniverseStore();
+const miniverseViewRefs: Ref<Map<string, any>> = shallowRef(new Map());
+const explodingMiniverses = ref<any[]>([]);
+
+watch(miniverseAnimatorsArray, async (newList, oldList) => {
+  const removed = oldList.filter(oldItem =>
+      !newList.find(newItem => newItem.miniverse.id === oldItem.miniverse.id)
+  );
+
+  if (removed.length > 0) {
+    explodingMiniverses.value.push(...removed);
+
+    for (const item of removed) {
+      const view = miniverseViewRefs.value.get(item.miniverse.id);
+      if (view && view.explode) {
+        await view.explode(2.5);
+      }
+
+      explodingMiniverses.value = explodingMiniverses.value.filter(
+          i => i.miniverse.id !== item.miniverse.id
+      );
+    }
+  }
+}, { deep: true });
+
+const visibleMiniverses = computed(() => [
+  ...miniverseAnimatorsArray.value,
+  ...explodingMiniverses.value
+]);
 
 /* -------------------- Lifecycle Hooks -------------------- */
 onMounted(async () => {
@@ -101,7 +131,7 @@ defineExpose({
   manager: miniverseAnimatorManager
 })
 
-const setMiniversesRef = (el: any | null, id: string) => {
+const setMiniversesGroupRef = (el: any | null, id: string) => {
   if (el) {
     miniversesRefs.value.set(id, el)
   } else {
@@ -109,6 +139,13 @@ const setMiniversesRef = (el: any | null, id: string) => {
   }
 };
 
+const setMiniverseViewRef = (el: any | null, id: string) => {
+  if (el) {
+    miniverseViewRefs.value.set(id, el);
+  } else {
+    miniverseViewRefs.value.delete(id);
+  }
+};
 </script>
 
 <template>
@@ -116,14 +153,15 @@ const setMiniversesRef = (el: any | null, id: string) => {
   <Stars :size="0.1" :radius="20"/>
 
   <TresGroup>
-    <template v-for="miniverseAnimator in miniverseAnimatorsArray" :key="miniverseAnimator.miniverse.id">
-      <TresGroup :ref="el => setMiniversesRef(el, miniverseAnimator.miniverse.id)">
+    <template v-for="miniverseAnimator in visibleMiniverses" :key="miniverseAnimator.miniverse.id">
+      <TresGroup :ref="el => setMiniversesGroupRef(el, miniverseAnimator.miniverse.id)">
         <MiniverseView v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id"
+                       :ref="el => setMiniverseViewRef(el, miniverseAnimator.miniverse.id)"
                        @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
                        @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"
                        @pointer-leave="miniverseAnimatorManager.handleMouseLeave(miniverseAnimator)"
                        :miniverse="miniverseAnimator.miniverse" />
-        <Html v-if="!focusedMiniverse" transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
+        <Html v-if="!focusedMiniverse && miniverseStore.miniverseAnimators.has(miniverseAnimator.miniverse.id)" transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
         <div class="miniverse-name-wrapper">
           <h1 class="miniverse-name">
             {{ miniverseAnimator.miniverse.name }}
