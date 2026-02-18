@@ -51,7 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  z-index: 1000000000;
+  z-index: 9000000000;
 }
 
 </style>

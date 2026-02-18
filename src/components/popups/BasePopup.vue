@@ -78,7 +78,7 @@ onClickOutside(popupRef, () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99437346;
+  z-index: 5000000000;
 }
 
 .popup {

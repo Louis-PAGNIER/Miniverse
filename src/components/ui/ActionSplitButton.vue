@@ -150,7 +150,6 @@ onUnmounted(() => {
       display: flex;
       flex-direction: column;
       min-width: 135px;
-      z-index: 10;
       overflow: hidden;
 
       button {

@@ -157,7 +157,7 @@ function selectOption(opt: string) {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  z-index: 10;
+  z-index: 2;
 }
 
 .search-input {

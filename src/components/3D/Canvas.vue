@@ -119,7 +119,7 @@ provide('miniverse', focusedMiniverse);
   height: 100%;
   cursor: auto;
   pointer-events: none;
-  z-index: 999999999;
+  z-index: 1000000000;
 }
 
 .main-overlay-wrapper {

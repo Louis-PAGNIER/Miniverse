@@ -95,7 +95,7 @@ onUnmounted(() => {
   min-width: 160px;
   box-shadow: 0 8px 20px rgba(0,0,0,.35);
   padding: 6px 0;
-  z-index: 10000;
+  z-index: 7000000000;
 }
 
 .item {
