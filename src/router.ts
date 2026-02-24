@@ -21,6 +21,7 @@ import GalleryModSheetPage from "@/pages/sheet-pages/ModSheetPage/GalleryModShee
 import {createRouter, createWebHistory} from "vue-router";
 import AccountRequest from "@/pages/AccountRequest.vue";
 import PermissionsSheetPage from "@/pages/sheet-pages/PermissionsSheetPage.vue";
+import InfoSheetPage from "@/pages/sheet-pages/InfoSheetPage.vue";
 
 export const mainRoutes = [
   {
@@ -129,6 +130,11 @@ export const mainRoutes = [
         path: 'permissions',
         name: 'Permissions',
         component: PermissionsSheetPage
+      },
+      {
+        path: 'info',
+        name: 'Info',
+        component: InfoSheetPage
       }
     ]
   },
@@ -174,6 +180,7 @@ export const sheetPagesRoutes = {
   console: {name: "Console"},
   files: {name: "Files"},
   permissions: {name: "Permissions"},
+  info: {name: "Info"},
 };
 
 export const router = createRouter({

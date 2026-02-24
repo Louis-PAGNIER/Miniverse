@@ -29,13 +29,33 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
   <MiniverseStartButton :miniverse="miniverse"/>
 
   <div class="summary">
-    <MiniverseSheetTile icon="version.png" label="MC Version" @click="$router.push(`/miniverse/${miniverse.id}/version`)">{{ miniverse.mc_version }}</MiniverseSheetTile>
-    <MiniverseSheetTile icon="player-head.png" label="Players" @click="$router.push(`/miniverse/${miniverse.id}/players`)">{{ numberOfPlayers }}/20</MiniverseSheetTile>
-    <MiniverseSheetTile icon="console.png" label="$sh" @click="$router.push(`/miniverse/${miniverse.id}/console`)">Console</MiniverseSheetTile>
-    <MiniverseSheetTile :icon="loaderIcon" label="Loader">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
-    <MiniverseSheetTile icon="bookshelf.png" label="World data" @click="$router.push(`/miniverse/${miniverse.id}/files`)">Files</MiniverseSheetTile>
-    <MiniverseSheetTile v-if="supportMods" icon="mods.png" label="Mods" @click="$router.push(`/miniverse/${miniverse.id}/mods`)">{{ miniverse.mods.length }}</MiniverseSheetTile>
-    <MiniverseSheetTile icon="permissions.png" label="Manage" @click="$router.push(`/miniverse/${miniverse.id}/permissions`)">Permissions</MiniverseSheetTile>
+    <router-link :to="`/miniverse/${miniverse.id}/info`">
+      <MiniverseSheetTile :icon="loaderIcon" label="Info">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
+    </router-link>
+
+    <router-link :to="`/miniverse/${miniverse.id}/version`">
+      <MiniverseSheetTile icon="version.png" label="MC Version">{{ miniverse.mc_version }}</MiniverseSheetTile>
+    </router-link>
+
+    <router-link :to="`/miniverse/${miniverse.id}/players`">
+      <MiniverseSheetTile icon="player-head.png" label="Players">{{ numberOfPlayers }}/20</MiniverseSheetTile>
+    </router-link>
+
+    <router-link :to="`/miniverse/${miniverse.id}/console`">
+      <MiniverseSheetTile icon="console.png" label="$sh">Console</MiniverseSheetTile>
+    </router-link>
+
+    <router-link :to="`/miniverse/${miniverse.id}/files`">
+      <MiniverseSheetTile icon="bookshelf.png" label="World data">Files</MiniverseSheetTile>
+    </router-link>
+
+    <router-link :to="`/miniverse/${miniverse.id}/mods`" v-if="supportMods">
+      <MiniverseSheetTile icon="mods.png" label="Mods">{{ miniverse.mods.length }}</MiniverseSheetTile>
+    </router-link>
+
+    <router-link :to="`/miniverse/${miniverse.id}/permissions`">
+      <MiniverseSheetTile icon="permissions.png" label="Manage">Permissions</MiniverseSheetTile>
+    </router-link>
   </div>
 </template>
 
@@ -46,5 +66,9 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
   width: 100%;
   padding: 16px 0;
   gap: var(--cell-gap);
+}
+
+a {
+  text-decoration: none;
 }
 </style>

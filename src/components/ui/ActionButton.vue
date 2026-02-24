@@ -33,6 +33,7 @@ const icons = import.meta.glob('@/assets/icons/*', { eager: true, import: 'defau
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
+  margin: 4px 0;
 
   &.disabled {
     opacity: 0.6;

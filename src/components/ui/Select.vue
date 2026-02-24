@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, onUnmounted, ref} from "vue";
-import {onClickOutside} from "@vueuse/core";
+import {computed, nextTick, ref} from "vue";
 
 const props = withDefaults(defineProps<{
   options: string[];

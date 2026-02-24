@@ -12,6 +12,7 @@ import MessagePopup from "@/components/popups/MessagePopup.vue";
 import {apiUpdateMiniverseMCVersion} from "@/api/miniverse";
 import {useAuthStore} from "@/stores/authStore";
 import {useToastStore} from "@/stores/toastStore";
+import Divider from "@/components/ui/Divider.vue";
 
 const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 
@@ -54,9 +55,16 @@ async function updateServer() {
     <Select v-model="selectedVersion" :options="options" :disabled="!authStore.isAdmin"></Select>
     <Checkbox v-model="showSnapshots" label="Show snapshot versions" :disabled="!authStore.isAdmin"></Checkbox>
 
-    <ActionButton @click="showUpdateServerPopup" v-if="miniverse.mc_version !== selectedVersion" width="100px" :disabled="isUpdating" severity="warning" icon="download.svg">
-      Update
-    </ActionButton>
+    <div v-if="miniverse.mc_version !== selectedVersion">
+      <Divider></Divider>
+      <ActionButton @click="showUpdateServerPopup"
+                    width="100px"
+                    :disabled="isUpdating"
+                    severity="success"
+                    icon="download.svg">
+        Update
+      </ActionButton>
+    </div>
 
     <MessagePopup v-model="showPopup"
                   title="Update Miniverse ?"
@@ -70,5 +78,7 @@ async function updateServer() {
 .version-sheet-page {
   display: flex;
   flex-direction: column;
+  width: min-content;
+  max-width: 100%;
 }
 </style>
