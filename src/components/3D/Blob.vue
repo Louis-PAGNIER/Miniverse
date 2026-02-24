@@ -124,7 +124,7 @@ defineExpose({ explode });
 <template>
   <TresGroup>
     <TresMesh :renderOrder="1" ref="blobRef">
-      <TresSphereGeometry :args="[4, 28, 28]" />
+      <TresIcosahedronGeometry :args="[4, 6]" />
       <TresShaderMaterial
           :depthWrite="false"
           :vertexShader="vertexShader"
