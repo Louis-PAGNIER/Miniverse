@@ -28,6 +28,8 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
 <template>
   <MiniverseStartButton :miniverse="miniverse"/>
 
+  <p class="miniverse-description">{{ miniverse.description }}</p>
+
   <div class="summary">
     <router-link :to="`/miniverse/${miniverse.id}/info`">
       <MiniverseSheetTile :icon="loaderIcon" :label="miniverse.mc_version">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
@@ -60,8 +62,16 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  padding: 16px 0;
+  padding: 0;
   gap: var(--cell-gap);
+}
+
+.miniverse-description {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: var(--color-secondary);
+  line-height: 1em;
+  max-width: 600px;
 }
 
 a {

@@ -1,16 +1,29 @@
 <script setup lang="ts">
-
+defineProps<{
+  vertical?: boolean
+}>();
 </script>
 
 <template>
-  <hr>
+  <div class="divider" :class="{ 'is-vertical': vertical }"></div>
 </template>
 
 <style scoped>
-hr {
+.divider {
+  background-color: var(--color-border);
+  border: none;
+}
+
+.divider:not(.is-vertical) {
   width: 100%;
-  border: 0;
-  border-top: 1px solid var(--color-border);
-  margin: 10px 0;
+  height: 1px;
+  margin: 20px 0;
+}
+
+.divider.is-vertical {
+  width: 1px;
+  height: auto;
+  align-self: stretch;
+  margin: 0 20px;
 }
 </style>

@@ -146,7 +146,7 @@ onUnmounted(() => {
       right: 0;
       background: var(--color-background-secondary);
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
       min-width: 135px;

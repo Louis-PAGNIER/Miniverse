@@ -13,6 +13,7 @@ const props = withDefaults(defineProps<{
 const selected = defineModel<string>({ default: '' });
 
 const isOpen = ref(false);
+const isUp = ref(false);
 const search = ref("");
 
 const dropdownRef = ref<HTMLElement | null>(null);
@@ -26,7 +27,18 @@ const filteredOptions = computed(() =>
 );
 
 function toggleIsOpen() {
+  if (props.disabled) return;
+
+  if (!isOpen.value) {
+    const rect = dropdownRef.value?.getBoundingClientRect();
+    if (rect) {
+      const spaceBelow = window.innerHeight - rect.bottom;
+      isUp.value = spaceBelow < 260;
+    }
+  }
+
   isOpen.value = !isOpen.value;
+
   if (isOpen.value) {
     nextTick(() => {
       searchInput.value?.focus();
@@ -64,7 +76,7 @@ function selectOption(opt: string) {
       <span class="arrow" :class="{ open: isOpen }">▼</span>
     </div>
 
-    <div v-if="isOpen" class="dropdown">
+    <div v-if="isOpen" class="dropdown" :class="{ 'is-up': isUp }">
       <input v-if="allowSearch"
              ref="searchInput"
              type="text"
@@ -148,15 +160,23 @@ function selectOption(opt: string) {
 
 .dropdown {
   position: absolute;
-  top: 45px;
+  top: calc(100% + 5px);
   left: 0;
   right: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background-secondary);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 0 45px rgba(0,0,0,0.95);
   z-index: 2;
+}
+
+.dropdown.is-up {
+  top: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  bottom: calc(100% + 5px);
+  box-shadow: 0 0 45px rgba(0,0,0,0.95);
 }
 
 .search-input {
@@ -168,6 +188,11 @@ function selectOption(opt: string) {
   background: var(--color-background-primary);
   color: var(--color-primary);
   font-size: 0.9em;
+}
+
+.dropdown.is-up .search-input {
+  border-bottom: none;
+  border-top: 1px solid var(--color-border);
 }
 
 .options-list {

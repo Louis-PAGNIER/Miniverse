@@ -9,7 +9,7 @@ const miniverse = inject<Miniverse>('miniverse')!;
 </script>
 
 <template>
-  <div class="presentation">
+  <div id="sheets-container" class="presentation">
     <h1 class="title">{{ miniverse.name }}</h1>
     <div class="content">
       <Navigator
@@ -23,6 +23,7 @@ const miniverse = inject<Miniverse>('miniverse')!;
 
 <style scoped>
 .presentation {
+  position: relative;
   width: calc(100% - 40px);
   min-height: calc(50vh - 40px);
   max-width: 1400px;
