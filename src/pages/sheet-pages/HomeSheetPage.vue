@@ -30,11 +30,7 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
 
   <div class="summary">
     <router-link :to="`/miniverse/${miniverse.id}/info`">
-      <MiniverseSheetTile :icon="loaderIcon" label="Info">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
-    </router-link>
-
-    <router-link :to="`/miniverse/${miniverse.id}/version`">
-      <MiniverseSheetTile icon="version.png" label="MC Version">{{ miniverse.mc_version }}</MiniverseSheetTile>
+      <MiniverseSheetTile :icon="loaderIcon" :label="miniverse.mc_version">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
     </router-link>
 
     <router-link :to="`/miniverse/${miniverse.id}/players`">

@@ -29,21 +29,21 @@ export async function apiCreateMiniverse(
 }
 
 export async function apiStartMiniverse(miniverseId: string): Promise<void> {
-  await apiClient.post(`/miniverses/${miniverseId}/start/`);
+  await apiClient.put(`/miniverses/${miniverseId}/start/`);
 }
 
 export async function apiStopMiniverse(miniverseId: string): Promise<void> {
-  await apiClient.post(`/miniverses/${miniverseId}/stop/`);
+  await apiClient.put(`/miniverses/${miniverseId}/stop/`);
 }
 
 export async function apiRestartMiniverse(miniverseId: string): Promise<void> {
-  await apiClient.post(`/miniverses/${miniverseId}/restart/`);
+  await apiClient.put(`/miniverses/${miniverseId}/restart/`);
 }
 
-export async function apiUpdateMiniverseMCVersion(miniverseId: string, mcVersion: string): Promise<void> {
-  await apiClient.post(`/miniverses/${miniverseId}/update_mc_version`, {
-    mc_version: mcVersion,
-  });
+export async function apiUpdateMiniverseInfo(miniverseId: string, name?: string, subdomain?: string, mc_version?: string): Promise<void> {
+  const payload = { name, subdomain, mc_version };
+  const cleanedPayload = Object.fromEntries(Object.entries(payload).filter(([_, value]) => value !== undefined));
+  await apiClient.put(`/miniverses/${miniverseId}`, cleanedPayload);
 }
 
 export async function apiDeleteMiniverse(miniverseId: string): Promise<void> {

@@ -1,7 +1,6 @@
 import Canvas from "@/components/3D/Canvas.vue";
 import HomeSheetPage from "@/pages/sheet-pages/HomeSheetPage.vue";
 import PlayersSheetPage from "@/pages/sheet-pages/PlayersSheetPage/PlayersSheetPage.vue";
-import VersionSheetPage from "@/pages/sheet-pages/VersionSheetPage.vue";
 import ModsSheetPage from "@/pages/sheet-pages/ModsSheetPage/ModsSheetPage.vue";
 import ConsoleSheetPage from "@/pages/sheet-pages/ConsoleSheetPage.vue";
 import ModSheetPage from "@/pages/sheet-pages/ModSheetPage/ModSheetPage.vue";
@@ -44,9 +43,9 @@ export const mainRoutes = [
         component: HomeSheetPage
       },
       {
-        path: 'version',
-        name: 'VersionSheetPage',
-        component: VersionSheetPage
+        path: 'info',
+        name: 'Info',
+        component: InfoSheetPage
       },
       {
         path: 'players',
@@ -131,11 +130,6 @@ export const mainRoutes = [
         name: 'Permissions',
         component: PermissionsSheetPage
       },
-      {
-        path: 'info',
-        name: 'Info',
-        component: InfoSheetPage
-      }
     ]
   },
   {
