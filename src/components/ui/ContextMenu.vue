@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted, onUnmounted, computed} from 'vue'
+import {ref, onMounted, onUnmounted, computed, nextTick} from 'vue'
 
 export interface ContextMenuItem {
   label: string
@@ -15,12 +15,32 @@ const props = defineProps<{
 const visible = ref(false)
 const x = ref(0)
 const y = ref(0)
+const menuRef = ref<HTMLElement | null>(null)
 
-function open(event: MouseEvent) {
+async function open(event: MouseEvent) {
   event.preventDefault()
-  x.value = event.clientX
-  y.value = event.clientY
   visible.value = true
+
+  await nextTick()
+
+  if (menuRef.value) {
+    const menuWidth = menuRef.value.offsetWidth
+    const menuHeight = menuRef.value.offsetHeight
+    const screenWidth = window.innerWidth
+    const screenHeight = window.innerHeight
+
+    if (event.clientX + menuWidth > screenWidth) {
+      x.value = event.clientX - menuWidth
+    } else {
+      x.value = event.clientX
+    }
+
+    if (event.clientY + menuHeight > screenHeight) {
+      y.value = event.clientY - menuHeight
+    } else {
+      y.value = event.clientY
+    }
+  }
 }
 
 function close() {
@@ -70,6 +90,7 @@ onUnmounted(() => {
   <teleport to="body">
     <div
         v-if="visible"
+        ref="menuRef"
         class="context-menu"
         :style="{ top: `${y}px`, left: `${x}px` }"
     >
