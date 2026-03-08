@@ -4,7 +4,7 @@ import {faArchive, faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@forta
 import Input from "@/components/ui/Input.vue";
 import {computed, onMounted, onUnmounted, Ref, ref, watch} from "vue";
 import Table, {Column} from "@/components/ui/Table.vue";
-import {formatFileSize, timeAgo} from "@/composables/format";
+import {formatFileSize, timeAgo, timeLocal} from "@/composables/format";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faFile, faFileCode, faFileLines, faFileZipper, faFolder} from "@fortawesome/free-regular-svg-icons";
 import {faJava, faPython} from "@fortawesome/free-brands-svg-icons";
@@ -188,21 +188,24 @@ const browserColumns: Column<FileInfo>[] = [
 
   {
     id: "size", name: "Size", class: 'optional3', value: (v: FileInfo) => v.size ? formatFileSize(v.size) : '--',
-    sortable: true, sortValue: (v: FileInfo) => v.size ?? 0
+    sortable: true, sortValue: (v: FileInfo) => v.size ?? 0,
+    tooltip: (v: FileInfo) => v.is_folder ? undefined : (v.size ?? 0).toString() + " bytes"
   },
 
   {
     id: "created", name: "Creation", class: 'optional1',
     sortable: true,
     value: (v: FileInfo) => timeAgo(v.created),
-    sortValue: (v: FileInfo) => v.created
+    sortValue: (v: FileInfo) => v.created,
+    tooltip: (v: FileInfo) => timeLocal(v.created)
   },
 
   {
     id: "updated", name: "Modification", class: 'optional1',
     sortable: true,
     value: (v: FileInfo) => timeAgo(v.updated),
-    sortValue: (v: FileInfo) => v.updated
+    sortValue: (v: FileInfo) => v.updated,
+    tooltip: (v: FileInfo) => timeLocal(v.updated)
   },
 ]
 

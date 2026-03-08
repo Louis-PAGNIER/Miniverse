@@ -10,6 +10,7 @@ export interface Column<T, V = unknown> {
   value?: (row: T) => V
   sortable?: boolean
   sortValue?: (row: T) => any
+  tooltip?: (row: T) => string | undefined;
 }
 
 const props = withDefaults(defineProps<{
@@ -87,7 +88,7 @@ const toggleSort = (col: Column<T>) => {
   emit('update:sort', sortState.value)
 }
 
-const handleSelection = (row: T, index: number, event: MouseEvent) => {
+const handleSelection = (row: T, event: MouseEvent) => {
   if (!props.selectable) return;
 
   const key = props.rowKey(row);
@@ -167,13 +168,17 @@ const handleSelection = (row: T, index: number, event: MouseEvent) => {
         :key="rowKey(row)"
         :class="{ selected: isSelected(row) }"
         @click="(e) => {
-          handleSelection(row, i, e)
+          handleSelection(row, e)
           emit('row-click', row, e)
         }"
         @dblclick="(e) => emit('row-dblclick', row, e)"
         @contextmenu="(e) => emit('row-context-menu', row, e)"
     >
-      <td v-for="col in columns" :key="col.id" :class="col.class" :style="{ width: col.width }">
+      <td v-for="col in columns"
+          :key="col.id"
+          :class="col.class"
+          :style="{ width: col.width }"
+          :title="col.tooltip ? col.tooltip(row) : undefined">
         <slot
             :name="`cell-${col.id}`"
             :value="col.value ? col.value(row) : row"

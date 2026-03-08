@@ -77,6 +77,15 @@ export function timeAgo(
   return "just now";
 }
 
+export function timeLocal(
+  timestamp?: number | string | Date
+): string {
+  if (!timestamp)
+    return '';
+
+  return (new Date(timestamp)).toLocaleString()
+}
+
 export function computeVersionRange(versions: string[]): string {
   if (versions.length === 0) return ""
 
