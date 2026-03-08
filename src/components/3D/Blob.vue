@@ -96,8 +96,6 @@ const explode = (duration: number = 2.5): Promise<void> => {
 
       const progress = Math.min(elapsed / duration, 1);
 
-      console.log("progress", progress)
-
       uniforms.uExplosion.value = interpolate(0, 0.4, progress, InterpolationType.EASE_OUT);
 
       if (progress >= 1) {
