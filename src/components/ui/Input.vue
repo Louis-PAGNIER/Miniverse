@@ -34,7 +34,6 @@ defineExpose({
         ref="inputRef"
         type="text"
         v-model="value"
-        @input="emit('update:modelValue', value)"
         :placeholder="placeholder || 'Enter text...'"
         :disabled="disabled"
         class="input-field"
