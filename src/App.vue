@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import {useAuthStore} from "@/stores/authStore";
-import {useMiniverseStore} from "@/stores/miniverseStore";
 import ToastContainer from "@/components/ToastContainer.vue";
 import UploadContainer from "@/components/UploadContainer.vue";
+import {initWebsocketService} from "@/services/websocket";
 
 const auth = useAuthStore();
-const miniverseStore = useMiniverseStore();
 
 auth.initialize().then(() => {
-  miniverseStore.fetchAll();
-  miniverseStore.connectWebSocket();
+  initWebsocketService()
 });
+
+
 </script>
 
 <template>

@@ -14,9 +14,13 @@ apiClient.interceptors.response.use(
   (error) => {
     const toastStore = useToastStore();
 
-    const message = error.response?.data?.detail ||
+    let message = error.response?.data?.detail ||
       error.response?.data?.message ||
       "An request error occured";
+
+    if (error.status >= 502) {
+      message = "Server is currently unavailable, try again later.  ";
+    }
 
     if (error.status === 403 && error.response?.data?.detail === "Inactive user") {
       router.replace("/request");

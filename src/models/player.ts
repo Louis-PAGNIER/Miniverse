@@ -14,14 +14,14 @@ export interface MSMPPlayerBan {
   player: MSMPPlayer
 }
 
-export interface Player {
-  id: string;
-  name: string;
-  is_operator: boolean;
+export interface MSMPOperator {
+  player: MSMPPlayer;
+  permissionLevel: number;
+  bypassesPlayerLimit: number;
 }
 
 export class PlayerAnimator {
-  player: Player;
+  player: MSMPPlayer;
 
   centerPositionAnimator: Vector3Animator;
   positionFrequency: number;
@@ -34,7 +34,7 @@ export class PlayerAnimator {
 
   animationStart: number;
 
-  constructor(player: Player) {
+  constructor(player: MSMPPlayer) {
     this.player = reactive(player);
 
     this.centerPositionAnimator = markRaw(new Vector3Animator());
