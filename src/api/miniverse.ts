@@ -40,8 +40,8 @@ export async function apiRestartMiniverse(miniverseId: string): Promise<void> {
   await apiClient.put(`/miniverses/${miniverseId}/restart/`);
 }
 
-export async function apiUpdateMiniverseInfo(miniverseId: string, name?: string, description?: string, subdomain?: string, mc_version?: string): Promise<void> {
-  const payload = {name, description, subdomain, mc_version};
+export async function apiUpdateMiniverseInfo(miniverseId: string, name?: string, description?: string, subdomain?: string, mc_version?: string, allow_bedrock?: boolean): Promise<void> {
+  const payload = {name, description, subdomain, mc_version, allow_bedrock};
   const cleanedPayload = Object.fromEntries(Object.entries(payload).filter(([_, value]) => value !== undefined));
   await apiClient.put(`/miniverses/${miniverseId}`, cleanedPayload);
 }

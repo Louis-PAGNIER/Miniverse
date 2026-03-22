@@ -28,6 +28,7 @@ const newDescription = ref<string>('');
 const newSubdomain = ref<string>('');
 const newGameVersion = ref<string>('');
 const showSnapshots = ref(false);
+const newAllowBedrock = ref(false);
 const versions = ref<MinecraftVersion[]>([]);
 const isUpdating = ref(false);
 const showConfirmPopup = ref(false);
@@ -41,7 +42,8 @@ const options = computed(() => {
 const hasGeneralInfoChanged = computed(() => {
   return newName.value !== miniverse.value.name ||
       newSubdomain.value !== miniverse.value.subdomain ||
-      newDescription.value !== miniverse.value.description
+      newDescription.value !== miniverse.value.description ||
+      newAllowBedrock.value !== miniverse.value.allow_bedrock;
 })
 
 const hasVersionChanged = computed(() => {
@@ -58,6 +60,7 @@ onMounted(async () => {
   newSubdomain.value = miniverse.value.subdomain;
   newGameVersion.value = miniverse.value.mc_version;
   showSnapshots.value = !isReleaseVersion(miniverse.value.mc_version);
+  newAllowBedrock.value = miniverse.value.allow_bedrock;
 
   versions.value = await apiGetMinecraftVersions(miniverse.value.mc_version);
 });
@@ -75,7 +78,7 @@ async function submitChanges() {
   isUpdating.value = true;
 
   try {
-    await apiUpdateMiniverseInfo(miniverse.value.id, newName.value, newDescription.value, newSubdomain.value, newGameVersion.value);
+    await apiUpdateMiniverseInfo(miniverse.value.id, newName.value, newDescription.value, newSubdomain.value, newGameVersion.value, newAllowBedrock.value);
     toastStore.addToast('Configuration updated', 'Miniverse configuration successfully updated.');
   } finally {
     isUpdating.value = false;
@@ -111,6 +114,13 @@ async function submitChanges() {
 
         <h4>Description</h4>
         <TextArea style="width: 100%;" v-model="newDescription" placeholder="Description..."></TextArea>
+
+        <h4>Bedrock</h4>
+        <Checkbox
+            v-if="authStore.isAdmin && !miniverse.is_on_lite_proxy"
+            v-model="newAllowBedrock"
+            label="Allow bedrock players"
+        />
       </section>
 
       <Divider class="section-divider"/>

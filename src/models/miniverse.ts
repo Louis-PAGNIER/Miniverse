@@ -12,6 +12,7 @@ export interface Miniverse {
   subdomain: string;
   is_on_lite_proxy: boolean;
   started: boolean;
+  allow_bedrock: boolean;
 
   users_roles: MiniverseUserRole[];
   mods: Mod[];
