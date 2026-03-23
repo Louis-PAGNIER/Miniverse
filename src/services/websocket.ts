@@ -73,6 +73,10 @@ const handleSync = async (data: SyncEvent) => {
   const playersMap = new Map<string, MSMPPlayer[]>(mapped_players);
 
   store.setMiniversePlayers(playersMap);
+
+  for (const el of data.data) {
+    store.miniverseBannedPlayersLists.set(el.miniverse.id, el.banned_players);
+  }
 };
 
 const handleMiniverseChanges = async (_: any) => {
@@ -85,9 +89,15 @@ const handleMiniversePlayersChange = async (data: any) => {
   store.setMiniversePlayers(new Map<string, MSMPPlayer[]>([[data.miniverse_id, data.data]]));
 }
 
+const handleMiniverseBannedPlayersChange = async (data: any) => {
+  const store = useMiniverseStore();
+  store.miniverseBannedPlayersLists.set(data.miniverse_id, data.data);
+}
+
 handlers.set("sync", handleSync);
 handlers.set("miniverse:created", handleMiniverseChanges);
 handlers.set("miniverse:deleted", handleMiniverseChanges);
 handlers.set("miniverse:updated", handleMiniverseChanges);
 
 handlers.set("minecraft:players", handleMiniversePlayersChange);
+handlers.set("minecraft:bans", handleMiniverseBannedPlayersChange);
