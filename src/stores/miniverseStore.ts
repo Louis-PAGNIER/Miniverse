@@ -2,8 +2,6 @@ import {defineStore} from "pinia";
 import {reactive, ref} from "vue";
 import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
 import {MSMPPlayer, MSMPPlayerBan, PlayerAnimator} from "@/models/player";
-import {apiGetMiniverses} from "@/api/miniverse";
-import {handlers} from "@/services/websocket";
 
 type MiniverseAnimatorsMap = Map<string, MiniverseAnimator>
 type MiniversePlayersMap = Map<string, PlayerAnimator[]>
@@ -22,36 +20,36 @@ export const useMiniverseStore = defineStore('miniverse', () => {
   }
 
   const setMiniverses = (newMiniverses: Miniverse[]) => {
-      const newById = new Map(newMiniverses.map(m => [m.id, m]));
+    const newById = new Map(newMiniverses.map(m => [m.id, m]));
 
-      // Update or delete
-      let i = 0;
-      while (i < miniverses.value.length) {
-        const existing = miniverses.value[i];
-        const incoming = newById.get(existing.id);
-        if (incoming) {
-          Object.assign(existing, incoming); // update in-place
-          newById.delete(existing.id); // Mark as processed
-          if (!incoming.started) {
-            miniversePlayersLists.set(existing.id, []); // Clear players if miniverse is stopped
-          }
-          i++
-        } else {
-          miniverses.value.splice(i, 1); // remove if not in new data
-          miniverseAnimators.delete(existing.id);
-          miniversePlayersLists.delete(existing.id);
+    // Update or delete
+    let i = 0;
+    while (i < miniverses.value.length) {
+      const existing = miniverses.value[i];
+      const incoming = newById.get(existing.id);
+      if (incoming) {
+        Object.assign(existing, incoming); // update in-place
+        newById.delete(existing.id); // Mark as processed
+        if (!incoming.started) {
+          miniversePlayersLists.set(existing.id, []); // Clear players if miniverse is stopped
         }
+        i++
+      } else {
+        miniverses.value.splice(i, 1); // remove if not in new data
+        miniverseAnimators.delete(existing.id);
+        miniversePlayersLists.delete(existing.id);
       }
+    }
 
-      // Add new ones
-      for (const m of newById.values()) {
-        const animator = new MiniverseAnimator(m);
-        miniverses.value.push(m);
-        miniverseAnimators.set(m.id, animator);
-        miniversePlayersLists.set(m.id, []);
-      }
+    // Add new ones
+    for (const m of newById.values()) {
+      const animator = new MiniverseAnimator(m);
+      miniverses.value.push(m);
+      miniverseAnimators.set(m.id, animator);
+      miniversePlayersLists.set(m.id, []);
+    }
 
-      miniverses.value = [...miniverses.value]
+    miniverses.value = [...miniverses.value]
   }
 
   const setMiniversePlayers = (newMiniversePlayersLists: Map<string, MSMPPlayer[]>) => {
@@ -65,18 +63,20 @@ export const useMiniverseStore = defineStore('miniverse', () => {
       // We build a new array of animators for reactivity
       const updatedAnimators: PlayerAnimator[] = [];
 
-      for (const newPlayer of newPlayers) {
-        const existingAnimator = existingAnimators.find(
-          pa => pa.player.id === newPlayer.id
-        );
+      if (newPlayers) {
+        for (const newPlayer of newPlayers) {
+          const existingAnimator = existingAnimators.find(
+            pa => pa.player.id === newPlayer.id
+          );
 
-        if (existingAnimator) {
-          // We keep the existing animator but update the player data
-          existingAnimator.player = reactive(newPlayer);
-          updatedAnimators.push(existingAnimator);
-        } else {
-          // If the player is new, we create a new animator
-          updatedAnimators.push(new PlayerAnimator(newPlayer));
+          if (existingAnimator) {
+            // We keep the existing animator but update the player data
+            existingAnimator.player = reactive(newPlayer);
+            updatedAnimators.push(existingAnimator);
+          } else {
+            // If the player is new, we create a new animator
+            updatedAnimators.push(new PlayerAnimator(newPlayer));
+          }
         }
       }
 
