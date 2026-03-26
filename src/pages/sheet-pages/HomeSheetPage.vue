@@ -1,28 +1,27 @@
 <script setup lang="ts">
-import {computed, ComputedRef, inject} from "vue";
-import { Miniverse } from "@/models/miniverse";
-import { useMiniverseStore } from "@/stores/miniverseStore";
+import {computed} from "vue";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 import MiniverseSheetTile from "@/components/miniverse-sheet/MiniverseSheetTile.vue";
 import MiniverseStartButton from "@/components/MiniverseStartButton.vue";
 import {MiniverseType} from "@/models/enums/miniverseType";
+import {Miniverse} from "@/models/miniverse";
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
 const numberOfPlayers = computed(() =>
-    miniverseStore.miniversePlayersLists.get(miniverse.value.id)?.length || 0
+    miniverseStore.playersMap.get(miniverse.id)?.length || 0
 );
 
 const supportMods = computed(() => {
-  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.value.type);
+  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.type);
 })
 
 function titleCase(str: string): string {
-  console.log("miniverse", miniverse)
   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
 }
 
-const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
+const loaderIcon = computed(() => miniverse.type.toLowerCase() + ".png");
 </script>
 
 <template>
@@ -32,7 +31,10 @@ const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
 
   <div class="summary">
     <router-link :to="`/miniverse/${miniverse.id}/info`">
-      <MiniverseSheetTile :icon="loaderIcon" :label="miniverse.mc_version">{{ titleCase(miniverse.type) }}</MiniverseSheetTile>
+      <MiniverseSheetTile :icon="loaderIcon" :label="miniverse.mc_version">{{
+          titleCase(miniverse.type)
+        }}
+      </MiniverseSheetTile>
     </router-link>
 
     <router-link :to="`/miniverse/${miniverse.id}/players`">

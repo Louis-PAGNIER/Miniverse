@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ComputedRef, inject, onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {MinecraftVersion} from "@/models/minecraftVersion";
 import {MinecraftVersionType} from "@/models/enums/minecraftVersionType";
@@ -18,10 +18,12 @@ import {apiUpdateMiniverseInfo} from "@/api/miniverse";
 import TextArea from "@/components/ui/TextArea.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {faSave} from "@fortawesome/free-solid-svg-icons";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
 const authStore = useAuthStore();
 const toastStore = useToastStore();
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
 const newName = ref<string>('');
 const newDescription = ref<string>('');
@@ -40,44 +42,45 @@ const options = computed(() => {
       .map(v => v.version);
 });
 
-const java_options = computed(() => {
+const javaOptions = computed(() => {
   return ["java25", "java21", "java17", "java11", "java8"]
 //   TODO : ask versions to backend
 })
 
 const hasGeneralInfoChanged = computed(() => {
-  return newName.value !== miniverse.value.name ||
-      newSubdomain.value !== miniverse.value.subdomain ||
-      newDescription.value !== miniverse.value.description ||
-      newAllowBedrock.value !== miniverse.value.allow_bedrock;
+  return newName.value !== miniverse.name ||
+      newSubdomain.value !== miniverse.subdomain ||
+      newDescription.value !== miniverse.description ||
+      newAllowBedrock.value !== miniverse.allow_bedrock;
 })
 
-const hasMCVersionChanged = computed(() => {
-  return newGameVersion.value !== miniverse.value.mc_version;
+const hasGameVersionChanged = computed(() => {
+  return newGameVersion.value !== miniverse.mc_version;
 })
 
 const hasJavaVersionChanged = computed(() => {
-  return newGameVersion.value !== miniverse.value.java_version;
+  return newGameVersion.value !== miniverse.java_version;
 })
 
 const hasChanged = computed(() => {
-  return hasGeneralInfoChanged.value || hasMCVersionChanged.value || hasJavaVersionChanged.value;
+  return hasGeneralInfoChanged.value || hasGameVersionChanged.value || hasJavaVersionChanged.value;
 });
 
 onMounted(async () => {
-  newName.value = miniverse.value.name;
-  newDescription.value = miniverse.value.description;
-  newSubdomain.value = miniverse.value.subdomain;
-  newGameVersion.value = miniverse.value.mc_version;
-  newJavaVersion.value = miniverse.value.java_version;
-  showSnapshots.value = !isReleaseVersion(miniverse.value.mc_version);
-  newAllowBedrock.value = miniverse.value.allow_bedrock;
+  newName.value = miniverse.name;
+  newDescription.value = miniverse.description;
+  newSubdomain.value = miniverse.subdomain;
+  newGameVersion.value = miniverse.mc_version;
+  newJavaVersion.value = miniverse.java_version;
+  newJavaVersion.value = miniverse.java_version;
+  showSnapshots.value = !isReleaseVersion(miniverse.mc_version);
+  newAllowBedrock.value = miniverse.allow_bedrock;
 
-  versions.value = await apiGetMinecraftVersions(miniverse.value.mc_version);
+  versions.value = await apiGetMinecraftVersions(miniverse.mc_version);
 });
 
 async function handleSave() {
-  if (newGameVersion.value !== miniverse.value.mc_version) {
+  if (newGameVersion.value !== miniverse.mc_version) {
     showConfirmPopup.value = true;
   } else {
     await submitChanges();
@@ -90,7 +93,7 @@ async function submitChanges() {
 
   try {
     await apiUpdateMiniverseInfo(
-        miniverse.value.id,
+        miniverse.id,
         newName.value,
         newDescription.value,
         newSubdomain.value,
@@ -172,7 +175,7 @@ async function submitChanges() {
         <div class="version-controls">
           <Select
               v-model="newJavaVersion"
-              :options="java_options"
+              :options="javaOptions"
               :disabled="!authStore.isAdmin"
           />
         </div>

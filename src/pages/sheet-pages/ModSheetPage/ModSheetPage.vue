@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {computed, ComputedRef, inject, onMounted, provide, ref, Ref, watch} from "vue";
+import {computed, onMounted, provide, ref, Ref, watch} from "vue";
 import {Miniverse} from "@/models/miniverse";
-import {RouteLocationNormalizedLoadedGeneric, Router, useRoute, useRouter} from "vue-router";
+import {RouteLocationNormalizedLoadedGeneric, useRoute} from "vue-router";
 import {apiGetModDetails, apiGetModVersionDetails, apiGetModVersions} from "@/api/mods";
 import {ModrinthProject, ModrinthProjectVersion} from "@/models/mod";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -11,11 +11,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {faHeart} from "@fortawesome/free-regular-svg-icons";
 import {formatBigNumber} from "@/composables/format";
-
-
 import Chip from "@/components/ui/Chip.vue";
 import Tabs from "@/components/ui/Tabs.vue";
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
+import {useMiniverseStore} from "@/stores/miniverseStore";
+
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
 const route: RouteLocationNormalizedLoadedGeneric = useRoute();
 
@@ -28,7 +29,7 @@ const modAvailableVersions: Ref<ModrinthProjectVersion[]> = ref([]);
 const installedVersionDetails: Ref<ModrinthProjectVersion | null> = ref(null);
 
 const installedMod = computed(() => {
-  return miniverse.value.mods.find(m => m.project_id === modId.value)
+  return miniverse.mods.find(m => m.project_id === modId.value)
 })
 
 provide('modContext', {

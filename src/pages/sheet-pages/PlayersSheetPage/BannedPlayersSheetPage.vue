@@ -4,23 +4,23 @@ import {faFaceKissWinkHeart} from "@fortawesome/free-regular-svg-icons";
 import IconButton from "@/components/ui/IconButton.vue";
 import Table, {Column} from "@/components/ui/Table.vue";
 import FlatPlayerHead from "@/components/FlatPlayerHead.vue";
-import {MSMPPlayerBan, Player} from "@/models/player";
-import {computed, ComputedRef, inject} from "vue";
+import {MSMPPlayer, MSMPPlayerBan} from "@/models/player";
+import {computed, ComputedRef} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import {useToastStore} from "@/stores/toastStore";
 import {apiUnbanPlayer} from "@/api/miniverse";
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
-const miniverseStore = useMiniverseStore();
 const toastStore = useToastStore();
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
 const bannedPlayers: ComputedRef<MSMPPlayerBan[]> = computed(() => {
-  return miniverseStore.miniverseBannedPlayersLists.get(miniverse.value.id) || [];
+  return miniverseStore.miniverseBannedPlayersLists.get(miniverse.id) || [];
 });
 
-async function unbanPlayer(player: Player) {
-  await apiUnbanPlayer(miniverse.value.id, player.id);
+async function unbanPlayer(player: MSMPPlayer) {
+  await apiUnbanPlayer(miniverse.id, player.id);
   toastStore.addToast('Player pardoned', `${player.name} is no longer banned.`, 'success');
 }
 

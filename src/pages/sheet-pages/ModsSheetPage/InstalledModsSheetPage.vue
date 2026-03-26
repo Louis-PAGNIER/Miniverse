@@ -1,17 +1,19 @@
 <script setup lang="ts">
 
 import SearchBar from "@/components/ui/SearchBar.vue";
-import {computed, ComputedRef, inject, onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
 const search = ref("");
 
 const filteredInstalledMods = computed(() => {
   const term = search.value.trim().toLowerCase();
 
-  return [...miniverse.value.mods]
+  return [...miniverse.mods]
       .filter(m => m.title.toLowerCase().includes(term))
       .sort((a, b) => a.title.localeCompare(b.title));
 });

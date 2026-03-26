@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ComputedRef, inject, onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import Table, {Column} from "@/components/ui/Table.vue";
 import {User} from "@/models/user";
@@ -12,15 +12,18 @@ import MessagePopup from "@/components/popups/MessagePopup.vue";
 import {apiListMiniverseUsersRole, apiSetUserRole} from "@/api/miniverse";
 import OverlayButton from "@/components/ui/OverlayButton.vue";
 import InputPopup from "@/components/popups/InputPopup.vue";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const authStore = useAuthStore();
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
 const miniverseUsers = ref<User[]>([]);
 const miniverseRoles = computed<Map<string, Role>>(() => {
   const m = new Map<string, Role>();
-  for (let userRole of miniverse.value.users_roles)
+  console.log(miniverse)
+  for (let userRole of miniverse.users_roles)
     m.set(userRole.user_id, userRole.role)
   return m;
 })
@@ -40,22 +43,22 @@ function confirmRemoveUserFromMiniverse(user: User) {
 }
 
 async function removeUserFromMiniverse(userId: string) {
-  await apiSetUserRole(miniverse.value.id, userId, Role.NONE);
+  await apiSetUserRole(miniverse.id, userId, Role.NONE);
   await refreshMiniverseUsers();
 }
 
 async function setMiniverseUserRole(userId: string, role: Role) {
-  await apiSetUserRole(miniverse.value.id, userId, role);
+  await apiSetUserRole(miniverse.id, userId, role);
   await refreshMiniverseUsers();
 }
 
 async function addUser(username: string) {
-  await apiSetUserRole(miniverse.value.id, username, Role.USER);
+  await apiSetUserRole(miniverse.id, username, Role.USER);
   await refreshMiniverseUsers();
 }
 
 async function refreshMiniverseUsers() {
-  miniverseUsers.value = await apiListMiniverseUsersRole(miniverse.value.id);
+  miniverseUsers.value = await apiListMiniverseUsersRole(miniverse.id);
 }
 
 const addedUsersColumns: Column<User>[] = [

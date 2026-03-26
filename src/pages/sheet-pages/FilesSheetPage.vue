@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import {ComputedRef, inject} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import FileBrowser from "@/components/ui/FileBrowser.vue";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 </script>
 
 <template>

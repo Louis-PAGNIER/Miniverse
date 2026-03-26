@@ -11,59 +11,53 @@ import {faUser} from "@fortawesome/free-regular-svg-icons";
 import Settings from "@/pages/Settings.vue";
 import Logo from "@/components/Logo.vue";
 import {useAuthStore} from "@/stores/authStore";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const router = useRouter();
 const route = useRoute();
 
 const authStore = useAuthStore();
+const store = useMiniverseStore();
 
-const systemRef: ShallowRef = shallowRef(null);
-const focusedMiniverse = computed(() => systemRef.value?.focusedMiniverse?.miniverse);
 const showAddMiniversePopup = ref<boolean>(false);
 
+watch(() => route.params.miniverse_id, (id) => {
+  store.setFocus(id as string || null);
+}, { immediate: true });
+
+const isSettings = computed(() => route.path.includes('/settings'));
+const currentMode = computed(() => {
+  if (isSettings.value) return 'settings';
+  if (store.focusedMiniverseId) return 'focus';
+  return 'home';
+});
+
 const handleMiniverseOverlayClick = (event: MouseEvent) => {
-  if (focusedMiniverse.value && event.target?.className === "miniverse-sheet-page-overlay") {
+  if (currentMode.value === 'focus' && event.target?.className === "miniverse-sheet-page-overlay") {
     router.push("/");
   }
 };
 
 const handleSettingsOverlayClick = (event: MouseEvent) => {
-  if (isSettingsRoute.value && event.target?.className === "settings-overlay") {
+  if (currentMode.value === 'settings' && event.target?.className === "settings-overlay") {
     router.push("/");
   }
 };
-
-const isSettingsRoute = computed(() => {
-  return route.matched.some(record => record.path === '/settings');
-});
-
-const currentViewMode = computed(() => {
-  if (isSettingsRoute.value) return 'settings';
-  if (focusedMiniverse.value) return 'focus';
-  return 'home';
-});
-
-watch([currentViewMode, systemRef], ([newMode, system], [oldMode, oldSystem]) => {
-  if (!system?.manager) return;
-  const isFirstMount = !oldSystem;
-  const shouldAnimate = !isFirstMount;
-  system.manager.setViewMode(newMode, shouldAnimate);
-}, { immediate: true });
 
 const openNewMiniverseDialog = () => {
   showAddMiniversePopup.value = true;
 };
 
-provide('miniverse', focusedMiniverse);
+provide('miniverse', store.focusedMiniverse);
 </script>
 
 <template>
   <TresCanvas window-size clear-color="black" :antialias="false">
-    <MiniversesListDisplay ref="systemRef" :router="router" :route="route"></MiniversesListDisplay>
+    <MiniversesListDisplay :mode="currentMode"></MiniversesListDisplay>
   </TresCanvas>
   <div id="overlays-wrapper">
     <transition name="fade">
-      <div class="main-overlay-wrapper" v-if="focusedMiniverse" @click="handleMiniverseOverlayClick($event)">
+      <div class="main-overlay-wrapper" v-if="store.focusedMiniverse" @click="handleMiniverseOverlayClick($event)">
         <div class="miniverse-sheet-page-overlay">
           <MiniverseSheet>
             <router-view />
@@ -73,7 +67,7 @@ provide('miniverse', focusedMiniverse);
     </transition>
 
     <transition name="fade-right">
-      <div class="main-overlay-wrapper" v-if="isSettingsRoute" @click="handleSettingsOverlayClick($event)">
+      <div class="main-overlay-wrapper" v-if="currentMode === 'settings'" @click="handleSettingsOverlayClick($event)">
         <div class="settings-overlay">
           <Settings />
         </div>

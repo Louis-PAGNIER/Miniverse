@@ -1,190 +1,105 @@
 <script setup lang="ts">
-import MiniverseView from "@/components/3D/MiniverseView.vue";
-import {Html, Stars} from "@tresjs/cientos";
+import {ref, computed, watch, onMounted, onBeforeUnmount} from "vue";
+import {Vector3} from "three";
 import {useLoop} from "@tresjs/core";
-import {computed, onBeforeUnmount, onMounted, Ref, ref, ShallowRef, shallowRef, watch} from "vue";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 import {Vector3Animator} from "@/composables/animations";
-import {MiniverseAnimatorManager} from "@/composables/useMiniverseGrid";
-import {Miniverse, MiniverseAnimator} from "@/models/miniverse";
-import {Group, Vector3} from "three";
-import {RouteLocation, Router} from "vue-router";
-import {sleep} from "@/composables/time";
+import {MiniverseLayoutCalculator, CAMERA_CONFIG, type ViewMode} from "@/composables/useMiniverseGrid";
+import MiniverseWrapper from "@/components/3D/MiniverseWrapper.vue";
+import {Stars} from "@tresjs/cientos";
 
-/* -------------------- Constants -------------------- */
-const DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 0, 40);
-const CAMERA_FOV: number = 30;
+const props = defineProps<{ mode: ViewMode }>();
+const store = useMiniverseStore();
 
-/* -------------------- Stores -------------------- */
-const miniverseStore = useMiniverseStore();
-
-/* -------------------- State -------------------- */
 const cameraRef = ref();
-const cameraPos = new Vector3Animator(DEFAULT_CAMERA_POSITION);
+const cameraPos = new Vector3Animator(new Vector3(0, 0, 40));
+const calculator = new MiniverseLayoutCalculator();
 
-const focusedMiniverse: Ref<MiniverseAnimator | null> = ref(null);
-const miniversesRefs = ref(new Map<string, Group>())
+const windowSize = ref({w: window.innerWidth, h: window.innerHeight});
+const wrapperRefs = new Map<string, any>();
 
-const miniverseAnimatorManager = new MiniverseAnimatorManager(cameraPos, focusedMiniverse);
-const miniverses = computed(() => Array.from(miniverseStore.miniverses.values()));
+const setWrapperRef = (el: any, id: any) => {
+  if (el) wrapperRefs.set(id, el);
+};
 
-const props = defineProps<{ route: RouteLocation, router: Router }>();
-
-const miniverseAnimatorsArray = computed(() =>
-    Array.from(miniverseStore.miniverseAnimators.values())
-);
-
-const miniverseViewRefs: Ref<Map<string, any>> = shallowRef(new Map());
-const explodingMiniverses = ref<any[]>([]);
-
-watch(miniverseAnimatorsArray, async (newList, oldList) => {
-  const removed = oldList.filter(oldItem =>
-      !newList.find(newItem => newItem.miniverse.id === oldItem.miniverse.id)
-  );
-
-  if (removed.length > 0) {
-    explodingMiniverses.value.push(...removed);
-
-    for (const item of removed) {
-      const view = miniverseViewRefs.value.get(item.miniverse.id);
-      if (view && view.explode) {
-        await view.explode(2.5);
-      }
-
-      explodingMiniverses.value = explodingMiniverses.value.filter(
-          i => i.miniverse.id !== item.miniverse.id
-      );
-    }
-  }
-}, { deep: true });
-
-const visibleMiniverses = computed(() => [
-  ...miniverseAnimatorsArray.value,
-  ...explodingMiniverses.value
-]);
-
-/* -------------------- Lifecycle Hooks -------------------- */
-onMounted(async () => {
-
-  function updateMiniverseFocus() {
-    const path = props.route.fullPath;
-    const match = path.match(/^\/miniverse\/([^\/#?&]+)/);
-    if (match) {
-      const id = match[1];
-      const miniverseAnimator = miniverseStore.miniverseAnimators.get(id);
-      if (miniverseAnimator) {
-        miniverseAnimatorManager.focusMiniverse(miniverseAnimator);
-      }
-    } else {
-      miniverseAnimatorManager.focusMiniverse(null);
-    }
-  }
-
-  watch(
-      miniverses, (newMiniverses, oldMiniverses) => {
-        const isAnimated = !!oldMiniverses && oldMiniverses.length > 0;
-        updateMiniverseFocus();
-        miniverseAnimatorManager.distributeMiniverses(isAnimated);
-  }, { immediate: true });
-
-  watch(
-      () => props.route.fullPath,
-      (newPath) => {
-        updateMiniverseFocus();
-      },
-      { immediate: true }
-  );
-
-  window.addEventListener("resize", miniverseAnimatorManager.handleResize);
-  document.addEventListener("wheel", miniverseAnimatorManager.handleScroll);
-
-  cameraRef.value.lookAt(0, 0, 0);
+const layoutTargets = computed(() => {
+  const _ = windowSize.value;
+  return calculator.calculate(store.miniverses, props.mode, store.focusedMiniverseId);
 });
 
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", miniverseAnimatorManager.handleResize);
-  document.removeEventListener("wheel", miniverseAnimatorManager.handleScroll);
-});
+watch(() => props.mode, (newMode) => {
+  const config = CAMERA_CONFIG[newMode];
+  if (config) {
+    cameraPos.setGoal(config.pos, config.duration, config.interpolation);
+  }
+}, {immediate: true});
 
-/* -------------------- Animation Loop -------------------- */
-const { onBeforeRender } = useLoop();
-onBeforeRender(({ delta }) => {
-  miniverseStore.miniverseAnimators.forEach((miniverseAnimator, miniverseId) => {
-    miniverseAnimator.positionAnimator.update(delta);
-    miniverseAnimator.scaleAnimator.update(delta);
-    const miniverseRef = miniversesRefs.value.get(miniverseId);
-
-    if (miniverseRef) {
-      miniverseRef.position.copy(miniverseAnimator.positionAnimator.value);
-      miniverseRef.scale.setScalar(miniverseAnimator.scaleAnimator.value);
-    }
-  });
-
+useLoop().onBeforeRender(({delta}) => {
   cameraPos.update(delta);
-  cameraRef.value.position.copy(cameraPos.value);
+  if (cameraRef.value) {
+    cameraRef.value.position.copy(cameraPos.value);
+  }
 });
 
-/* -------------------- Exposes -------------------- */
-defineExpose({
-  focusedMiniverse,
-  focusMiniverse: miniverseAnimatorManager.focusMiniverse,
-  manager: miniverseAnimatorManager
-})
-
-const setMiniversesGroupRef = (el: any | null, id: string) => {
-  if (el) {
-    miniversesRefs.value.set(id, el)
-  } else {
-    miniversesRefs.value.delete(id)
+const handleScroll = (e: WheelEvent) => {
+  if (props.mode === 'home') {
+    const minY = calculator.getMinY();
+    const targetY = Math.max(minY, Math.min(0, cameraPos.endValue.y - e.deltaY * 0.02));
+    cameraPos.setGoal(new Vector3(0, targetY, cameraPos.value.z), 0);
   }
 };
 
-const setMiniverseViewRef = (el: any | null, id: string) => {
-  if (el) {
-    miniverseViewRefs.value.set(id, el);
-  } else {
-    miniverseViewRefs.value.delete(id);
+const handleResize = () => {
+  windowSize.value = {w: window.innerWidth, h: window.innerHeight};
+};
+
+onMounted(() => {
+  document.addEventListener("wheel", handleScroll);
+  window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("wheel", handleScroll);
+  document.removeEventListener("resize", handleResize);
+});
+
+const onLeave = async (el: any, done: () => void) => {
+  const id = el.name;
+  const wrapper = wrapperRefs.get(id);
+
+  if (wrapper) {
+    try {
+      await wrapper.explode();
+    } finally {
+      wrapperRefs.delete(id);
+    }
   }
+  done();
 };
 </script>
 
 <template>
-  <TresPerspectiveCamera ref="cameraRef" :position="DEFAULT_CAMERA_POSITION" :fov="CAMERA_FOV" />
+  <TresPerspectiveCamera ref="cameraRef" :position="[0, 0, 40]" :fov="30"/>
   <Stars :size="0.1" :radius="20"/>
 
-  <TresGroup>
-    <template v-for="miniverseAnimator in visibleMiniverses" :key="miniverseAnimator.miniverse.id">
-      <TresGroup :ref="el => setMiniversesGroupRef(el, miniverseAnimator.miniverse.id)">
-        <MiniverseView v-if="!focusedMiniverse || focusedMiniverse.miniverse.id === miniverseAnimator.miniverse.id"
-                       :ref="el => setMiniverseViewRef(el, miniverseAnimator.miniverse.id)"
-                       @click="router.push(`/miniverse/${miniverseAnimator.miniverse.id}`)"
-                       @pointer-enter="miniverseAnimatorManager.handleMouseEnter(miniverseAnimator)"
-                       @pointer-leave="miniverseAnimatorManager.handleMouseLeave(miniverseAnimator)"
-                       :miniverse="miniverseAnimator.miniverse" />
-        <Html v-if="!focusedMiniverse && miniverseStore.miniverseAnimators.has(miniverseAnimator.miniverse.id)" transform :distance-factor="4" :position="[0, -5, 0]" :scale="[1.5, 1.5, 1.5]">
-        <div class="miniverse-name-wrapper">
-          <h1 class="miniverse-name">
-            {{ miniverseAnimator.miniverse.name }}
-          </h1>
-        </div>
-        </Html>
-      </TresGroup>
-    </template>
+  <TresGroup v-if="cameraRef">
+    <TransitionGroup
+        :css="false"
+        @leave="onLeave"
+    >
+      <MiniverseWrapper
+          v-for="miniverse in store.miniverses"
+          :key="miniverse.id"
+          :name="miniverse.id"
+          :ref="(el) => setWrapperRef(el, miniverse.id)"
+          :miniverse="miniverse"
+          :targetPosition="layoutTargets.get(miniverse.id)?.position || new Vector3()"
+          :targetScale="layoutTargets.get(miniverse.id)?.scale || 1.0"
+          :isHomeMode="props.mode === 'home'"
+      />
+    </TransitionGroup>
   </TresGroup>
 
-  <TresAmbientLight :intensity="0.7" />
-  <TresPointLight :position="[5, 5, 2]" :intensity="75" />
+  <TresAmbientLight :intensity="0.7"/>
+  <TresPointLight :position="[5, 5, 2]" :intensity="75"/>
 </template>
-
-<style scoped>
-.miniverse-name {
-  cursor: text;
-}
-
-.miniverse-name-wrapper {
-  background: var(--color-background-primary);
-  opacity: 0.8;
-  padding: 8px 70px;
-  border-radius: 8px;
-}
-</style>

@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { Miniverse } from "@/models/miniverse";
-import {inject} from "vue";
-
 import Navigator from "@/components/miniverse-sheet/Navigator.vue";
 import {sheetPagesRoutes} from "@/router";
+import {useMiniverseStore} from "@/stores/miniverseStore";
 
-const miniverse = inject<Miniverse>('miniverse')!;
+const store = useMiniverseStore();
 </script>
 
 <template>
   <div id="sheets-container" class="presentation">
-    <h1 class="title">{{ miniverse.name }}</h1>
+    <h1 class="title">{{ store.focusedMiniverse?.name }}</h1>
     <div class="content">
       <Navigator
-        :basePath="`/miniverse/${miniverse.id}`"
+        :basePath="`/miniverse/${store.focusedMiniverse?.id}`"
         :routes="sheetPagesRoutes"
       />
       <slot></slot>

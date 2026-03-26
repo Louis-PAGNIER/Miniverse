@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, inject, ComputedRef } from "vue";
+import { computed } from "vue";
 import { Miniverse } from "@/models/miniverse";
 import { useMiniverseStore } from "@/stores/miniverseStore";
-import { Player } from "@/models/player";
 import { useToastStore } from "@/stores/toastStore";
 import Table, {Column} from "@/components/ui/Table.vue";
 import {apiBanPlayer, apiKickPlayer, apiSetPlayerOperator} from "@/api/miniverse";
@@ -15,13 +14,14 @@ import {
 import IconButton from "@/components/ui/IconButton.vue";
 import Chip from "@/components/ui/Chip.vue";
 import FlatPlayerHead from "@/components/FlatPlayerHead.vue";
+import {MSMPPlayer} from "@/models/player";
 
-const miniverse = inject<ComputedRef<Miniverse>>('miniverse')!;
-const miniverseStore = useMiniverseStore();
 const toastStore = useToastStore();
+const miniverseStore = useMiniverseStore();
+const miniverse = miniverseStore.focusedMiniverse as Miniverse;
 
-async function setPlayerOperator(player: Player, value: boolean) {
-  await apiSetPlayerOperator(miniverse.value.id, player.id, value);
+async function setPlayerOperator(player: MSMPPlayer, value: boolean) {
+  await apiSetPlayerOperator(miniverse.id, player.id, value);
   if (value) {
     toastStore.addToast('Operator added', `${player.name} is now operator.`, 'success');
   } else {
@@ -29,25 +29,22 @@ async function setPlayerOperator(player: Player, value: boolean) {
   }
 }
 
-async function kickPlayer(player: Player, reason: string = 'You have been kicked by an administrator') {
-  await apiKickPlayer(miniverse.value.id, player.id, reason);
+async function kickPlayer(player: MSMPPlayer, reason: string = 'You have been kicked by an administrator') {
+  await apiKickPlayer(miniverse.id, player.id, reason);
   toastStore.addToast('Player kicked', `${player.name} has been kicked successfully.`, 'success');
 }
 
-async function banPlayer(player: Player, reason: string = 'You have been banned by an administrator') {
-  await apiBanPlayer(miniverse.value.id, player.id, reason);
+async function banPlayer(player: MSMPPlayer, reason: string = 'You have been banned by an administrator') {
+  await apiBanPlayer(miniverse.id, player.id, reason);
   toastStore.addToast('Player banned', `${player.name} has been banned successfully.`, 'success');
 }
 
-const players = computed(() => {
-  const animators = miniverseStore.miniversePlayersLists.get(miniverse.value.id) || [];
-  return animators.map((p) => p.player);
-});
+const players = computed(() => miniverseStore.playersMap.get(miniverse.id) || []);
 
-const connectedPlayersTableColumns: Column<Player>[] = [
+const connectedPlayersTableColumns: Column<MSMPPlayer>[] = [
   { id: "head", name: "", },
-  { id: "username", name: "Username", value: (p: Player) => p.name, sortable: true },
-  { id: "role", name: "Role", sortable: true, sortValue: (p: Player) => p.is_operator },
+  { id: "username", name: "Username", value: (p: MSMPPlayer) => p.name, sortable: true },
+  { id: "role", name: "Role", sortable: true, sortValue: (p: MSMPPlayer) => false}, // TODO: //p.is_operator },
   { id: "actions", name: "Actions" },
 ]
 </script>
