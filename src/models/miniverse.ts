@@ -8,6 +8,7 @@ export interface Miniverse {
   name: string;
   type: MiniverseType;
   description: string;
+  java_version: string;
   mc_version: string;
   subdomain: string;
   is_on_lite_proxy: boolean;

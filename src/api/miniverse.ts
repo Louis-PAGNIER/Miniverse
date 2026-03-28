@@ -13,6 +13,7 @@ export async function apiCreateMiniverse(
   name: string,
   description: string,
   type: MiniverseType,
+  javaVersion: string | null = null,
   MCVersion: string,
   subdomain: string,
   liteProxy: boolean,
@@ -20,6 +21,7 @@ export async function apiCreateMiniverse(
   const response = await apiClient.post('/miniverses/', {
     name: name,
     type: type,
+    java_version: javaVersion,
     mc_version: MCVersion,
     description: description,
     subdomain: subdomain,
@@ -40,8 +42,16 @@ export async function apiRestartMiniverse(miniverseId: string): Promise<void> {
   await apiClient.put(`/miniverses/${miniverseId}/restart/`);
 }
 
-export async function apiUpdateMiniverseInfo(miniverseId: string, name?: string, description?: string, subdomain?: string, mc_version?: string, allow_bedrock?: boolean): Promise<void> {
-  const payload = {name, description, subdomain, mc_version, allow_bedrock};
+export async function apiUpdateMiniverseInfo(
+  miniverseId: string,
+  name?: string,
+  description?: string,
+  subdomain?: string,
+  java_version?: string,
+  mc_version?: string,
+  allow_bedrock?: boolean
+): Promise<void> {
+  const payload = {name, description, subdomain, java_version, mc_version, allow_bedrock};
   const cleanedPayload = Object.fromEntries(Object.entries(payload).filter(([_, value]) => value !== undefined));
   await apiClient.put(`/miniverses/${miniverseId}`, cleanedPayload);
 }

@@ -27,6 +27,7 @@ const newName = ref<string>('');
 const newDescription = ref<string>('');
 const newSubdomain = ref<string>('');
 const newGameVersion = ref<string>('');
+const newJavaVersion = ref<string>('');
 const showSnapshots = ref(false);
 const newAllowBedrock = ref(false);
 const versions = ref<MinecraftVersion[]>([]);
@@ -39,6 +40,11 @@ const options = computed(() => {
       .map(v => v.version);
 });
 
+const java_options = computed(() => {
+  return ["java25", "java21", "java17", "java11", "java8"]
+//   TODO : ask versions to backend
+})
+
 const hasGeneralInfoChanged = computed(() => {
   return newName.value !== miniverse.value.name ||
       newSubdomain.value !== miniverse.value.subdomain ||
@@ -46,12 +52,16 @@ const hasGeneralInfoChanged = computed(() => {
       newAllowBedrock.value !== miniverse.value.allow_bedrock;
 })
 
-const hasVersionChanged = computed(() => {
+const hasMCVersionChanged = computed(() => {
   return newGameVersion.value !== miniverse.value.mc_version;
 })
 
+const hasJavaVersionChanged = computed(() => {
+  return newGameVersion.value !== miniverse.value.java_version;
+})
+
 const hasChanged = computed(() => {
-  return hasGeneralInfoChanged.value || hasVersionChanged.value;
+  return hasGeneralInfoChanged.value || hasMCVersionChanged.value || hasJavaVersionChanged.value;
 });
 
 onMounted(async () => {
@@ -59,6 +69,7 @@ onMounted(async () => {
   newDescription.value = miniverse.value.description;
   newSubdomain.value = miniverse.value.subdomain;
   newGameVersion.value = miniverse.value.mc_version;
+  newJavaVersion.value = miniverse.value.java_version;
   showSnapshots.value = !isReleaseVersion(miniverse.value.mc_version);
   newAllowBedrock.value = miniverse.value.allow_bedrock;
 
@@ -78,7 +89,14 @@ async function submitChanges() {
   isUpdating.value = true;
 
   try {
-    await apiUpdateMiniverseInfo(miniverse.value.id, newName.value, newDescription.value, newSubdomain.value, newGameVersion.value, newAllowBedrock.value);
+    await apiUpdateMiniverseInfo(
+        miniverse.value.id,
+        newName.value,
+        newDescription.value,
+        newSubdomain.value,
+        newJavaVersion.value,
+        newGameVersion.value,
+        newAllowBedrock.value);
     toastStore.addToast('Configuration updated', 'Miniverse configuration successfully updated.');
   } finally {
     isUpdating.value = false;
@@ -90,12 +108,13 @@ async function submitChanges() {
   <div class="info-sheet-page">
     <teleport defer to="#sheets-container">
       <ActionButton v-if="hasChanged"
-          class="save-button"
-          @click="handleSave"
-          :disabled="isUpdating"
-          severity="success"
+                    class="save-button"
+                    @click="handleSave"
+                    :disabled="isUpdating"
+                    severity="success"
       >
-       <font-awesome-icon :icon="faSave"></font-awesome-icon> Save
+        <font-awesome-icon :icon="faSave"></font-awesome-icon>
+        Save
       </ActionButton>
     </teleport>
 
@@ -135,7 +154,7 @@ async function submitChanges() {
             :disabled="true"
         />
 
-        <h4>Version</h4>
+        <h4>MC Version</h4>
         <div class="version-controls">
           <Select
               v-model="newGameVersion"
@@ -146,6 +165,15 @@ async function submitChanges() {
               v-if="authStore.isAdmin"
               v-model="showSnapshots"
               label="Include snapshots"
+          />
+        </div>
+
+        <h4>Java Version</h4>
+        <div class="version-controls">
+          <Select
+              v-model="newJavaVersion"
+              :options="java_options"
+              :disabled="!authStore.isAdmin"
           />
         </div>
       </section>

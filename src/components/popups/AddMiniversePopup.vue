@@ -64,6 +64,7 @@ async function createMiniverse() {
         miniverseName.value,
         "",
         miniverseType.value,
+        null,
         miniverseSelectedVersion.value,
         miniverseSubdomain.value,
         miniverseLiteProxy.value
