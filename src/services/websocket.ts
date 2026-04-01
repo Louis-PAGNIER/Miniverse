@@ -84,6 +84,11 @@ const handleMiniverseChanges = async (_: any) => {
   store.setMiniverses(await apiGetMiniverses());
 };
 
+const handleMiniverseCreated = async (_: any) => {
+  const store = useMiniverseStore();
+  store.setMiniverses(await apiGetMiniverses(), true);
+};
+
 const handleMiniversePlayersChange = async (data: any) => {
   const store = useMiniverseStore();
   store.setMiniversePlayers(new Map<string, MSMPPlayer[]>([[data.miniverse_id, data.data]]));
@@ -95,7 +100,7 @@ const handleMiniverseBannedPlayersChange = async (data: any) => {
 }
 
 handlers.set("sync", handleSync);
-handlers.set("miniverse:created", handleMiniverseChanges);
+handlers.set("miniverse:created", handleMiniverseCreated);
 handlers.set("miniverse:deleted", handleMiniverseChanges);
 handlers.set("miniverse:updated", handleMiniverseChanges);
 

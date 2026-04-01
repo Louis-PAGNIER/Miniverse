@@ -23,8 +23,16 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     return miniverses.value.find((item) => item.id === id) ?? null;
   }
 
-  const setMiniverses = (data: Miniverse[]) => {
-    miniverses.value = data;
+  const setMiniverses = (newList: Miniverse[], markAsNew = false) => {
+    if (markAsNew) {
+      const currentIds = new Set(miniverses.value.map(m => m.id));
+      miniverses.value = newList.map(m => ({
+        ...m,
+        isNew: !currentIds.has(m.id)
+      }));
+    } else {
+      miniverses.value = newList;
+    }
   };
 
   function setFocus(id: string | null) {

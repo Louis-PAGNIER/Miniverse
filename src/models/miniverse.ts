@@ -19,6 +19,10 @@ export interface Miniverse {
   mods: Mod[];
 }
 
+export interface MiniverseUI extends Miniverse {
+  isNew?: boolean;
+}
+
 export class MiniverseAnimator {
   miniverse: Miniverse;
   positionAnimator: Vector3Animator;

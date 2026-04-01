@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {useLoop} from "@tresjs/core";
 import {Vector3} from "three";
-import {Miniverse} from "@/models/miniverse";
+import {MiniverseUI} from "@/models/miniverse";
 import {InterpolationType, NumberAnimator, Vector3Animator} from "@/composables/animations";
 import MiniverseView from "@/components/3D/MiniverseView.vue";
 import {router} from "@/router";
@@ -10,7 +10,7 @@ import {Html} from "@tresjs/cientos";
 import {useStableRef} from "@/composables/useStableRef";
 
 const props = defineProps<{
-  miniverse: Miniverse,
+  miniverse: MiniverseUI,
   targetPosition: Vector3,
   targetScale: number,
   isHomeMode: boolean
@@ -40,6 +40,13 @@ useLoop().onBeforeRender(({delta}) => {
   }
 });
 
+onMounted(() => {
+  if (props.miniverse.isNew) {
+    assemble();
+    props.miniverse.isNew = false;
+  }
+});
+
 const handleClick = () => {
   if (props.isHomeMode) {
     router.push(`/miniverse/${props.miniverse.id}`);
@@ -60,11 +67,12 @@ const handlePointerLeave = () => {
   }
 };
 
+const assemble = async () => {
+  await viewRef.value.assemble();
+};
+
 const explode = async () => {
-  const view = getView();
-  if (view?.explode) {
-    await view.explode();
-  }
+  await getView().explode();
 };
 
 defineExpose({

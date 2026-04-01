@@ -48,14 +48,15 @@ const blobSpeed = computed(() => {
   return props.miniverse.started ? 1.0 : 0.5;
 });
 
-const explode = async () => {
-  const blob = getBlob();
-  if (blob?.explode) {
-    await blob.explode();
-  }
+const assemble = async () => {
+  await blobRef.value.assemble();
 };
 
-defineExpose({explode});
+const explode = async () => {
+  await getBlob().explode();
+};
+
+defineExpose({assemble, explode});
 </script>
 
 <template>
