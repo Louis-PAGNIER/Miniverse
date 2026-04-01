@@ -17,13 +17,13 @@ import {useMiniverseStore} from "@/stores/miniverseStore";
 const authStore = useAuthStore();
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const miniverseUsers = ref<User[]>([]);
 const miniverseRoles = computed<Map<string, Role>>(() => {
   const m = new Map<string, Role>();
   console.log(miniverse)
-  for (let userRole of miniverse.users_roles)
+  for (let userRole of miniverse.value.users_roles)
     m.set(userRole.user_id, userRole.role)
   return m;
 })
@@ -43,22 +43,22 @@ function confirmRemoveUserFromMiniverse(user: User) {
 }
 
 async function removeUserFromMiniverse(userId: string) {
-  await apiSetUserRole(miniverse.id, userId, Role.NONE);
+  await apiSetUserRole(miniverse.value.id, userId, Role.NONE);
   await refreshMiniverseUsers();
 }
 
 async function setMiniverseUserRole(userId: string, role: Role) {
-  await apiSetUserRole(miniverse.id, userId, role);
+  await apiSetUserRole(miniverse.value.id, userId, role);
   await refreshMiniverseUsers();
 }
 
 async function addUser(username: string) {
-  await apiSetUserRole(miniverse.id, username, Role.USER);
+  await apiSetUserRole(miniverse.value.id, username, Role.USER);
   await refreshMiniverseUsers();
 }
 
 async function refreshMiniverseUsers() {
-  miniverseUsers.value = await apiListMiniverseUsersRole(miniverse.id);
+  miniverseUsers.value = await apiListMiniverseUsersRole(miniverse.value.id);
 }
 
 const addedUsersColumns: Column<User>[] = [

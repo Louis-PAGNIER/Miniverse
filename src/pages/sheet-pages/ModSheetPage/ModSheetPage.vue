@@ -16,7 +16,7 @@ import Tabs from "@/components/ui/Tabs.vue";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const route: RouteLocationNormalizedLoadedGeneric = useRoute();
 
@@ -29,7 +29,7 @@ const modAvailableVersions: Ref<ModrinthProjectVersion[]> = ref([]);
 const installedVersionDetails: Ref<ModrinthProjectVersion | null> = ref(null);
 
 const installedMod = computed(() => {
-  return miniverse.mods.find(m => m.project_id === modId.value)
+  return miniverse.value.mods.find(m => m.project_id === modId.value)
 })
 
 provide('modContext', {

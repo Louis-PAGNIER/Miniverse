@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {AnsiUp} from 'ansi_up';
-import {onUnmounted, ref, watch, nextTick} from "vue";
+import {onUnmounted, ref, watch, nextTick, computed} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {WS_BASE} from "@/api/api";
 import {useMiniverseStore} from "@/stores/miniverseStore";
@@ -9,7 +9,7 @@ const ansiUp = new AnsiUp();
 ansiUp.use_classes = true;
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const lines = ref<string[]>([]);
 const consoleScreenRef = ref<HTMLElement | null>(null);

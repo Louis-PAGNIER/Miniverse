@@ -2,9 +2,10 @@
 import {Miniverse} from "@/models/miniverse";
 import FileBrowser from "@/components/ui/FileBrowser.vue";
 import {useMiniverseStore} from "@/stores/miniverseStore";
+import {computed} from "vue";
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 </script>
 
 <template>

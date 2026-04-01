@@ -10,12 +10,16 @@ type MiniverseBannedPlayersMap = Map<string, MSMPPlayerBan[]>
 export const useMiniverseStore = defineStore('miniverse', () => {
 
   const miniverses = ref<Miniverse[]>([]);
-  const playersMap = ref<Map<string, MSMPPlayer[]>>(new Map());
+  const playersMap = reactive<Map<string, MSMPPlayer[]>>(new Map());
   const focusedMiniverseId = ref<string | null>(null);
 
-  const focusedMiniverse = computed(() =>
-    miniverses.value.find(m => m.id === focusedMiniverseId.value) || null
-  );
+  const focusedMiniverse = computed(() => {
+    if (!focusedMiniverseId.value) return null;
+
+    const found = miniverses.value.find(m => m.id === focusedMiniverseId.value);
+
+    return found || null;
+  });
 
   const miniverseBannedPlayersLists = reactive<MiniverseBannedPlayersMap>(new Map());
 
@@ -39,10 +43,6 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     focusedMiniverseId.value = id;
   }
 
-  const setMiniversePlayers = (newMap: Map<string, MSMPPlayer[]>) => {
-    playersMap.value = new Map(newMap);
-  };
-
   return {
     miniverses,
     focusedMiniverse,
@@ -52,6 +52,5 @@ export const useMiniverseStore = defineStore('miniverse', () => {
     getMiniverseById,
     setMiniverses,
     setFocus,
-    setMiniversePlayers
   };
 });

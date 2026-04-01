@@ -13,14 +13,14 @@ import {apiUnbanPlayer} from "@/api/miniverse";
 
 const toastStore = useToastStore();
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const bannedPlayers: ComputedRef<MSMPPlayerBan[]> = computed(() => {
-  return miniverseStore.miniverseBannedPlayersLists.get(miniverse.id) || [];
+  return miniverseStore.miniverseBannedPlayersLists.get(miniverse.value.id) || [];
 });
 
 async function unbanPlayer(player: MSMPPlayer) {
-  await apiUnbanPlayer(miniverse.id, player.id);
+  await apiUnbanPlayer(miniverse.value.id, player.id);
   toastStore.addToast('Player pardoned', `${player.name} is no longer banned.`, 'success');
 }
 

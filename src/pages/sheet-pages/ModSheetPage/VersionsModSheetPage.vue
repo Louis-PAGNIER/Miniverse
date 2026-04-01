@@ -5,7 +5,7 @@ import Table, {Column} from "@/components/ui/Table.vue";
 import Chip from "@/components/ui/Chip.vue";
 import IconButton from "@/components/ui/IconButton.vue";
 import {apiInstallMod} from "@/api/miniverse";
-import {capitalize, inject} from "vue";
+import {capitalize, computed, inject} from "vue";
 import {Miniverse} from "@/models/miniverse";
 import {useToastStore} from "@/stores/toastStore";
 import {ModrinthProjectVersion} from "@/models/mod";
@@ -13,7 +13,7 @@ import {computeVersionRange, formatBigNumber, timeAgo} from "@/composables/forma
 import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 const toastStore = useToastStore();
 
 const {
@@ -23,7 +23,7 @@ const {
 } = inject<any>('modContext');
 
 async function installMod(versionId: string) {
-  await apiInstallMod(miniverse.id, versionId)
+  await apiInstallMod(miniverse.value.id, versionId)
   toastStore.addToast('Mod installed', `Mod ${modDetails.value?.title} installed successfully.`, 'success');
 }
 

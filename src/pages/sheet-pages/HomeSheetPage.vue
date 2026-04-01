@@ -7,21 +7,21 @@ import {MiniverseType} from "@/models/enums/miniverseType";
 import {Miniverse} from "@/models/miniverse";
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const numberOfPlayers = computed(() =>
-    miniverseStore.playersMap.get(miniverse.id)?.length || 0
+    miniverseStore.playersMap.get(miniverse.value.id)?.length || 0
 );
 
 const supportMods = computed(() => {
-  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.type);
+  return [MiniverseType.FABRIC, MiniverseType.FORGE, MiniverseType.NEO_FORGE].includes(miniverse.value.type);
 })
 
 function titleCase(str: string): string {
   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
 }
 
-const loaderIcon = computed(() => miniverse.type.toLowerCase() + ".png");
+const loaderIcon = computed(() => miniverse.value.type.toLowerCase() + ".png");
 </script>
 
 <template>

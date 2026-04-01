@@ -23,7 +23,7 @@ import {useMiniverseStore} from "@/stores/miniverseStore";
 const authStore = useAuthStore();
 const toastStore = useToastStore();
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const newName = ref<string>('');
 const newDescription = ref<string>('');
@@ -48,18 +48,18 @@ const javaOptions = computed(() => {
 })
 
 const hasGeneralInfoChanged = computed(() => {
-  return newName.value !== miniverse.name ||
-      newSubdomain.value !== miniverse.subdomain ||
-      newDescription.value !== miniverse.description ||
-      newAllowBedrock.value !== miniverse.allow_bedrock;
+  return newName.value !== miniverse.value.name ||
+      newSubdomain.value !== miniverse.value.subdomain ||
+      newDescription.value !== miniverse.value.description ||
+      newAllowBedrock.value !== miniverse.value.allow_bedrock;
 })
 
 const hasGameVersionChanged = computed(() => {
-  return newGameVersion.value !== miniverse.mc_version;
+  return newGameVersion.value !== miniverse.value.mc_version;
 })
 
 const hasJavaVersionChanged = computed(() => {
-  return newGameVersion.value !== miniverse.java_version;
+  return newGameVersion.value !== miniverse.value.java_version;
 })
 
 const hasChanged = computed(() => {
@@ -67,20 +67,20 @@ const hasChanged = computed(() => {
 });
 
 onMounted(async () => {
-  newName.value = miniverse.name;
-  newDescription.value = miniverse.description;
-  newSubdomain.value = miniverse.subdomain;
-  newGameVersion.value = miniverse.mc_version;
-  newJavaVersion.value = miniverse.java_version;
-  newJavaVersion.value = miniverse.java_version;
-  showSnapshots.value = !isReleaseVersion(miniverse.mc_version);
-  newAllowBedrock.value = miniverse.allow_bedrock;
+  newName.value = miniverse.value.name;
+  newDescription.value = miniverse.value.description;
+  newSubdomain.value = miniverse.value.subdomain;
+  newGameVersion.value = miniverse.value.mc_version;
+  newJavaVersion.value = miniverse.value.java_version;
+  newJavaVersion.value = miniverse.value.java_version;
+  showSnapshots.value = !isReleaseVersion(miniverse.value.mc_version);
+  newAllowBedrock.value = miniverse.value.allow_bedrock;
 
-  versions.value = await apiGetMinecraftVersions(miniverse.mc_version);
+  versions.value = await apiGetMinecraftVersions(miniverse.value.mc_version);
 });
 
 async function handleSave() {
-  if (newGameVersion.value !== miniverse.mc_version) {
+  if (newGameVersion.value !== miniverse.value.mc_version) {
     showConfirmPopup.value = true;
   } else {
     await submitChanges();
@@ -93,7 +93,7 @@ async function submitChanges() {
 
   try {
     await apiUpdateMiniverseInfo(
-        miniverse.id,
+        miniverse.value.id,
         newName.value,
         newDescription.value,
         newSubdomain.value,

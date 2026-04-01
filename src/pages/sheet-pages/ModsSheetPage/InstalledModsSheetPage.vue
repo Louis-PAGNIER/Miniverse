@@ -6,14 +6,14 @@ import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
 
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 const search = ref("");
 
 const filteredInstalledMods = computed(() => {
   const term = search.value.trim().toLowerCase();
 
-  return [...miniverse.mods]
+  return [...miniverse.value.mods]
       .filter(m => m.title.toLowerCase().includes(term))
       .sort((a, b) => a.title.localeCompare(b.title));
 });

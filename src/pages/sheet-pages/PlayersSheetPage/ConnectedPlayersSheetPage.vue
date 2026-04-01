@@ -18,10 +18,10 @@ import {MSMPPlayer} from "@/models/player";
 
 const toastStore = useToastStore();
 const miniverseStore = useMiniverseStore();
-const miniverse = miniverseStore.focusedMiniverse as Miniverse;
+const miniverse = computed(() => miniverseStore.focusedMiniverse as Miniverse);
 
 async function setPlayerOperator(player: MSMPPlayer, value: boolean) {
-  await apiSetPlayerOperator(miniverse.id, player.id, value);
+  await apiSetPlayerOperator(miniverse.value.id, player.id, value);
   if (value) {
     toastStore.addToast('Operator added', `${player.name} is now operator.`, 'success');
   } else {
@@ -30,16 +30,16 @@ async function setPlayerOperator(player: MSMPPlayer, value: boolean) {
 }
 
 async function kickPlayer(player: MSMPPlayer, reason: string = 'You have been kicked by an administrator') {
-  await apiKickPlayer(miniverse.id, player.id, reason);
+  await apiKickPlayer(miniverse.value.id, player.id, reason);
   toastStore.addToast('Player kicked', `${player.name} has been kicked successfully.`, 'success');
 }
 
 async function banPlayer(player: MSMPPlayer, reason: string = 'You have been banned by an administrator') {
-  await apiBanPlayer(miniverse.id, player.id, reason);
+  await apiBanPlayer(miniverse.value.id, player.id, reason);
   toastStore.addToast('Player banned', `${player.name} has been banned successfully.`, 'success');
 }
 
-const players = computed(() => miniverseStore.playersMap.get(miniverse.id) || []);
+const players = computed(() => miniverseStore.playersMap.get(miniverse.value.id) || []);
 
 const connectedPlayersTableColumns: Column<MSMPPlayer>[] = [
   { id: "head", name: "", },
