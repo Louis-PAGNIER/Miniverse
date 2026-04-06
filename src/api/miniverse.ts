@@ -16,6 +16,7 @@ export async function apiCreateMiniverse(
   javaVersion: string | null = null,
   MCVersion: string,
   subdomain: string,
+  onlineMode: boolean,
   liteProxy: boolean,
 ): Promise<Miniverse> {
   const response = await apiClient.post('/miniverses/', {
@@ -25,6 +26,7 @@ export async function apiCreateMiniverse(
     mc_version: MCVersion,
     description: description,
     subdomain: subdomain,
+    online_mode: onlineMode,
     is_on_lite_proxy: liteProxy,
   });
   return response.data;

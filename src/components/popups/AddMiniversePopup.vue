@@ -67,6 +67,7 @@ async function createMiniverse() {
         null,
         miniverseSelectedVersion.value,
         miniverseSubdomain.value,
+        true,
         miniverseLiteProxy.value
     );
     clearInputs();
