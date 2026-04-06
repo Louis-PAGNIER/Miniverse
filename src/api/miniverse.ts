@@ -49,9 +49,10 @@ export async function apiUpdateMiniverseInfo(
   subdomain?: string,
   java_version?: string,
   mc_version?: string,
+  online_mode?: boolean,
   allow_bedrock?: boolean
 ): Promise<void> {
-  const payload = {name, description, subdomain, java_version, mc_version, allow_bedrock};
+  const payload = {name, description, subdomain, java_version, mc_version, online_mode, allow_bedrock};
   const cleanedPayload = Object.fromEntries(Object.entries(payload).filter(([_, value]) => value !== undefined));
   await apiClient.put(`/miniverses/${miniverseId}`, cleanedPayload);
 }

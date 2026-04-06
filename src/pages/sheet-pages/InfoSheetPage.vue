@@ -30,6 +30,7 @@ const newDescription = ref<string>('');
 const newSubdomain = ref<string>('');
 const newGameVersion = ref<string>('');
 const newJavaVersion = ref<string>('');
+const newOnlineMode = ref<boolean>(false);
 const showSnapshots = ref(false);
 const newAllowBedrock = ref(false);
 const versions = ref<MinecraftVersion[]>([]);
@@ -54,16 +55,20 @@ const hasGeneralInfoChanged = computed(() => {
       newAllowBedrock.value !== miniverse.value.allow_bedrock;
 })
 
+const hasOnlineModeChanged = computed(() => {
+  return newOnlineMode.value !== miniverse.value.online_mode;
+})
+
 const hasGameVersionChanged = computed(() => {
   return newGameVersion.value !== miniverse.value.mc_version;
 })
 
 const hasJavaVersionChanged = computed(() => {
-  return newGameVersion.value !== miniverse.value.java_version;
+  return newJavaVersion.value !== miniverse.value.java_version;
 })
 
 const hasChanged = computed(() => {
-  return hasGeneralInfoChanged.value || hasGameVersionChanged.value || hasJavaVersionChanged.value;
+  return hasGeneralInfoChanged.value || hasGameVersionChanged.value || hasJavaVersionChanged.value || hasOnlineModeChanged.value;
 });
 
 onMounted(async () => {
@@ -71,7 +76,7 @@ onMounted(async () => {
   newDescription.value = miniverse.value.description;
   newSubdomain.value = miniverse.value.subdomain;
   newGameVersion.value = miniverse.value.mc_version;
-  newJavaVersion.value = miniverse.value.java_version;
+  newOnlineMode.value = miniverse.value.online_mode;
   newJavaVersion.value = miniverse.value.java_version;
   showSnapshots.value = !isReleaseVersion(miniverse.value.mc_version);
   newAllowBedrock.value = miniverse.value.allow_bedrock;
@@ -80,7 +85,7 @@ onMounted(async () => {
 });
 
 async function handleSave() {
-  if (newGameVersion.value !== miniverse.value.mc_version) {
+  if (hasGameVersionChanged || hasJavaVersionChanged || hasOnlineModeChanged) {
     showConfirmPopup.value = true;
   } else {
     await submitChanges();
@@ -99,6 +104,7 @@ async function submitChanges() {
         newSubdomain.value,
         newJavaVersion.value,
         newGameVersion.value,
+        newOnlineMode.value,
         newAllowBedrock.value);
     toastStore.addToast('Configuration updated', 'Miniverse configuration successfully updated.');
   } finally {
@@ -137,12 +143,14 @@ async function submitChanges() {
         <h4>Description</h4>
         <TextArea style="width: 100%;" v-model="newDescription" placeholder="Description..."></TextArea>
 
-        <h4>Bedrock</h4>
-        <Checkbox
-            v-if="authStore.isAdmin && !miniverse.is_on_lite_proxy"
-            v-model="newAllowBedrock"
-            label="Allow bedrock players"
-        />
+        <div v-if="authStore.isAdmin && !miniverse.is_on_lite_proxy">
+          <h4>Bedrock</h4>
+          <Checkbox
+              v-model="newAllowBedrock"
+              label="Allow bedrock players"
+          />
+        </div>
+
       </section>
 
       <Divider class="section-divider"/>
@@ -179,16 +187,24 @@ async function submitChanges() {
               :disabled="!authStore.isAdmin"
           />
         </div>
+
+        <h4>Other Settings</h4>
+        <Checkbox
+            v-model="newOnlineMode"
+            :disabled="!authStore.isAdmin"
+            label="Online mode"
+        />
       </section>
     </div>
 
     <MessagePopup
         v-model="showConfirmPopup"
-        title="Update Version?"
+        title="Restart server?"
         @ok="submitChanges"
     >
-      Changing the version to {{ newGameVersion }} will require a server restart.
-      Moreover, no server downgrade will be possible.
+      This action will require a server restart.
+      <span v-if="hasGameVersionChanged">Moreover, no server downgrade will be possible.</span>
+
       Continue?
     </MessagePopup>
   </div>

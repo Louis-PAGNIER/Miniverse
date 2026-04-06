@@ -11,6 +11,7 @@ export interface Miniverse {
   java_version: string;
   mc_version: string;
   subdomain: string;
+  online_mode: boolean;
   is_on_lite_proxy: boolean;
   started: boolean;
   allow_bedrock: boolean;
