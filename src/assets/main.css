@@ -80,7 +80,7 @@ a:hover {
     margin: 0 8px;
 }
 
-.scrollbar {
+.scrollbar, textarea {
     &::-webkit-scrollbar {
         width: 10px;
         height: 10px;

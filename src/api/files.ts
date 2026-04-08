@@ -101,3 +101,7 @@ export async function apiRenameItem(miniverseId: string, path: string, newName: 
     new_name: newName
   });
 }
+
+export async function apiGetFileContent(miniverseId: string, path: string): Promise<string> {
+  return (await apiClient.get(`/files/${miniverseId}/content?path=` + path)).data;
+}

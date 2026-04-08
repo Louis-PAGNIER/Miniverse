@@ -30,6 +30,7 @@
     "markdown-it-task-lists": "^2.1.1",
     "markdown-it-toc-done-right": "^4.2.0",
     "pinia": "^3.0.3",
+    "simple-code-editor": "^2.1.0",
     "skinview3d": "^3.1.0",
     "three": "^0.171.0",
     "tus-js-client": "^4.3.1",

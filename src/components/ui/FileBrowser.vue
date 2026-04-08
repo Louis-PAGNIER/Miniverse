@@ -15,6 +15,7 @@ import {
   apiDeleteFiles,
   apiDownloadMiniverseFiles,
   apiExtractArchive,
+  apiGetFileContent,
   apiListFiles,
   apiRenameItem,
   apiUploadFiles
@@ -23,6 +24,10 @@ import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 import ContextMenu, {ContextMenuItem} from "@/components/ui/ContextMenu.vue";
 import InputPopup from "@/components/popups/InputPopup.vue";
+
+import hljs from 'highlight.js';
+// @ts-ignore
+import CodeEditor from "simple-code-editor";
 
 const props = defineProps<{
   miniverse: Miniverse
@@ -37,6 +42,8 @@ const selectedPaths: Ref<Array<string>> = ref([]);
 const copiedPaths: Ref<Array<string>> = ref([]);
 const dropZoneVisibility: Ref<boolean> = ref(false);
 const showRenamePopup: Ref<boolean> = ref(false);
+const fileContent: Ref<string | null> = ref(null);
+const isCurrentPathAFile: Ref<boolean> = ref(false);
 
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>()
 
@@ -76,8 +83,20 @@ function normalizePath(path?: string): string {
   return path.startsWith("/") ? path : "/" + path;
 }
 
+async function loadFileContent(path: string) {
+  fileContent.value = await apiGetFileContent(props.miniverse.id, path);
+  isCurrentPathAFile.value = true;
+}
+
 async function refreshFiles() {
-  files.value = await apiListFiles(props.miniverse.id, browsingPath.value);
+  const fetchedFiles = await apiListFiles(props.miniverse.id, browsingPath.value);
+  if (fetchedFiles !== null) {
+    files.value = fetchedFiles
+    isCurrentPathAFile.value = false;
+    fileContent.value = null;
+  } else {
+    await loadFileContent(browsingPath.value);
+  }
 }
 
 async function navigateFileBrowserTo(path: string) {
@@ -299,6 +318,7 @@ onUnmounted(() => {
       </div>
 
       <div class="dropzone"
+           v-if="!isCurrentPathAFile"
            @dragleave="dropZoneVisibility = false"
            @drop="onDrop"
            :style="{visibility: dropZoneVisibility ? 'visible' : 'hidden'}">
@@ -308,7 +328,18 @@ onUnmounted(() => {
       <div class="content scrollbar"
            @dragenter="dropZoneVisibility = true"
       >
+        <div v-if="isCurrentPathAFile" class="file-editor-container">
+          <CodeEditor :highlight="hljs"
+                      width="100%"
+                      height="100%"
+                      :line-nums="true"
+                      :languages="[[browsingPath.split('.').toReversed()[0]]]"
+                      v-model="fileContent">
+          </CodeEditor>
+        </div>
+
         <Table
+            v-else
             v-model:selectedKeys="selectedPaths"
             :columns="browserColumns"
             :rows="files"
@@ -396,6 +427,11 @@ onUnmounted(() => {
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
+
+      .file-editor-container {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
