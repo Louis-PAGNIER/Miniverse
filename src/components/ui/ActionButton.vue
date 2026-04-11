@@ -1,20 +1,29 @@
 <script setup lang="ts">
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {computed, useSlots} from "vue";
+import {IconDefinition} from "@fortawesome/free-brands-svg-icons";
+
 const props = defineProps<{
-  icon?: string;
+  icon?: string | IconDefinition;
   disabled?: boolean;
-  severity: 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  severity?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  size?: 'normal' | 'small'
 }>();
 
-const icons = import.meta.glob('@/assets/icons/*', { eager: true, import: 'default' })
+const slots = useSlots();
+const hasSlot = computed(() => {
+  const slot = slots.default?.();
+  return slot && slot.length > 0;
+});
 </script>
 
 <template>
   <button
       class="button"
-      :class="[severity, { disabled }]"
+      :class="[severity, size, { disabled}]"
       :disabled="disabled"
   >
-    <img v-if="icon" :src="icons[`/src/assets/icons/${icon}`]" class="icon svg-primary" />
+    <font-awesome-icon v-if="icon" :icon="icon" :class="{ icon: true, 'icon-spaced': hasSlot }"></font-awesome-icon>
     <span class="label"><slot/></span>
   </button>
 </template>
@@ -27,17 +36,29 @@ const icons = import.meta.glob('@/assets/icons/*', { eager: true, import: 'defau
   justify-content: center;
   gap: 2px;
   padding: 10px;
-  border: none;
   border-radius: 8px;
   font-size: 1em;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: 0.2s;
   margin: 4px 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-background-accent);
+  color: var(--color-primary);
+
+  &.small {
+    font-size: 0.85em;
+    height: 30px;
+    padding: 6px 14px;
+  }
 
   &.disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  &:hover {
+    border-color: var(--color-primary);
   }
 
   &.primary {
@@ -50,38 +71,42 @@ const icons = import.meta.glob('@/assets/icons/*', { eager: true, import: 'defau
   }
 
   &.success {
-    background-color: var(--color-success);
-    color: white;
+    border-color: var(--color-success);
+    color: var(--color-success);
 
     &:hover:not(.disabled) {
-      background-color: var(--color-success-secondary);
+      border-color: var(--color-success-secondary);
+      color: var(--color-success-secondary);
     }
   }
 
   &.warning {
-    background-color: var(--color-warning);
-    color: white;
+    border-color: var(--color-warning);
+    color: var(--color-warning);
 
     &:hover:not(.disabled) {
-      background-color: var(--color-warning-secondary);
+      border-color: var(--color-warning-secondary);
+      color: var(--color-warning-secondary);
     }
   }
 
   &.danger {
-    background-color: var(--color-danger);
-    color: white;
+    border-color: var(--color-danger);
+    color: var(--color-danger);
 
     &:hover:not(.disabled) {
-      background-color: var(--color-danger-secondary);
+      border-color: var(--color-danger-secondary);
+      color: var(--color-danger-secondary);
     }
   }
 
   &.info {
-    background-color: var(--color-info);
-    color: white;
+    border-color: var(--color-info);
+    color: var(--color-info);
 
     &:hover:not(.disabled) {
-      background-color: var(--color-info-secondary);
+      border-color: var(--color-info-secondary);
+      color: var(--color-info-secondary);
     }
   }
 

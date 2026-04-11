@@ -38,9 +38,8 @@ const store = useToastStore();
   border-radius: 8px;
   width: 280px;
   box-shadow: 0 4px 17px rgba(255, 255, 255, 0.15);
-  color: var(--color-primary);
+  color: var(--color-primary) !important;
   font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.4);
 
   .message, .title {
     width: 100%;
