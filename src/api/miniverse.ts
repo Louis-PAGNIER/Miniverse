@@ -26,6 +26,7 @@ export async function apiCreateMiniverse(
     description: description,
     subdomain: subdomain,
     is_on_lite_proxy: liteProxy,
+    online_mode: true
   });
   return response.data;
 }
