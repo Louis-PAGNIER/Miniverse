@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Button from "@/components/ui/OverlayButton.vue";
 import {faArchive, faArrowUp, faCopy, faDownload, faPaste, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Input from "@/components/ui/Input.vue";
 import {computed, onMounted, onUnmounted, Ref, ref, watch} from "vue";
@@ -15,14 +14,19 @@ import {
   apiDeleteFiles,
   apiDownloadMiniverseFiles,
   apiExtractArchive,
+  apiGetFileContent,
   apiListFiles,
-  apiRenameItem,
+  apiRenameItem, apiSetFileContent,
   apiUploadFiles
 } from "@/api/files";
 import {Miniverse} from "@/models/miniverse";
 import {useRoute, useRouter} from "vue-router";
 import ContextMenu, {ContextMenuItem} from "@/components/ui/ContextMenu.vue";
 import InputPopup from "@/components/popups/InputPopup.vue";
+import FileEditor from "@/components/ui/FileEditor.vue";
+import ActionButton from "@/components/ui/ActionButton.vue";
+import {showHTTPError} from "@/api/api";
+import {useToastStore} from "@/stores/toastStore";
 
 const props = defineProps<{
   miniverse: Miniverse
@@ -30,6 +34,7 @@ const props = defineProps<{
 
 const route = useRoute();
 const router = useRouter();
+const toastStore = useToastStore();
 
 const browsingPath: Ref<string> = ref("");
 const files: Ref<FileInfo[]> = ref([]);
@@ -37,6 +42,9 @@ const selectedPaths: Ref<Array<string>> = ref([]);
 const copiedPaths: Ref<Array<string>> = ref([]);
 const dropZoneVisibility: Ref<boolean> = ref(false);
 const showRenamePopup: Ref<boolean> = ref(false);
+const fileContent: Ref<string | null> = ref(null);
+const isCurrentPathAFile: Ref<boolean> = ref(false);
+const isFileToLarge: Ref<boolean> = ref(false);
 
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>()
 
@@ -76,8 +84,31 @@ function normalizePath(path?: string): string {
   return path.startsWith("/") ? path : "/" + path;
 }
 
+async function loadFileContent(path: string) {
+  try {
+    fileContent.value = await apiGetFileContent(props.miniverse.id, path);
+    isFileToLarge.value = false
+  } catch (e: any) {
+    if (e.status === 480) {
+      fileContent.value = null;
+      isFileToLarge.value = true
+    } else {
+      showHTTPError(e);
+    }
+    console.log(e)
+  }
+  isCurrentPathAFile.value = true;
+}
+
 async function refreshFiles() {
-  files.value = await apiListFiles(props.miniverse.id, browsingPath.value);
+  const fetchedFiles = await apiListFiles(props.miniverse.id, browsingPath.value);
+  if (fetchedFiles !== null) {
+    files.value = fetchedFiles
+    isCurrentPathAFile.value = false;
+    fileContent.value = null;
+  } else {
+    await loadFileContent(browsingPath.value);
+  }
 }
 
 async function navigateFileBrowserTo(path: string) {
@@ -212,6 +243,16 @@ const browserColumns: Column<FileInfo>[] = [
 const canPaste = computed(() => copiedPaths.value.length > 0);
 const canUncompress = computed(() => selectedPaths.value.every(p => p.toLowerCase().endsWith(".zip")));
 const canRename = computed(() => selectedPaths.value.length === 1);
+const browsingElementName = computed(() => {
+  const name = browsingPath.value.split("/");
+  return name.length > 0 ? name[name.length - 1] : "";
+})
+
+async function handleFileSave(content: string) {
+  const fileName = browsingElementName.value;
+  await apiSetFileContent(props.miniverse.id, browsingPath.value, content);
+  toastStore.addToast("Saved successfully", `${fileName} has been written successfully.`, 'success');
+}
 
 const nameOfFirstFile = computed(() => {
   if (selectedPaths.value.length === 0) return "";
@@ -289,16 +330,17 @@ onUnmounted(() => {
        @drop="(e) => {e.preventDefault()}">
     <div class="main">
       <div class="header">
-        <Button :icon="faTrash" severity="danger" @click="deleteSelection"></Button>
-        <Button :icon="faDownload" @click="downloadSelection"></Button>
-        <Button :icon="faArchive" @click="extractSelection"></Button>
-        <Button :icon="faCopy" @click="copySelection"></Button>
-        <Button :icon="faPaste" @click="pasteFiles"></Button>
-        <Button :icon="faArrowUp" @click="navigateFileBrowserToParent"></Button>
+        <ActionButton size="small" :icon="faTrash" severity="danger" @click="deleteSelection"></ActionButton>
+        <ActionButton size="small" :icon="faDownload" @click="downloadSelection"></ActionButton>
+        <ActionButton size="small" :icon="faArchive" @click="extractSelection"></ActionButton>
+        <ActionButton size="small" :icon="faCopy" @click="copySelection"></ActionButton>
+        <ActionButton size="small" :icon="faPaste" @click="pasteFiles"></ActionButton>
+        <ActionButton size="small" :icon="faArrowUp" @click="navigateFileBrowserToParent"></ActionButton>
         <Input class="input-path" v-model="browsingPath" placeholder="/" @keyup.enter="onPathBarValidate"></Input>
       </div>
 
       <div class="dropzone"
+           v-if="!isCurrentPathAFile"
            @dragleave="dropZoneVisibility = false"
            @drop="onDrop"
            :style="{visibility: dropZoneVisibility ? 'visible' : 'hidden'}">
@@ -308,7 +350,19 @@ onUnmounted(() => {
       <div class="content scrollbar"
            @dragenter="dropZoneVisibility = true"
       >
+        <div v-if="isCurrentPathAFile" class="file-editor-container">
+          <FileEditor v-if="!isFileToLarge"
+                      :filename=browsingElementName
+                      v-model="fileContent"
+                      :on-save="handleFileSave">
+          </FileEditor>
+          <div v-else class="file-to-large-disclaimer">
+            {{ browsingElementName }} file is too large.
+          </div>
+        </div>
+
         <Table
+            v-else
             v-model:selectedKeys="selectedPaths"
             :columns="browserColumns"
             :rows="files"
@@ -396,7 +450,25 @@ onUnmounted(() => {
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
+
+      .file-editor-container {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
+}
+
+.file-to-large-disclaimer {
+  background: #0d1117;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 1.75em;
+  color: var(--color-danger-secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

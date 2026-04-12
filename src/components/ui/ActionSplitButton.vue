@@ -113,11 +113,12 @@ onUnmounted(() => {
     }
 
     &.danger {
-      background: var(--color-danger-secondary);
+      background: var(--color-danger);
       color: var(--color-secondary);
 
       &:hover {
-        background: var(--color-danger);
+        background: var(--color-danger-tertiary);
+        color: var(--color-danger);
       }
     }
   }
@@ -168,10 +169,10 @@ onUnmounted(() => {
         }
 
         &.danger {
-          color: var(--color-danger-secondary);
+          color: var(--color-danger);
 
           &:hover {
-            background: var(--color-danger-secondary);
+            background: var(--color-danger);
             color: var(--color-secondary);
           }
         }
