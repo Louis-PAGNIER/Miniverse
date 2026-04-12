@@ -20,9 +20,18 @@ export async function apiCopyFiles(miniverseId: string, paths: string[], destina
 }
 
 export async function apiDownloadMiniverseFiles(miniverseId: string, paths: string[]): Promise<void> {
-  if (paths.length == 0) return;
+  if (paths.length === 0) return;
 
-  window.location.assign(`${API_BASE}/files/${miniverseId}/download?paths=${encodeURIComponent(paths.toString())}`);
+  const url = `${API_BASE}/files/${miniverseId}/download?paths=${encodeURIComponent(paths.join(','))}`;
+
+  const link = document.createElement('a');
+  link.href = url;
+
+  link.setAttribute('download', '');
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 export function apiUploadFiles(miniverseId: string, destination: string, files: File[], callback: () => Promise<void>): void {
