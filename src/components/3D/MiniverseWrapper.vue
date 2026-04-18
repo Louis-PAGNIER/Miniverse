@@ -86,8 +86,8 @@ defineExpose({
         ref="viewRef"
         :miniverse="miniverse"
         @click="handleClick"
-        @pointer-enter="handlePointerEnter"
-        @pointer-leave="handlePointerLeave"
+        @pointerenter="handlePointerEnter"
+        @pointerleave="handlePointerLeave"
     />
     <Html
         v-if="isHomeMode"

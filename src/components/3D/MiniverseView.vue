@@ -81,14 +81,17 @@ watch(() => state.value?.scene, (newScene) => {
 const airshipGroupRef = ref();
 const orbitRadius = 5;
 const orbitSpeed = 0.2;
+const randomPhase = Math.random() * Math.PI * 2;
+
 onBeforeRender(({ elapsed }) => {
   if (airshipGroupRef.value) {
-    const x = Math.cos(-elapsed * orbitSpeed) * orbitRadius
-    const z = Math.sin(-elapsed * orbitSpeed) * orbitRadius
+    const angle = (-elapsed * orbitSpeed) + randomPhase
+
+    const x = Math.cos(angle) * orbitRadius
+    const z = Math.sin(angle) * orbitRadius
 
     airshipGroupRef.value.position.set(x, 1, z)
-
-    airshipGroupRef.value.rotation.y = elapsed * orbitSpeed
+    airshipGroupRef.value.rotation.y = -angle
   }
 })
 </script>
@@ -105,7 +108,9 @@ onBeforeRender(({ elapsed }) => {
         :targetScale="scaleFactor"
     />
 
-    <TresGroup v-if="miniverse.name.toLowerCase() === 'aeronautics'" ref="airshipGroupRef" :scale="[0.05, 0.05, 0.05]" :position="[0, 0, 0]" :rotation="[0, 0, 0]">
+    <TresGroup v-if="miniverse.name.toLowerCase().includes('aeronautics')"
+               ref="airshipGroupRef"
+               :scale="[0.05, 0.05, 0.05]">
       <primitive v-if="state" :object="state?.scene" />
     </TresGroup>
 
