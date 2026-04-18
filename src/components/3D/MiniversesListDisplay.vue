@@ -101,5 +101,5 @@ const onLeave = async (el: any, done: () => void) => {
   </TresGroup>
 
   <TresAmbientLight :intensity="0.7"/>
-  <TresPointLight :position="[5, 5, 2]" :intensity="75"/>
+  <TresPointLight :position="[-10, 10, 10]" :intensity="150"/>
 </template>

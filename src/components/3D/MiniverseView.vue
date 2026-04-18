@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import {computed, ComputedRef, ref, watch} from 'vue';
-import Player from "@/components/3D/Player.vue";
+import {computed, ref, watch} from 'vue';
 import Blob from "@/components/3D/Blob.vue";
 import {generateFibonacciSphere} from "@/composables/maths";
-import {useLoop} from "@tresjs/core";
 import {Miniverse} from "@/models/miniverse";
 import {useMiniverseStore} from "@/stores/miniverseStore";
-import {arePlayerListsEqual, PlayerAnimator} from "@/models/player";
-import {Color, Group} from "three";
-import {InterpolationType} from "@/composables/animations";
-import {PlayerFloatAnimation} from "@/assets/minecraft-animations/PlayerFloat";
+import {Box3, Color, Vector3} from "three";
 import PlayerWrapper from "@/components/3D/PlayerWrapper.vue";
 import {useStableRef} from "@/composables/useStableRef";
+import {useGLTF} from '@tresjs/cientos'
+import {useLoop} from "@tresjs/core";
+
+const { onBeforeRender } = useLoop();
 
 const props = defineProps<{
   miniverse: Miniverse
@@ -57,6 +56,41 @@ const explode = async () => {
 };
 
 defineExpose({assemble, explode});
+
+/* Temporary code for Create Aeronautics */
+const path = '/src/assets/misc/airship.glb'
+const { state, nodes, materials } = useGLTF(path)
+
+watch(() => state.value?.scene, (newScene) => {
+  if (newScene) {
+    const box = new Box3().setFromObject(newScene)
+    const center = new Vector3()
+    box.getCenter(center)
+
+    newScene.position.sub(center)
+    newScene.traverse((child) => {
+      if (child?.isMesh) {
+        if (child.material) {
+          child.material.metalness = 0.1;
+        }
+      }
+    })
+  }
+}, { immediate: true })
+
+const airshipGroupRef = ref();
+const orbitRadius = 5;
+const orbitSpeed = 0.2;
+onBeforeRender(({ elapsed }) => {
+  if (airshipGroupRef.value) {
+    const x = Math.cos(-elapsed * orbitSpeed) * orbitRadius
+    const z = Math.sin(-elapsed * orbitSpeed) * orbitRadius
+
+    airshipGroupRef.value.position.set(x, 1, z)
+
+    airshipGroupRef.value.rotation.y = elapsed * orbitSpeed
+  }
+})
 </script>
 
 <template>
@@ -70,5 +104,10 @@ defineExpose({assemble, explode});
         :targetPosition="positions[index]"
         :targetScale="scaleFactor"
     />
+
+    <TresGroup v-if="miniverse.name.toLowerCase() === 'aeronautics'" ref="airshipGroupRef" :scale="[0.05, 0.05, 0.05]" :position="[0, 0, 0]" :rotation="[0, 0, 0]">
+      <primitive v-if="state" :object="state?.scene" />
+    </TresGroup>
+
   </TresGroup>
 </template>

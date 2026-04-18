@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Mesh, Vector2 } from "three";
 import { Ref, shallowRef, watch } from "vue";
-import { useRenderLoop } from "@tresjs/core";
 import * as THREE from "three";
 import {interpolate, InterpolationType} from "@/composables/animations";
+import {useLoop} from "@tresjs/core";
 
-const { onLoop } = useRenderLoop();
+const { onBeforeRender } = useLoop();
 
 const props = defineProps<{
   color1: THREE.Color,
@@ -143,7 +143,7 @@ const assemble = (duration: number = 2.0): Promise<void> => {
     if (blobRef.value) blobRef.value.visible = true;
 
     let elapsed = 0;
-    const { off } = onLoop(({ delta }) => {
+    const { off } = onBeforeRender(({ delta }) => {
       elapsed += delta;
       const progress = Math.min(elapsed / duration, 1);
 
@@ -163,7 +163,7 @@ const explode = (duration: number = 2.0): Promise<void> => {
 
     uniforms.uAssemble.value = 1.0;
 
-    const { off } = onLoop(({ delta }) => {
+    const { off } = onBeforeRender(({ delta }) => {
       elapsed += delta;
       const progress = Math.min(elapsed / duration, 1);
 
@@ -181,7 +181,7 @@ const explode = (duration: number = 2.0): Promise<void> => {
 watch(() => props.color1, (val) => { uniforms.uColor1.value = val; }, { immediate: true });
 watch(() => props.color2, (val) => { uniforms.uColor2.value = val; }, { immediate: true });
 
-onLoop(({delta}) => {
+onBeforeRender(({delta}) => {
   if (blobRef.value) {
     uniforms.uTime.value += delta * props.speed;
   }
