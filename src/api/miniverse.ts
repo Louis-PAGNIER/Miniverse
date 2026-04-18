@@ -28,7 +28,6 @@ export async function apiCreateMiniverse(
     subdomain: subdomain,
     online_mode: onlineMode,
     is_on_lite_proxy: liteProxy,
-    online_mode: true
   });
   return response.data;
 }

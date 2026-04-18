@@ -9,6 +9,7 @@ import PlayerWrapper from "@/components/3D/PlayerWrapper.vue";
 import {useStableRef} from "@/composables/useStableRef";
 import {useGLTF} from '@tresjs/cientos'
 import {useLoop} from "@tresjs/core";
+import airshipUrl from '@/assets/misc/airship.glb?url'
 
 const { onBeforeRender } = useLoop();
 
@@ -58,8 +59,7 @@ const explode = async () => {
 defineExpose({assemble, explode});
 
 /* Temporary code for Create Aeronautics */
-const path = '/src/assets/misc/airship.glb'
-const { state, nodes, materials } = useGLTF(path)
+const { state, nodes, materials } = useGLTF(airshipUrl)
 
 watch(() => state.value?.scene, (newScene) => {
   if (newScene) {
